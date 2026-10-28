@@ -10,5 +10,8 @@
 | --- | ---: | --- |
 | [src/PinDock/App.xaml.cs](../../src/PinDock/App.xaml.cs) | 2 | [1](src_PinDock_App.xaml.cs-80bd509d-1.md) |
 | [src/PinDock/AssemblyInfo.cs](../../src/PinDock/AssemblyInfo.cs) | 0 | [1](src_PinDock_AssemblyInfo.cs-7454da25-1.md) |
-| [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 16 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
-| [src/PinDock/MainWindow.xaml.cs](../../src/PinDock/MainWindow.xaml.cs) | 11 | [1](src_PinDock_MainWindow.xaml.cs-e7a13908-1.md) |
+| [src/PinDock/BookmarkEditor.xaml.cs](../../src/PinDock/BookmarkEditor.xaml.cs) | 5 | [1](src_PinDock_BookmarkEditor.xaml.cs-dd4b6496-1.md) |
+| [src/PinDock/BookmarkRow.cs](../../src/PinDock/BookmarkRow.cs) | 7 | [1](src_PinDock_BookmarkRow.cs-335705d0-1.md) |
+| [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 18 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
+| [src/PinDock/MainWindow.xaml.cs](../../src/PinDock/MainWindow.xaml.cs) | 14 | [1](src_PinDock_MainWindow.xaml.cs-e7a13908-1.md) |
+| [src/PinDock/ShellIconService.cs](../../src/PinDock/ShellIconService.cs) | 7 | [1](src_PinDock_ShellIconService.cs-5a643bb8-1.md) |

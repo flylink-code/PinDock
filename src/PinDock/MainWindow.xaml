@@ -9,10 +9,26 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,18,0,12">
             <Button Content="添加文件" Padding="12,7" Click="AddFile_Click"/>
             <Button Content="添加文件夹" Padding="12,7" Margin="8,0" Click="AddFolder_Click"/>
+            <Button Content="添加路径" Padding="12,7" Click="AddPath_Click"/>
+            <Button Content="编辑" Padding="12,7" Margin="8,0" Click="Edit_Click"/>
             <Button Content="打开" Padding="12,7" Click="Open_Click"/>
             <Button Content="移除收藏" Padding="12,7" Margin="8,0" Click="Remove_Click"/>
         </StackPanel>
-        <ListBox x:Name="ItemsList" Grid.Row="2" DisplayMemberPath="Name" MouseDoubleClick="Open_Click"/>
+        <ListBox x:Name="ItemsList" Grid.Row="2" MouseDoubleClick="Open_Click" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="4">
+                        <Border Width="32" Height="32" Background="#E4EDDF" CornerRadius="6" ToolTip="{Binding IconError}">
+                            <Grid><TextBlock Text="?" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#617667"/><Image Source="{Binding Icon}" Width="24" Height="24"/></Grid>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Bookmark.Name}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Bookmark.Path}" Foreground="#617667" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <TextBlock Grid.Row="3" Margin="0,12,0,0" Foreground="#617667" Text="将文件或文件夹拖入此窗口。移除收藏不会删除原文件。"/>
     </Grid>
 </Window>

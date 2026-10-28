@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Collections.cs) · page 1/1
 
-Source SHA-256: a959bf52a6e5461aaa2739876e48ef6f341c2775d24929c9af4255d6c80b04f1
+Source SHA-256: 1e26dcefd39224050dcdf94ee622dbb54fcb07f2cd4461612e2c8e3b1242b445
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -19,11 +19,13 @@ Source SHA-256: a959bf52a6e5461aaa2739876e48ef6f341c2775d24929c9af4255d6c80b04f1
 | LibraryData | class_declaration | PinDock | [16](../../src/PinDock/Collections.cs#L16) |
 | Version | property_declaration | PinDock::LibraryData | [18](../../src/PinDock/Collections.cs#L18) |
 | Items | property_declaration | PinDock::LibraryData | [19](../../src/PinDock/Collections.cs#L19) |
-| LibraryStore | class_declaration | PinDock | [22](../../src/PinDock/Collections.cs#L22) |
-| Load | method_declaration | PinDock::LibraryStore | [28](../../src/PinDock/Collections.cs#L28) |
-| Read | method_declaration | PinDock::LibraryStore | [41](../../src/PinDock/Collections.cs#L41) |
-| Save | method_declaration | PinDock::LibraryStore | [48](../../src/PinDock/Collections.cs#L48) |
-| IsDuplicate | method_declaration | PinDock::LibraryStore | [59](../../src/PinDock/Collections.cs#L59) |
+| UnsupportedLibraryVersionException | class_declaration | PinDock | [22](../../src/PinDock/Collections.cs#L22) |
+| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [24](../../src/PinDock/Collections.cs#L24) |
+| LibraryStore | class_declaration | PinDock | [27](../../src/PinDock/Collections.cs#L27) |
+| Load | method_declaration | PinDock::LibraryStore | [33](../../src/PinDock/Collections.cs#L33) |
+| Read | method_declaration | PinDock::LibraryStore | [46](../../src/PinDock/Collections.cs#L46) |
+| Save | method_declaration | PinDock::LibraryStore | [55](../../src/PinDock/Collections.cs#L55) |
+| IsDuplicate | method_declaration | PinDock::LibraryStore | [66](../../src/PinDock/Collections.cs#L66) |
 
 Parser recovery: 1 diagnostic(s). Inspect source; extraction may be incomplete.
-- line 22: ERROR
+- line 27: ERROR

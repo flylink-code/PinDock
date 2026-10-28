@@ -1,4 +1,5 @@
 using PinDock;
+using System.IO;
 
 string directory = Path.Combine(Path.GetTempPath(), "PinDock-tests-" + Guid.NewGuid());
 try
@@ -18,7 +19,28 @@ try
     if (recovered.Items.Count != 1) throw new Exception("Backup recovery failed");
     store.Save(recovered);
     if (store.Load().Items.Count != 1) throw new Exception("Recovery save failed");
-    Console.WriteLine("PASS: round trip, duplicates and backup recovery");
+    string path = Path.Combine(directory, "library.json");
+    File.WriteAllText(path, "{\"Version\":2,\"Items\":[]}");
+    try { store.Load(); throw new Exception("Future version must not use backup"); }
+    catch (UnsupportedLibraryVersionException) { }
+    if (!File.ReadAllText(path).Contains("\"Version\":2")) throw new Exception("Future version was changed");
+    File.WriteAllText(path, "{\"Version\":1,\"Items\":[{\"Path\":null}]}");
+    if (store.Load().Items.Count != 1) throw new Exception("Invalid item did not recover from backup");
+    var icons = new ShellIconService();
+    var folderIcon = await icons.GetAsync(directory);
+    var executableIcon = await icons.GetAsync(Environment.ProcessPath!);
+    string textFile = Path.Combine(directory, "文档.txt");
+    File.WriteAllText(textFile, "PinDock");
+    var fileIcon = await icons.GetAsync(textFile);
+    dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell")!)!;
+    dynamic shortcut = shell.CreateShortcut(Path.Combine(directory, "快捷方式.lnk"));
+    shortcut.TargetPath = Environment.ProcessPath;
+    shortcut.Save();
+    var shortcutIcon = await icons.GetAsync(Path.Combine(directory, "快捷方式.lnk"));
+    if (!folderIcon.IsFrozen || !executableIcon.IsFrozen || !fileIcon.IsFrozen || !shortcutIcon.IsFrozen) throw new Exception("Shell icon must be frozen for UI use");
+    if (!ReferenceEquals(folderIcon, await icons.GetAsync(directory))) throw new Exception("Icon cache missed");
+    Console.WriteLine("PASS: Windows Shell folder, executable, file and shortcut icons, frozen images and cache reuse");
+    Console.WriteLine("PASS: round trip, duplicates, backup recovery, invalid items and future-version protection");
 }
 finally
 {

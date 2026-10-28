@@ -19,6 +19,11 @@ public sealed class LibraryData
     public List<Bookmark> Items { get; set; } = [];
 }
 
+public sealed class UnsupportedLibraryVersionException : Exception
+{
+    public UnsupportedLibraryVersionException(int version) : base($"Unsupported library version: {version}") { }
+}
+
 public sealed class LibraryStore(string directory)
 {
     private readonly string path = Path.Combine(directory, "library.json");
@@ -41,7 +46,9 @@ public sealed class LibraryStore(string directory)
     private static LibraryData Read(string file)
     {
         var data = JsonSerializer.Deserialize<LibraryData>(File.ReadAllText(file), Options) ?? throw new InvalidDataException("Empty library");
-        if (data.Version != 1 || data.Items is null) throw new InvalidDataException("Unsupported or invalid library");
+        if (data.Version != 1) throw new UnsupportedLibraryVersionException(data.Version);
+        if (data.Items is null || data.Items.Any(item => item is null || string.IsNullOrWhiteSpace(item.Path) || item.Name is null || item.Arguments is null || item.WorkingDirectory is null))
+            throw new InvalidDataException("Invalid library items");
         return data;
     }
 
