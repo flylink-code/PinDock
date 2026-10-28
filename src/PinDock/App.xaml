@@ -3,13 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-        <SolidColorBrush x:Key="InkBrush" Color="#233B38"/>
-        <SolidColorBrush x:Key="MutedBrush" Color="#71817A"/>
-        <SolidColorBrush x:Key="PaperBrush" Color="#F7F8F2"/>
-        <SolidColorBrush x:Key="LineBrush" Color="#DCE3DA"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#236950"/>
-        <SolidColorBrush x:Key="SoftBrush" Color="#E4EDDF"/>
-        <SolidColorBrush x:Key="SelectedBrush" Color="#EDF3E7"/>
-        <SolidColorBrush x:Key="GlassBrush" Color="#E0F9FBF5"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="InkBrush" Color="#233B38"/>
+            <SolidColorBrush x:Key="MutedBrush" Color="#71817A"/>
+            <SolidColorBrush x:Key="PaperBrush" Color="#F7F8F2"/>
+            <SolidColorBrush x:Key="LineBrush" Color="#DCE3DA"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#236950"/>
+            <SolidColorBrush x:Key="SoftBrush" Color="#E4EDDF"/>
+            <SolidColorBrush x:Key="SelectedBrush" Color="#EDF3E7"/>
+            <SolidColorBrush x:Key="GlassBrush" Color="#E0F9FBF5"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace PinDock;
 
-public partial class BookmarkEditor : Window
+public partial class BookmarkEditor : CardWindowBase
 {
     public Bookmark Result { get; }
 

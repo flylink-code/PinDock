@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace PinDock;
 
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : CardWindowBase
 {
     private readonly AppController controller;
     private bool loading = true;
@@ -20,7 +20,7 @@ public partial class SettingsWindow : Window
     public void ShowSettings()
     {
         LoadFromSettings();
-        ShowPage("general");
+        NavGeneral.IsChecked = true;
         Show();
         Activate();
     }
@@ -33,6 +33,7 @@ public partial class SettingsWindow : Window
         ModeHotkey.IsChecked = s.DisplayMode == DisplayMode.Hotkey;
         ModeAutoHide.IsChecked = s.DisplayMode == DisplayMode.EdgeAutoHide;
         CollapseAfterLaunch.IsChecked = s.CollapseAfterLaunch;
+        HotkeyText.Text = $"{s.HotkeyModifiers.Replace("+", " + ")} + {s.HotkeyKey}";
         PaletteForest.IsChecked = s.Palette == Palette.Forest;
         PaletteOcean.IsChecked = s.Palette == Palette.Ocean;
         PaletteSand.IsChecked = s.Palette == Palette.Sand;
@@ -41,7 +42,7 @@ public partial class SettingsWindow : Window
         SelectCombo(ThemeBox, s.ThemeMode.ToString());
         SelectCombo(SizeBox, s.IconSize.ToString());
         OpacitySlider.Value = Math.Round(s.Opacity * 100);
-        OpacityLabel.Text = $"透明度 {(int)OpacitySlider.Value}%";
+        OpacityValue.Text = $"{(int)OpacitySlider.Value}%";
         TopmostBox.IsChecked = s.Topmost;
         AvoidFullscreenBox.IsChecked = s.AvoidFullscreen;
         LockPositionBox.IsChecked = s.LockPosition;
@@ -50,17 +51,49 @@ public partial class SettingsWindow : Window
         EdgeRight.IsChecked = s.DockEdge == DockEdge.Right;
         EdgeBottom.IsChecked = s.DockEdge == DockEdge.Bottom;
         SelectCombo(MonitorPolicyBox, s.MonitorPolicy.ToString());
-        MonitorBox.Items.Clear();
-        foreach (var monitor in MonitorQuery.All())
-        {
-            MonitorBox.Items.Add(new ComboBoxItem { Content = monitor.DisplayName, Tag = monitor.DeviceName });
-            if (string.Equals(monitor.DeviceName, s.MonitorDeviceName, StringComparison.OrdinalIgnoreCase) ||
-                (s.MonitorDeviceName is null && monitor.IsPrimary))
-                MonitorBox.SelectedItem = MonitorBox.Items[^1];
-        }
-        if (MonitorBox.SelectedItem is null && MonitorBox.Items.Count > 0) MonitorBox.SelectedIndex = 0;
-        MonitorBox.IsEnabled = s.MonitorPolicy == MonitorPolicy.Fixed;
+        BuildMonitorCards(s);
         loading = false;
+    }
+
+    private void BuildMonitorCards(AppSettings s)
+    {
+        MonitorList.Items.Clear();
+        var monitors = MonitorQuery.All();
+        string? selected = s.MonitorDeviceName ?? monitors.First(m => m.IsPrimary).DeviceName;
+        for (int i = 0; i < monitors.Count; i++)
+        {
+            var monitor = monitors[i];
+            var content = new StackPanel();
+            content.Children.Add(new TextBlock
+            {
+                Text = $"{i + 1} · {(monitor.IsPrimary ? "主显示器" : "外接显示器")}",
+                FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = $"{monitor.Bounds.Width:0} × {monitor.Bounds.Height:0}",
+                FontSize = 11, Margin = new Thickness(0, 4, 0, 0), HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = (System.Windows.Media.Brush)FindResource("MutedBrush")
+            });
+            var card = new RadioButton
+            {
+                GroupName = "Monitor",
+                Content = content,
+                Tag = monitor.DeviceName,
+                Style = (Style)FindResource("SelectCard"),
+                Margin = new Thickness(0, 0, i == monitors.Count - 1 ? 0 : 12, 0),
+                IsChecked = string.Equals(monitor.DeviceName, selected, StringComparison.OrdinalIgnoreCase),
+                IsEnabled = s.MonitorPolicy == MonitorPolicy.Fixed
+            };
+            card.Checked += SettingsChanged;
+            MonitorList.Items.Add(card);
+        }
+        MonitorHint.Text = s.MonitorPolicy == MonitorPolicy.Fixed
+            ? "Dock 固定显示在所选显示器上；该显示器被拔掉时回到主显示器。"
+            : s.MonitorPolicy == MonitorPolicy.Primary
+                ? "Dock 始终显示在系统主显示器上。"
+                : "每次呼出时，Dock 出现在鼠标所在的显示器上。";
+        ScreenLabel.Text = monitors.Count > 1 ? "显示器" : "主显示器";
     }
 
     private static void SelectCombo(ComboBox box, string tag)
@@ -71,13 +104,9 @@ public partial class SettingsWindow : Window
         }
     }
 
-    private void Nav_Click(object sender, RoutedEventArgs e)
+    private void Nav_Checked(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string page) ShowPage(page);
-    }
-
-    private void ShowPage(string page)
-    {
+        if (PanelGeneral is null || sender is not RadioButton { Tag: string page }) return;
         PanelGeneral.Visibility = page == "general" ? Visibility.Visible : Visibility.Collapsed;
         PanelAppearance.Visibility = page == "appearance" ? Visibility.Visible : Visibility.Collapsed;
         PanelBehavior.Visibility = page == "behavior" ? Visibility.Visible : Visibility.Collapsed;
@@ -92,8 +121,8 @@ public partial class SettingsWindow : Window
 
     private void Opacity_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        if (loading || OpacityLabel is null) return;
-        OpacityLabel.Text = $"透明度 {(int)OpacitySlider.Value}%";
+        if (loading) return;
+        OpacityValue.Text = $"{(int)OpacitySlider.Value}%";
         ApplyToSettings();
     }
 
@@ -123,9 +152,16 @@ public partial class SettingsWindow : Window
             : DockEdge.Bottom;
         if (MonitorPolicyBox.SelectedItem is ComboBoxItem policy && policy.Tag is string policyTag)
             s.MonitorPolicy = Enum.Parse<MonitorPolicy>(policyTag);
-        MonitorBox.IsEnabled = s.MonitorPolicy == MonitorPolicy.Fixed;
-        if (MonitorBox.SelectedItem is ComboBoxItem monitor && monitor.Tag is string device)
-            s.MonitorDeviceName = device;
+        foreach (RadioButton card in MonitorList.Items)
+        {
+            if (card.IsChecked == true && card.Tag is string device) s.MonitorDeviceName = device;
+            card.IsEnabled = s.MonitorPolicy == MonitorPolicy.Fixed;
+        }
+        MonitorHint.Text = s.MonitorPolicy == MonitorPolicy.Fixed
+            ? "Dock 固定显示在所选显示器上；该显示器被拔掉时回到主显示器。"
+            : s.MonitorPolicy == MonitorPolicy.Primary
+                ? "Dock 始终显示在系统主显示器上。"
+                : "每次呼出时，Dock 出现在鼠标所在的显示器上。";
         controller.ApplySettings();
     }
 
@@ -158,8 +194,6 @@ public partial class SettingsWindow : Window
             MessageBox.Show(this, $"导出失败：{ex.Message}");
         }
     }
-
-    private void Close_Click(object sender, RoutedEventArgs e) => Hide();
 
     protected override void OnClosing(CancelEventArgs e)
     {

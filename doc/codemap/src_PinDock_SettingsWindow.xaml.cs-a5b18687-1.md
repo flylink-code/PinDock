@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/SettingsWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 79f4c8ef5ca31cf13447916818d4c5abb21b1fb1553fd28a7f03f89890d11e51
+Source SHA-256: 6ecf9a0fd2cba531f9e033cfb55b94d407cc2d123fc444c5772a603f120faa7d
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -13,13 +13,12 @@ Source SHA-256: 79f4c8ef5ca31cf13447916818d4c5abb21b1fb1553fd28a7f03f89890d11e51
 | SettingsWindow | constructor_declaration | PinDock::SettingsWindow | [14](../../src/PinDock/SettingsWindow.xaml.cs#L14) |
 | ShowSettings | method_declaration | PinDock::SettingsWindow | [20](../../src/PinDock/SettingsWindow.xaml.cs#L20) |
 | LoadFromSettings | method_declaration | PinDock::SettingsWindow | [28](../../src/PinDock/SettingsWindow.xaml.cs#L28) |
-| SelectCombo | method_declaration | PinDock::SettingsWindow | [66](../../src/PinDock/SettingsWindow.xaml.cs#L66) |
-| Nav_Click | method_declaration | PinDock::SettingsWindow | [74](../../src/PinDock/SettingsWindow.xaml.cs#L74) |
-| ShowPage | method_declaration | PinDock::SettingsWindow | [79](../../src/PinDock/SettingsWindow.xaml.cs#L79) |
-| SettingsChanged | method_declaration | PinDock::SettingsWindow | [87](../../src/PinDock/SettingsWindow.xaml.cs#L87) |
-| Opacity_Changed | method_declaration | PinDock::SettingsWindow | [93](../../src/PinDock/SettingsWindow.xaml.cs#L93) |
-| ApplyToSettings | method_declaration | PinDock::SettingsWindow | [100](../../src/PinDock/SettingsWindow.xaml.cs#L100) |
-| Import_Click | method_declaration | PinDock::SettingsWindow | [132](../../src/PinDock/SettingsWindow.xaml.cs#L132) |
-| Export_Click | method_declaration | PinDock::SettingsWindow | [147](../../src/PinDock/SettingsWindow.xaml.cs#L147) |
-| Close_Click | method_declaration | PinDock::SettingsWindow | [162](../../src/PinDock/SettingsWindow.xaml.cs#L162) |
-| OnClosing | method_declaration | PinDock::SettingsWindow | [164](../../src/PinDock/SettingsWindow.xaml.cs#L164) |
+| BuildMonitorCards | method_declaration | PinDock::SettingsWindow | [58](../../src/PinDock/SettingsWindow.xaml.cs#L58) |
+| SelectCombo | method_declaration | PinDock::SettingsWindow | [99](../../src/PinDock/SettingsWindow.xaml.cs#L99) |
+| Nav_Checked | method_declaration | PinDock::SettingsWindow | [107](../../src/PinDock/SettingsWindow.xaml.cs#L107) |
+| SettingsChanged | method_declaration | PinDock::SettingsWindow | [116](../../src/PinDock/SettingsWindow.xaml.cs#L116) |
+| Opacity_Changed | method_declaration | PinDock::SettingsWindow | [122](../../src/PinDock/SettingsWindow.xaml.cs#L122) |
+| ApplyToSettings | method_declaration | PinDock::SettingsWindow | [129](../../src/PinDock/SettingsWindow.xaml.cs#L129) |
+| Import_Click | method_declaration | PinDock::SettingsWindow | [168](../../src/PinDock/SettingsWindow.xaml.cs#L168) |
+| Export_Click | method_declaration | PinDock::SettingsWindow | [183](../../src/PinDock/SettingsWindow.xaml.cs#L183) |
+| OnClosing | method_declaration | PinDock::SettingsWindow | [198](../../src/PinDock/SettingsWindow.xaml.cs#L198) |

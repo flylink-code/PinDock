@@ -2,7 +2,7 @@ using System.Windows;
 
 namespace PinDock;
 
-public partial class PromptDialog : Window
+public partial class PromptDialog : CardWindowBase
 {
     public string Result { get; private set; } = "";
 

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/PromptDialog.xaml.cs) · page 1/1
 
-Source SHA-256: 2e6c3414e0f975dcccb26f0e9c86e52ffc88171abd4b1baac4707e723fb829c4
+Source SHA-256: 98f2d88556215326953ee978b5df8ee55923e19bea8c6eb717438cea076f1685
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

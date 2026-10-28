@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkEditor.xaml.cs) · page 1/1
 
-Source SHA-256: 7e8228d719929f87b97c11aebb3b3dfa3949c4b5ea90321ef508c3d7cbc54450
+Source SHA-256: 36b05ac8beed5b6fd0cb43a81163354d74fc125fea5c4b235caa5c3b6e45cef8
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

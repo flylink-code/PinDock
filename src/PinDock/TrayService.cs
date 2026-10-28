@@ -13,11 +13,12 @@ public sealed class TrayService : IDisposable
 
     public TrayService()
     {
+        using var iconStream = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Assets/PinDock.ico")).Stream;
         icon = new System.Windows.Forms.NotifyIcon
         {
             Text = "PinDock",
             Visible = true,
-            Icon = SystemIcons.Application
+            Icon = new Icon(iconStream)
         };
         var menu = new System.Windows.Forms.ContextMenuStrip();
         menu.Items.Add("显示 / 隐藏 Dock", null, (_, _) => ToggleRequested?.Invoke());

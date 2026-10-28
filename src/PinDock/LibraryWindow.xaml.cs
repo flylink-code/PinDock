@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace PinDock;
 
-public partial class LibraryWindow : Window
+public partial class LibraryWindow : CardWindowBase
 {
     private readonly AppController controller;
     private readonly ShellIconService icons;
@@ -24,8 +24,9 @@ public partial class LibraryWindow : Window
     public void ShowLibrary(bool moreOverflow = false)
     {
         overflowOnly = moreOverflow;
-        TitleText.Text = moreOverflow ? "更多固定收藏" : "全部收藏";
+        Title = moreOverflow ? "更多固定收藏" : "全部收藏";
         filter = "all";
+        FilterAll.IsChecked = true;
         SearchBox.Text = "";
         search = "";
         Refresh();
@@ -43,6 +44,7 @@ public partial class LibraryWindow : Window
             pool = pool.Where(i => (i.Name + " " + i.Path + " " + i.Group).Contains(search, StringComparison.OrdinalIgnoreCase));
         var rows = pool.Select(item => new BookmarkRow(item, icons)).ToList();
         ItemsList.ItemsSource = rows;
+        EmptyText.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         CountText.Text = $"显示 {rows.Count} 项 · 共 {controller.Data.Items.Count} 项收藏 · {controller.Data.Items.Count(i => i.Pinned)} 项固定";
     }
 
@@ -54,14 +56,9 @@ public partial class LibraryWindow : Window
 
     private void FilterButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string tag)
-        {
-            filter = tag;
-            Refresh();
-        }
+        filter = (string)((RadioButton)sender).Tag;
+        Refresh();
     }
-
-    private void Close_Click(object sender, RoutedEventArgs e) => Hide();
 
     private void Add_Click(object sender, RoutedEventArgs e)
     {
