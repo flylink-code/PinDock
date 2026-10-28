@@ -1,0 +1,18 @@
+<Window x:Class="PinDock.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PinDock · 开发预览" Width="720" Height="480" MinWidth="500" MinHeight="320"
+        Background="#F4F7F0" WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="Window_Drop">
+    <Grid Margin="24">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="PinDock" FontSize="27" FontWeight="SemiBold" Foreground="#245B44"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,18,0,12">
+            <Button Content="添加文件" Padding="12,7" Click="AddFile_Click"/>
+            <Button Content="添加文件夹" Padding="12,7" Margin="8,0" Click="AddFolder_Click"/>
+            <Button Content="打开" Padding="12,7" Click="Open_Click"/>
+            <Button Content="移除收藏" Padding="12,7" Margin="8,0" Click="Remove_Click"/>
+        </StackPanel>
+        <ListBox x:Name="ItemsList" Grid.Row="2" DisplayMemberPath="Name" MouseDoubleClick="Open_Click"/>
+        <TextBlock Grid.Row="3" Margin="0,12,0,0" Foreground="#617667" Text="将文件或文件夹拖入此窗口。移除收藏不会删除原文件。"/>
+    </Grid>
+</Window>
