@@ -7,14 +7,28 @@ public partial class BookmarkEditor : Window
 {
     public Bookmark Result { get; }
 
-    public BookmarkEditor(Bookmark item)
+    public BookmarkEditor(Bookmark item, IEnumerable<string> groups)
     {
         InitializeComponent();
-        Result = new Bookmark { Id = item.Id, Name = item.Name, Path = item.Path, Arguments = item.Arguments, WorkingDirectory = item.WorkingDirectory, Pinned = item.Pinned };
+        Result = new Bookmark
+        {
+            Id = item.Id,
+            Name = item.Name,
+            Path = item.Path,
+            Arguments = item.Arguments,
+            WorkingDirectory = item.WorkingDirectory,
+            Group = item.Group,
+            Pinned = item.Pinned
+        };
         NameInput.Text = Result.Name;
         PathInput.Text = Result.Path;
         ArgumentsInput.Text = Result.Arguments;
         WorkingDirectoryInput.Text = Result.WorkingDirectory;
+        GroupInput.Items.Clear();
+        GroupInput.Items.Add("未分组");
+        foreach (string group in groups) GroupInput.Items.Add(group);
+        GroupInput.Text = string.IsNullOrEmpty(Result.Group) ? "未分组" : Result.Group;
+        PinnedInput.IsChecked = Result.Pinned;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -32,6 +46,9 @@ public partial class BookmarkEditor : Window
         if (Result.Name.Length == 0) Result.Name = path;
         Result.Arguments = ArgumentsInput.Text;
         Result.WorkingDirectory = WorkingDirectoryInput.Text.Trim();
+        string group = GroupInput.Text.Trim();
+        Result.Group = group is "" or "未分组" ? "" : group;
+        Result.Pinned = PinnedInput.IsChecked == true;
         DialogResult = true;
     }
 }

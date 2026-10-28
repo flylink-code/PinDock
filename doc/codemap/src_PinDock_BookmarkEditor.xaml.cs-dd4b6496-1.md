@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkEditor.xaml.cs) · page 1/1
 
-Source SHA-256: 6275649aeb727525b03a419990f7c21281c053bb7c52bd73ca86bac1ccc00245
+Source SHA-256: 7e8228d719929f87b97c11aebb3b3dfa3949c4b5ea90321ef508c3d7cbc54450
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,4 +12,4 @@ Source SHA-256: 6275649aeb727525b03a419990f7c21281c053bb7c52bd73ca86bac1ccc00245
 | BookmarkEditor | class_declaration | PinDock | [6](../../src/PinDock/BookmarkEditor.xaml.cs#L6) |
 | Result | property_declaration | PinDock::BookmarkEditor | [8](../../src/PinDock/BookmarkEditor.xaml.cs#L8) |
 | BookmarkEditor | constructor_declaration | PinDock::BookmarkEditor | [10](../../src/PinDock/BookmarkEditor.xaml.cs#L10) |
-| Save_Click | method_declaration | PinDock::BookmarkEditor | [20](../../src/PinDock/BookmarkEditor.xaml.cs#L20) |
+| Save_Click | method_declaration | PinDock::BookmarkEditor | [34](../../src/PinDock/BookmarkEditor.xaml.cs#L34) |

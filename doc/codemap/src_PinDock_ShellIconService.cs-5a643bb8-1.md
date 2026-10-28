@@ -4,14 +4,16 @@
 
 [Module](app.md) · [Source](../../src/PinDock/ShellIconService.cs) · page 1/1
 
-Source SHA-256: baf337d939e6e2d7ec28a672eb74ab32cc6cbef4b6738b300ac9a90bcd3cdccf
+Source SHA-256: e8506cc8529194a2aded4d332c187902000864138cb0ac72634db0bc1f9aaf90
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [8](../../src/PinDock/ShellIconService.cs#L8) |
-| ShellIconService | class_declaration | PinDock | [10](../../src/PinDock/ShellIconService.cs#L10) |
-| GetAsync | method_declaration | PinDock::ShellIconService | [15](../../src/PinDock/ShellIconService.cs#L15) |
-| Extract | method_declaration | PinDock::ShellIconService | [31](../../src/PinDock/ShellIconService.cs#L31) |
-| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [45](../../src/PinDock/ShellIconService.cs#L45) |
-| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [55](../../src/PinDock/ShellIconService.cs#L55) |
-| DestroyIcon | method_declaration | PinDock::ShellIconService | [58](../../src/PinDock/ShellIconService.cs#L58) |
+| ShellIconService | class_declaration | PinDock | [14](../../src/PinDock/ShellIconService.cs#L14) |
+| ShellIconService | constructor_declaration | PinDock::ShellIconService | [19](../../src/PinDock/ShellIconService.cs#L19) |
+| GetAsync | method_declaration | PinDock::ShellIconService | [26](../../src/PinDock/ShellIconService.cs#L26) |
+| Run | method_declaration | PinDock::ShellIconService | [42](../../src/PinDock/ShellIconService.cs#L42) |
+| Extract | method_declaration | PinDock::ShellIconService | [51](../../src/PinDock/ShellIconService.cs#L51) |
+| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [65](../../src/PinDock/ShellIconService.cs#L65) |
+| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [75](../../src/PinDock/ShellIconService.cs#L75) |
+| DestroyIcon | method_declaration | PinDock::ShellIconService | [78](../../src/PinDock/ShellIconService.cs#L78) |

@@ -1,9 +1,15 @@
-﻿<Application x:Class="PinDock.App"
+<Application x:Class="PinDock.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:PinDock"
-             StartupUri="MainWindow.xaml">
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="InkBrush" Color="#233B38"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#71817A"/>
+        <SolidColorBrush x:Key="PaperBrush" Color="#F7F8F2"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#DCE3DA"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#236950"/>
+        <SolidColorBrush x:Key="SoftBrush" Color="#E4EDDF"/>
+        <SolidColorBrush x:Key="SelectedBrush" Color="#EDF3E7"/>
+        <SolidColorBrush x:Key="GlassBrush" Color="#E0F9FBF5"/>
     </Application.Resources>
 </Application>

@@ -7,24 +7,44 @@ using System.Windows.Media.Imaging;
 
 namespace PinDock;
 
+/// <summary>
+/// SHGetFileInfo 依赖已初始化的 COM，并且在新进程里并发首次调用会失败。
+/// 所有提取都在同一个 STA 后台线程上串行执行。
+/// </summary>
 public sealed class ShellIconService
 {
     private readonly ConcurrentDictionary<string, Task<ImageSource>> cache = new(StringComparer.OrdinalIgnoreCase);
-    private readonly SemaphoreSlim workers = new(2);
+    private readonly BlockingCollection<(string Path, TaskCompletionSource<ImageSource> Result)> queue = [];
+
+    public ShellIconService()
+    {
+        var worker = new Thread(Run) { IsBackground = true, Name = "PinDock.ShellIcons" };
+        worker.SetApartmentState(ApartmentState.STA);
+        worker.Start();
+    }
 
     public async Task<ImageSource> GetAsync(string path)
     {
-        var task = cache.GetOrAdd(path, key => Task.Run(async () =>
+        var task = cache.GetOrAdd(path, key =>
         {
-            await workers.WaitAsync();
-            try { return Extract(key); }
-            finally { workers.Release(); }
-        }));
+            var result = new TaskCompletionSource<ImageSource>(TaskCreationOptions.RunContinuationsAsynchronously);
+            queue.Add((key, result));
+            return result.Task;
+        });
         try { return await task; }
         catch
         {
             cache.TryRemove(new KeyValuePair<string, Task<ImageSource>>(path, task));
             throw;
+        }
+    }
+
+    private void Run()
+    {
+        foreach (var (path, result) in queue.GetConsumingEnumerable())
+        {
+            try { result.SetResult(Extract(path)); }
+            catch (Win32Exception ex) { result.SetException(ex); }
         }
     }
 

@@ -10,13 +10,16 @@ public sealed class Bookmark
     public string Path { get; set; } = "";
     public string Arguments { get; set; } = "";
     public string WorkingDirectory { get; set; } = "";
+    public string Group { get; set; } = "";
     public bool Pinned { get; set; }
 }
 
 public sealed class LibraryData
 {
-    public int Version { get; set; } = 1;
+    public int Version { get; set; } = 2;
     public List<Bookmark> Items { get; set; } = [];
+    public List<string> Groups { get; set; } = [];
+    public AppSettings Settings { get; set; } = new();
 }
 
 public sealed class UnsupportedLibraryVersionException : Exception
@@ -46,14 +49,35 @@ public sealed class LibraryStore(string directory)
     private static LibraryData Read(string file)
     {
         var data = JsonSerializer.Deserialize<LibraryData>(File.ReadAllText(file), Options) ?? throw new InvalidDataException("Empty library");
-        if (data.Version != 1) throw new UnsupportedLibraryVersionException(data.Version);
-        if (data.Items is null || data.Items.Any(item => item is null || string.IsNullOrWhiteSpace(item.Path) || item.Name is null || item.Arguments is null || item.WorkingDirectory is null))
+        if (data.Version is not (1 or 2)) throw new UnsupportedLibraryVersionException(data.Version);
+        if (data.Items is null || data.Items.Any(item => item is null || string.IsNullOrWhiteSpace(item.Path) || item.Name is null || item.Arguments is null || item.WorkingDirectory is null || item.Group is null))
             throw new InvalidDataException("Invalid library items");
+        data.Groups ??= [];
+        data.Settings ??= new();
+        ValidateSettings(data.Settings);
+        if (data.Version == 1)
+        {
+            data.Version = 2;
+            foreach (var item in data.Items)
+                item.Group ??= "";
+        }
         return data;
+    }
+
+    private static void ValidateSettings(AppSettings settings)
+    {
+        if (settings.Opacity < AppSettings.MinOpacity || settings.Opacity > AppSettings.MaxOpacity)
+            throw new InvalidDataException($"Opacity out of range: {settings.Opacity}");
+        if (!Enum.IsDefined(settings.DisplayMode) || !Enum.IsDefined(settings.DockEdge) || !Enum.IsDefined(settings.ThemeMode) ||
+            !Enum.IsDefined(settings.Palette) || !Enum.IsDefined(settings.MonitorPolicy) || !Enum.IsDefined(settings.IconSize))
+            throw new InvalidDataException("Invalid settings enum value");
+        if (settings.HotkeyModifiers is null || settings.HotkeyKey is null)
+            throw new InvalidDataException("Hotkey settings missing");
     }
 
     public void Save(LibraryData data)
     {
+        data.Version = 2;
         Directory.CreateDirectory(directory);
         string temp = path + ".tmp";
         File.WriteAllText(temp, JsonSerializer.Serialize(data, Options));

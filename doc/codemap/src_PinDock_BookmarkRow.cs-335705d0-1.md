@@ -4,14 +4,17 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkRow.cs) · page 1/1
 
-Source SHA-256: 4a19812301db2e745abfb4c6797fdc3d74d291cab0745022c02b255335467f33
+Source SHA-256: d302f2cdb356ef34ef16bea770048e076a594c2254a75e5d16ab553718ef2ddb
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/BookmarkRow.cs#L4) |
-| BookmarkRow | class_declaration | PinDock | [6](../../src/PinDock/BookmarkRow.cs#L6) |
-| Bookmark | property_declaration | PinDock::BookmarkRow | [8](../../src/PinDock/BookmarkRow.cs#L8) |
-| Icon | property_declaration | PinDock::BookmarkRow | [9](../../src/PinDock/BookmarkRow.cs#L9) |
-| IconError | property_declaration | PinDock::BookmarkRow | [10](../../src/PinDock/BookmarkRow.cs#L10) |
-| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [13](../../src/PinDock/BookmarkRow.cs#L13) |
-| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [19](../../src/PinDock/BookmarkRow.cs#L19) |
+| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/BookmarkRow.cs#L5) |
+| BookmarkRow | class_declaration | PinDock | [7](../../src/PinDock/BookmarkRow.cs#L7) |
+| Bookmark | property_declaration | PinDock::BookmarkRow | [9](../../src/PinDock/BookmarkRow.cs#L9) |
+| Icon | property_declaration | PinDock::BookmarkRow | [10](../../src/PinDock/BookmarkRow.cs#L10) |
+| IconError | property_declaration | PinDock::BookmarkRow | [11](../../src/PinDock/BookmarkRow.cs#L11) |
+| Subtitle | property_declaration | PinDock::BookmarkRow | [12](../../src/PinDock/BookmarkRow.cs#L12) |
+| PinLabel | property_declaration | PinDock::BookmarkRow | [13](../../src/PinDock/BookmarkRow.cs#L13) |
+| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [16](../../src/PinDock/BookmarkRow.cs#L16) |
+| NotifyPinChanged | method_declaration | PinDock::BookmarkRow | [22](../../src/PinDock/BookmarkRow.cs#L22) |
+| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [28](../../src/PinDock/BookmarkRow.cs#L28) |

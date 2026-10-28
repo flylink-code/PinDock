@@ -4,9 +4,11 @@
 
 [Module](app.md) · [Source](../../src/PinDock/App.xaml.cs) · page 1/1
 
-Source SHA-256: b3a584b77129e7fb782b1c9550953ce0e14ba0726577b37dc6720c21028f0432
+Source SHA-256: 19934001472019b363a4118381775460685ed9e70eac70779e6991f59143211b
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/App.xaml.cs#L5) |
-| App | class_declaration | PinDock | [10](../../src/PinDock/App.xaml.cs#L10) |
+| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/App.xaml.cs#L4) |
+| App | class_declaration | PinDock | [6](../../src/PinDock/App.xaml.cs#L6) |
+| OnStartup | method_declaration | PinDock::App | [11](../../src/PinDock/App.xaml.cs#L11) |
+| OnExit | method_declaration | PinDock::App | [25](../../src/PinDock/App.xaml.cs#L25) |

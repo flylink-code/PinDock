@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Collections.cs) · page 1/1
 
-Source SHA-256: 1e26dcefd39224050dcdf94ee622dbb54fcb07f2cd4461612e2c8e3b1242b445
+Source SHA-256: 93dcac7e2d5b0e152989c434b1e2ca963954b1646eea322b3b6087302694a912
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -15,17 +15,21 @@ Source SHA-256: 1e26dcefd39224050dcdf94ee622dbb54fcb07f2cd4461612e2c8e3b1242b445
 | Path | property_declaration | PinDock::Bookmark | [10](../../src/PinDock/Collections.cs#L10) |
 | Arguments | property_declaration | PinDock::Bookmark | [11](../../src/PinDock/Collections.cs#L11) |
 | WorkingDirectory | property_declaration | PinDock::Bookmark | [12](../../src/PinDock/Collections.cs#L12) |
-| Pinned | property_declaration | PinDock::Bookmark | [13](../../src/PinDock/Collections.cs#L13) |
-| LibraryData | class_declaration | PinDock | [16](../../src/PinDock/Collections.cs#L16) |
-| Version | property_declaration | PinDock::LibraryData | [18](../../src/PinDock/Collections.cs#L18) |
-| Items | property_declaration | PinDock::LibraryData | [19](../../src/PinDock/Collections.cs#L19) |
-| UnsupportedLibraryVersionException | class_declaration | PinDock | [22](../../src/PinDock/Collections.cs#L22) |
-| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [24](../../src/PinDock/Collections.cs#L24) |
-| LibraryStore | class_declaration | PinDock | [27](../../src/PinDock/Collections.cs#L27) |
-| Load | method_declaration | PinDock::LibraryStore | [33](../../src/PinDock/Collections.cs#L33) |
-| Read | method_declaration | PinDock::LibraryStore | [46](../../src/PinDock/Collections.cs#L46) |
-| Save | method_declaration | PinDock::LibraryStore | [55](../../src/PinDock/Collections.cs#L55) |
-| IsDuplicate | method_declaration | PinDock::LibraryStore | [66](../../src/PinDock/Collections.cs#L66) |
+| Group | property_declaration | PinDock::Bookmark | [13](../../src/PinDock/Collections.cs#L13) |
+| Pinned | property_declaration | PinDock::Bookmark | [14](../../src/PinDock/Collections.cs#L14) |
+| LibraryData | class_declaration | PinDock | [17](../../src/PinDock/Collections.cs#L17) |
+| Version | property_declaration | PinDock::LibraryData | [19](../../src/PinDock/Collections.cs#L19) |
+| Items | property_declaration | PinDock::LibraryData | [20](../../src/PinDock/Collections.cs#L20) |
+| Groups | property_declaration | PinDock::LibraryData | [21](../../src/PinDock/Collections.cs#L21) |
+| Settings | property_declaration | PinDock::LibraryData | [22](../../src/PinDock/Collections.cs#L22) |
+| UnsupportedLibraryVersionException | class_declaration | PinDock | [25](../../src/PinDock/Collections.cs#L25) |
+| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [27](../../src/PinDock/Collections.cs#L27) |
+| LibraryStore | class_declaration | PinDock | [30](../../src/PinDock/Collections.cs#L30) |
+| Load | method_declaration | PinDock::LibraryStore | [36](../../src/PinDock/Collections.cs#L36) |
+| Read | method_declaration | PinDock::LibraryStore | [49](../../src/PinDock/Collections.cs#L49) |
+| ValidateSettings | method_declaration | PinDock::LibraryStore | [67](../../src/PinDock/Collections.cs#L67) |
+| Save | method_declaration | PinDock::LibraryStore | [78](../../src/PinDock/Collections.cs#L78) |
+| IsDuplicate | method_declaration | PinDock::LibraryStore | [90](../../src/PinDock/Collections.cs#L90) |
 
 Parser recovery: 1 diagnostic(s). Inspect source; extraction may be incomplete.
-- line 27: ERROR
+- line 30: ERROR
