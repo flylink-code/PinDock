@@ -10,6 +10,15 @@ namespace PinDock;
 /// </summary>
 public class CardWindowBase : Window
 {
+    public static readonly DependencyProperty UseLargeHeaderProperty =
+        DependencyProperty.Register(nameof(UseLargeHeader), typeof(bool), typeof(CardWindowBase), new PropertyMetadata(false));
+
+    public bool UseLargeHeader
+    {
+        get => (bool)GetValue(UseLargeHeaderProperty);
+        set => SetValue(UseLargeHeaderProperty, value);
+    }
+
     public CardWindowBase()
     {
         Style = (Style)Application.Current.FindResource("CardWindow");

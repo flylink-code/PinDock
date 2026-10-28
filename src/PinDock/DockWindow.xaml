@@ -3,10 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PinDock" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ResizeMode="NoResize" Topmost="True" SizeToContent="WidthAndHeight"
+        AllowDrop="True" Drop="Window_Drop" MouseRightButtonUp="Window_MouseRightButtonUp"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <Style x:Key="DockButton" TargetType="Button">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -16,9 +18,10 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Border x:Name="DockChrome" Background="{DynamicResource GlassBrush}" BorderBrush="#AAFFFFFF" BorderThickness="1" CornerRadius="19" Padding="10">
+    <Border x:Name="DockChrome" Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
+            BorderThickness="1" CornerRadius="19" Padding="12,10">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="8" Opacity="0.18" Color="#294637"/>
+            <DropShadowEffect BlurRadius="26" ShadowDepth="8" Opacity="0.2" Color="#182A21"/>
         </Border.Effect>
         <StackPanel x:Name="ItemsPanel" Orientation="Horizontal"/>
     </Border>

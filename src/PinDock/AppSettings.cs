@@ -26,8 +26,11 @@ public sealed class AppSettings
     public bool CollapseAfterLaunch { get; set; } = true;
     public double EdgeOffset { get; set; }
     public string? MonitorDeviceName { get; set; }
+    public bool ExplorerContextMenu { get; set; }
     public string HotkeyModifiers { get; set; } = "Alt+Shift";
     public string HotkeyKey { get; set; } = "P";
+
+    public bool HasHotkey => !string.IsNullOrWhiteSpace(HotkeyModifiers) && !string.IsNullOrWhiteSpace(HotkeyKey);
 }
 
 public enum BookmarkKind { Application, Folder, File }

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/ThemeService.cs) · page 1/1
 
-Source SHA-256: f446703369364f07f67f98fc8d06638f013cb52993d65e17091dc270ec0a408b
+Source SHA-256: fb24bcb138ee1205857a1a85abf0c2d9f38fb0138856fee05a28118173e02f1c
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -16,5 +16,5 @@ Source SHA-256: f446703369364f07f67f98fc8d06638f013cb52993d65e17091dc270ec0a408b
 | Dispose | method_declaration | PinDock::ThemeService | [28](../../src/PinDock/ThemeService.cs#L28) |
 | OnUserPreferenceChanged | method_declaration | PinDock::ThemeService | [33](../../src/PinDock/ThemeService.cs#L33) |
 | Refresh | method_declaration | PinDock::ThemeService | [39](../../src/PinDock/ThemeService.cs#L39) |
-| SetBrush | method_declaration | PinDock::ThemeService | [58](../../src/PinDock/ThemeService.cs#L58) |
-| IsSystemDark | method_declaration | PinDock::ThemeService | [65](../../src/PinDock/ThemeService.cs#L65) |
+| SetBrush | method_declaration | PinDock::ThemeService | [64](../../src/PinDock/ThemeService.cs#L64) |
+| IsSystemDark | method_declaration | PinDock::ThemeService | [71](../../src/PinDock/ThemeService.cs#L71) |

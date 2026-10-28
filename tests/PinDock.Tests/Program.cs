@@ -137,7 +137,48 @@ try
     if (target.Items.Any(i => i.Group == "开发项目")) throw new Exception("Group remove did not clear items");
     if (target.Groups.Contains("开发项目")) throw new Exception("Group still listed");
 
-    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups");
+    // 快捷键清除（不使用）与扩展按键解析测试
+    var clearedSettings = new AppSettings { HotkeyModifiers = "", HotkeyKey = "" };
+    if (clearedSettings.HasHotkey) throw new Exception("Cleared hotkey must report HasHotkey = false");
+    if (HotkeyService.FormatDisplay("", "") != "不使用") throw new Exception("Cleared hotkey display mismatch");
+    if (HotkeyService.FormatDisplay("Ctrl+Alt", "F1") != "Ctrl + Alt + F1") throw new Exception("Hotkey display mismatch");
+    if (HotkeyService.ParseKey("F1") != 0x70u || HotkeyService.ParseKey("F12") != 0x7Bu || HotkeyService.ParseKey("Space") != 0x20u)
+        throw new Exception("Extended hotkey key parse failed");
+    store.Save(new LibraryData { Settings = clearedSettings });
+    var loadedCleared = store.Load();
+    if (loadedCleared.Settings.HasHotkey) throw new Exception("Cleared hotkey round trip failed");
+
+    // 本机已安装应用扫描与过滤测试
+    string appDir = Path.Combine(directory, "StartMenuPrograms");
+    Directory.CreateDirectory(appDir);
+    File.WriteAllText(Path.Combine(appDir, "Visual Studio Code.lnk"), "");
+    File.WriteAllText(Path.Combine(appDir, "Uninstall Tool.lnk"), "");
+    File.WriteAllText(Path.Combine(appDir, "卸载程序.exe"), "");
+    File.WriteAllText(Path.Combine(appDir, "Everything.exe"), "");
+    var discovered = InstalledAppsService.DiscoverFromDirectories([appDir]);
+    if (discovered.Count != 2 || discovered[0].Name != "Everything" || discovered[1].Name != "Visual Studio Code")
+        throw new Exception("InstalledAppsService discovery or filtering failed");
+
+    // 资源管理器右键命令与参数提取测试
+    if (ExplorerMenuService.TryExtractAddPath(["--add", @"D:\Work\ProjectA"]) != @"D:\Work\ProjectA")
+        throw new Exception("Explorer --add argument parse failed");
+    if (!ExplorerMenuService.BuildCommand(@"C:\App\PinDock.exe").Contains("--add \"%1\""))
+        throw new Exception("Explorer command build failed");
+
+    // 名称推断与全色板解析测试
+    if (BookmarkEditor.SuggestDisplayName(@"C:\Apps\WeChat.lnk") != "WeChat")
+        throw new Exception("Shortcut display name suggestion failed");
+    if (BookmarkEditor.SuggestDisplayName(directory) != Path.GetFileName(directory))
+        throw new Exception("Directory display name suggestion failed");
+    foreach (Palette p in Enum.GetValues<Palette>())
+    {
+        var light = Palettes.Resolve(p, false);
+        var dark = Palettes.Resolve(p, true);
+        if (light.Paper == dark.Paper || light.GlassBorder == dark.GlassBorder)
+            throw new Exception($"Palette {p} light/dark differentiation failed");
+    }
+
+    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, hotkey clear, app discovery, explorer args, palettes");
 }
 finally
 {

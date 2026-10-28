@@ -4,18 +4,20 @@
 
 [Module](app.md) · [Source](../../src/PinDock/HotkeyService.cs) · page 1/1
 
-Source SHA-256: db96059199afadb08fb0e3c966cc5cf0fcf6a9ee93ce33f3b96319032beb36dc
+Source SHA-256: b74738c3a9419987417af53ae9e363b35240eb6e9e570ab7d171fe0d612270f7
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/HotkeyService.cs#L4) |
-| HotkeyService | class_declaration | PinDock | [6](../../src/PinDock/HotkeyService.cs#L6) |
-| Register | method_declaration | PinDock::HotkeyService | [14](../../src/PinDock/HotkeyService.cs#L14) |
-| Dispose | method_declaration | PinDock::HotkeyService | [25](../../src/PinDock/HotkeyService.cs#L25) |
-| EnsureWindow | method_declaration | PinDock::HotkeyService | [33](../../src/PinDock/HotkeyService.cs#L33) |
-| Unregister | method_declaration | PinDock::HotkeyService | [48](../../src/PinDock/HotkeyService.cs#L48) |
-| Hook | method_declaration | PinDock::HotkeyService | [55](../../src/PinDock/HotkeyService.cs#L55) |
-| ParseModifiers | method_declaration | PinDock::HotkeyService | [65](../../src/PinDock/HotkeyService.cs#L65) |
-| ParseKey | method_declaration | PinDock::HotkeyService | [83](../../src/PinDock/HotkeyService.cs#L83) |
-| RegisterHotKey | method_declaration | PinDock::HotkeyService | [93](../../src/PinDock/HotkeyService.cs#L93) |
-| UnregisterHotKey | method_declaration | PinDock::HotkeyService | [96](../../src/PinDock/HotkeyService.cs#L96) |
+| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/HotkeyService.cs#L5) |
+| HotkeyService | class_declaration | PinDock | [7](../../src/PinDock/HotkeyService.cs#L7) |
+| Register | method_declaration | PinDock::HotkeyService | [15](../../src/PinDock/HotkeyService.cs#L15) |
+| FormatDisplay | method_declaration | PinDock::HotkeyService | [29](../../src/PinDock/HotkeyService.cs#L29) |
+| TryFormatKey | method_declaration | PinDock::HotkeyService | [36](../../src/PinDock/HotkeyService.cs#L36) |
+| Dispose | method_declaration | PinDock::HotkeyService | [67](../../src/PinDock/HotkeyService.cs#L67) |
+| EnsureWindow | method_declaration | PinDock::HotkeyService | [75](../../src/PinDock/HotkeyService.cs#L75) |
+| Unregister | method_declaration | PinDock::HotkeyService | [90](../../src/PinDock/HotkeyService.cs#L90) |
+| Hook | method_declaration | PinDock::HotkeyService | [97](../../src/PinDock/HotkeyService.cs#L97) |
+| ParseModifiers | method_declaration | PinDock::HotkeyService | [107](../../src/PinDock/HotkeyService.cs#L107) |
+| ParseKey | method_declaration | PinDock::HotkeyService | [127](../../src/PinDock/HotkeyService.cs#L127) |
+| RegisterHotKey | method_declaration | PinDock::HotkeyService | [142](../../src/PinDock/HotkeyService.cs#L142) |
+| UnregisterHotKey | method_declaration | PinDock::HotkeyService | [145](../../src/PinDock/HotkeyService.cs#L145) |

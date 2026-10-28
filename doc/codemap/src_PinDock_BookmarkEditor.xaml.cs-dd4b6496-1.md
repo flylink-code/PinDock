@@ -4,12 +4,18 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkEditor.xaml.cs) · page 1/1
 
-Source SHA-256: 36b05ac8beed5b6fd0cb43a81163354d74fc125fea5c4b235caa5c3b6e45cef8
+Source SHA-256: 9c8d66ecd7d2cd4e6931e87e45511dd1a2f73c1ab7bbe351bd91f23ccffbd5f2
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/BookmarkEditor.xaml.cs#L4) |
-| BookmarkEditor | class_declaration | PinDock | [6](../../src/PinDock/BookmarkEditor.xaml.cs#L6) |
-| Result | property_declaration | PinDock::BookmarkEditor | [8](../../src/PinDock/BookmarkEditor.xaml.cs#L8) |
-| BookmarkEditor | constructor_declaration | PinDock::BookmarkEditor | [10](../../src/PinDock/BookmarkEditor.xaml.cs#L10) |
-| Save_Click | method_declaration | PinDock::BookmarkEditor | [34](../../src/PinDock/BookmarkEditor.xaml.cs#L34) |
+| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/BookmarkEditor.xaml.cs#L5) |
+| BookmarkEditor | class_declaration | PinDock | [7](../../src/PinDock/BookmarkEditor.xaml.cs#L7) |
+| Result | property_declaration | PinDock::BookmarkEditor | [9](../../src/PinDock/BookmarkEditor.xaml.cs#L9) |
+| BookmarkEditor | constructor_declaration | PinDock::BookmarkEditor | [11](../../src/PinDock/BookmarkEditor.xaml.cs#L11) |
+| InstalledAppCombo_SelectionChanged | method_declaration | PinDock::BookmarkEditor | [51](../../src/PinDock/BookmarkEditor.xaml.cs#L51) |
+| BrowseFolder_Click | method_declaration | PinDock::BookmarkEditor | [60](../../src/PinDock/BookmarkEditor.xaml.cs#L60) |
+| BrowseFile_Click | method_declaration | PinDock::BookmarkEditor | [67](../../src/PinDock/BookmarkEditor.xaml.cs#L67) |
+| Window_Drop | method_declaration | PinDock::BookmarkEditor | [79](../../src/PinDock/BookmarkEditor.xaml.cs#L79) |
+| ApplyPickedPath | method_declaration | PinDock::BookmarkEditor | [85](../../src/PinDock/BookmarkEditor.xaml.cs#L85) |
+| SuggestDisplayName | method_declaration | PinDock::BookmarkEditor | [92](../../src/PinDock/BookmarkEditor.xaml.cs#L92) |
+| Save_Click | method_declaration | PinDock::BookmarkEditor | [111](../../src/PinDock/BookmarkEditor.xaml.cs#L111) |

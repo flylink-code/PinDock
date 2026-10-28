@@ -51,6 +51,12 @@ public sealed class ThemeService
             SetBrush(app, "SoftBrush", Current.Soft);
             SetBrush(app, "SelectedBrush", Current.Selected);
             SetBrush(app, "GlassBrush", Current.Glass);
+            SetBrush(app, "GlassBorderBrush", Current.GlassBorder);
+            SetBrush(app, "InputBackgroundBrush", Current.InputBackground);
+            SetBrush(app, "SwitchOffBrush", Current.SwitchOff);
+            SetBrush(app, "FolderBgBrush", Current.FolderBg);
+            SetBrush(app, "FolderFgBrush", Current.FolderFg);
+            SetBrush(app, "TooltipBgBrush", Current.TooltipBg);
         }
         Changed?.Invoke();
     }

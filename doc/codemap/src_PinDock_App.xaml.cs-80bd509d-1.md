@@ -4,11 +4,13 @@
 
 [Module](app.md) · [Source](../../src/PinDock/App.xaml.cs) · page 1/1
 
-Source SHA-256: 19934001472019b363a4118381775460685ed9e70eac70779e6991f59143211b
+Source SHA-256: 3614b830ccee6f37ca8fdf2e6cdcddbd5497faaae780ab0b1e6cb9866c279ee3
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/App.xaml.cs#L4) |
-| App | class_declaration | PinDock | [6](../../src/PinDock/App.xaml.cs#L6) |
-| OnStartup | method_declaration | PinDock::App | [11](../../src/PinDock/App.xaml.cs#L11) |
-| OnExit | method_declaration | PinDock::App | [25](../../src/PinDock/App.xaml.cs#L25) |
+| PinDock | file_scoped_namespace_declaration |  | [6](../../src/PinDock/App.xaml.cs#L6) |
+| App | class_declaration | PinDock | [8](../../src/PinDock/App.xaml.cs#L8) |
+| OnStartup | method_declaration | PinDock::App | [15](../../src/PinDock/App.xaml.cs#L15) |
+| SendToRunningInstance | method_declaration | PinDock::App | [40](../../src/PinDock/App.xaml.cs#L40) |
+| ListenForCommandsAsync | method_declaration | PinDock::App | [54](../../src/PinDock/App.xaml.cs#L54) |
+| OnExit | method_declaration | PinDock::App | [88](../../src/PinDock/App.xaml.cs#L88) |

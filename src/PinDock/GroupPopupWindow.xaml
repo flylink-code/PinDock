@@ -4,20 +4,36 @@
         Title="收藏组" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight" Topmost="True"
         PreviewKeyDown="Window_PreviewKeyDown" Deactivated="Window_Deactivated">
-    <Border Width="330" MaxHeight="420" Background="{DynamicResource GlassBrush}" BorderBrush="#B0FFFFFF"
+    <Border Width="330" MaxHeight="420" Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
             BorderThickness="1" CornerRadius="15" Padding="18">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="28" ShadowDepth="10" Opacity="0.2" Color="#294637"/>
+            <DropShadowEffect BlurRadius="28" ShadowDepth="10" Opacity="0.2" Color="#182A21"/>
         </Border.Effect>
         <DockPanel>
-            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                <TextBlock x:Name="TitleText" FontWeight="SemiBold" Foreground="{DynamicResource InkBrush}"/>
-                <TextBlock x:Name="CountText" HorizontalAlignment="Right" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <TextBlock x:Name="TitleText" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource InkBrush}"/>
+                <TextBlock x:Name="CountText" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
             </DockPanel>
-            <TextBox x:Name="SearchBox" DockPanel.Dock="Top" Margin="0,0,0,8" Padding="9,8" FontSize="12"
-                     Background="#55FFFFFF" BorderBrush="{DynamicResource LineBrush}" TextChanged="SearchBox_TextChanged"/>
-            <TextBlock DockPanel.Dock="Bottom" Margin="0,8,0,0" FontSize="10" Foreground="{DynamicResource MutedBrush}"
-                       Text="收藏组 ≠ 文件夹目录 · 不扫描磁盘内容"/>
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                <TextBox x:Name="SearchBox" Padding="10,8" FontSize="12"
+                         Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}" TextChanged="SearchBox_TextChanged"/>
+                <TextBlock Text="搜索本组收藏…" IsHitTestVisible="False" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedBrush}" Margin="12,0,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+            <Border DockPanel.Dock="Bottom" Margin="0,8,0,0" Padding="0,11,0,0" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0">
+                <TextBlock FontSize="10" Foreground="{DynamicResource MutedBrush}" Text="收藏组 ≠ 文件夹目录 · 不扫描磁盘内容"/>
+            </Border>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="ListPanel"/>
             </ScrollViewer>

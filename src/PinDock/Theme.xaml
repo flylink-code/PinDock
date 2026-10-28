@@ -134,7 +134,7 @@
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SoftBrush}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -278,7 +278,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <Grid Width="34" Height="20" Background="Transparent">
-                        <Border x:Name="Track" CornerRadius="10" Background="#B7C1B5"/>
+                        <Border x:Name="Track" CornerRadius="10" Background="{DynamicResource SwitchOffBrush}"/>
                         <Ellipse x:Name="Knob" Width="14" Height="14" Fill="White" HorizontalAlignment="Left" Margin="3,0,0,0"/>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -326,17 +326,17 @@
     <!-- 输入框 -->
     <Style TargetType="TextBox">
         <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
         <Setter Property="CaretBrush" Value="{DynamicResource InkBrush}"/>
         <Setter Property="SelectionBrush" Value="{DynamicResource AccentBrush}"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="11,9"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border x:Name="Bd" CornerRadius="7" BorderThickness="1" Background="{TemplateBinding Background}"
+                    <Border x:Name="Bd" CornerRadius="8" BorderThickness="1.5" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
                     </Border>
@@ -486,12 +486,71 @@
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
         <Setter Property="FontSize" Value="11"/>
+        <Setter Property="HasDropShadow" Value="False"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
-                    <Border Background="#253E34" CornerRadius="6" Padding="9,6">
+                    <Border Background="{DynamicResource TooltipBgBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="9,6">
                         <ContentPresenter/>
                     </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 右键菜单 -->
+    <Style TargetType="ContextMenu">
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+        <Setter Property="HasDropShadow" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Margin="8" Padding="5" CornerRadius="11"
+                            Background="{DynamicResource PaperBrush}"
+                            BorderBrush="{DynamicResource LineBrush}"
+                            BorderThickness="1">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.22" Color="#101815"/>
+                        </Border.Effect>
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Bd" Padding="12,8" CornerRadius="7" Background="Transparent">
+                        <ContentPresenter ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SoftBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1" Margin="8,4" Background="{DynamicResource LineBrush}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -608,8 +667,8 @@
         </Setter>
     </Style>
 
-    <!-- 卡片式窗口：圆角纸面、阴影、57 像素标题栏（Logo 方块 + 标题 + 副标题 + 关闭） -->
-    <Style x:Key="CardWindow" TargetType="Window">
+    <!-- 卡片式窗口：圆角纸面、阴影、支持紧凑标题栏（设置）与大标题栏（全部收藏/弹窗） -->
+    <Style x:Key="CardWindow" TargetType="Window" xmlns:local="clr-namespace:PinDock">
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="AllowsTransparency" Value="True"/>
         <Setter Property="Background" Value="Transparent"/>
@@ -624,34 +683,45 @@
                     <Border Margin="16" Background="{DynamicResource PaperBrush}" BorderBrush="{DynamicResource LineBrush}"
                             BorderThickness="1" CornerRadius="17">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="32" ShadowDepth="10" Opacity="0.22" Color="#20372B"/>
+                            <DropShadowEffect BlurRadius="32" ShadowDepth="10" Opacity="0.22" Color="#14231C"/>
                         </Border.Effect>
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="57"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Border x:Name="PART_TitleBar" Background="Transparent" BorderBrush="{DynamicResource LineBrush}"
-                                    BorderThickness="0,0,0,1">
-                                <DockPanel Margin="22,0,14,0">
+                                    BorderThickness="0,0,0,1" MinHeight="57">
+                                <DockPanel x:Name="HeaderDock" Margin="22,0,14,0">
                                     <Button x:Name="PART_Close" DockPanel.Dock="Right" Content="×" Style="{StaticResource IconButton}"
-                                            AutomationProperties.Name="关闭"/>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Border Width="24" Height="24" CornerRadius="8" Background="{DynamicResource AccentBrush}" Margin="0,0,10,0">
-                                            <TextBlock Text="p" FontFamily="Georgia" FontStyle="Italic" FontSize="18"
-                                                       Foreground="{DynamicResource PaperBrush}" HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center" Margin="0,-3,0,0"/>
-                                        </Border>
-                                        <TextBlock Text="{TemplateBinding Title}" FontSize="13" VerticalAlignment="Center"
+                                            VerticalAlignment="Center" AutomationProperties.Name="关闭"/>
+                                    <StackPanel x:Name="CompactHeader" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{TemplateBinding Title}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
                                                    Foreground="{DynamicResource InkBrush}"/>
                                         <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" FontSize="11"
-                                                   Margin="10,2,0,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
+                                                   Margin="10,1,0,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
+                                    </StackPanel>
+                                    <StackPanel x:Name="LargeHeader" VerticalAlignment="Center" Visibility="Collapsed">
+                                        <TextBlock Text="{TemplateBinding Title}" FontSize="22" FontWeight="Bold"
+                                                   Foreground="{DynamicResource InkBrush}"/>
+                                        <TextBlock x:Name="LargeSubtitle" Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" FontSize="12"
+                                                   Margin="0,4,0,0" Foreground="{DynamicResource MutedBrush}"/>
                                     </StackPanel>
                                 </DockPanel>
                             </Border>
                             <ContentPresenter Grid.Row="1"/>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding UseLargeHeader, RelativeSource={RelativeSource Self}}" Value="True">
+                            <Setter TargetName="HeaderDock" Property="Margin" Value="24,18,16,18"/>
+                            <Setter TargetName="CompactHeader" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="LargeHeader" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                            <Setter TargetName="LargeSubtitle" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -4,24 +4,26 @@
 
 [Module](app.md) · [Source](../../src/PinDock/LibraryWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 35f9fd60c3560c0be3a0119053e8fe3bd063216cc5e599d334b427fa0328062d
+Source SHA-256: 5be345a1496cfa0e8e7f63b4c803e807702b8674ff061e75813c9551cdcab094
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [7](../../src/PinDock/LibraryWindow.xaml.cs#L7) |
-| LibraryWindow | class_declaration | PinDock | [9](../../src/PinDock/LibraryWindow.xaml.cs#L9) |
-| LibraryWindow | constructor_declaration | PinDock::LibraryWindow | [17](../../src/PinDock/LibraryWindow.xaml.cs#L17) |
-| ShowLibrary | method_declaration | PinDock::LibraryWindow | [24](../../src/PinDock/LibraryWindow.xaml.cs#L24) |
-| Refresh | method_declaration | PinDock::LibraryWindow | [37](../../src/PinDock/LibraryWindow.xaml.cs#L37) |
-| Filter_Changed | method_declaration | PinDock::LibraryWindow | [51](../../src/PinDock/LibraryWindow.xaml.cs#L51) |
-| FilterButton_Click | method_declaration | PinDock::LibraryWindow | [57](../../src/PinDock/LibraryWindow.xaml.cs#L57) |
-| Add_Click | method_declaration | PinDock::LibraryWindow | [63](../../src/PinDock/LibraryWindow.xaml.cs#L63) |
-| Edit_Click | method_declaration | PinDock::LibraryWindow | [69](../../src/PinDock/LibraryWindow.xaml.cs#L69) |
-| Open_Click | method_declaration | PinDock::LibraryWindow | [76](../../src/PinDock/LibraryWindow.xaml.cs#L76) |
-| Remove_Click | method_declaration | PinDock::LibraryWindow | [82](../../src/PinDock/LibraryWindow.xaml.cs#L82) |
-| Pin_Click | method_declaration | PinDock::LibraryWindow | [89](../../src/PinDock/LibraryWindow.xaml.cs#L89) |
-| ManageGroups_Click | method_declaration | PinDock::LibraryWindow | [97](../../src/PinDock/LibraryWindow.xaml.cs#L97) |
-| Import_Click | method_declaration | PinDock::LibraryWindow | [105](../../src/PinDock/LibraryWindow.xaml.cs#L105) |
-| Export_Click | method_declaration | PinDock::LibraryWindow | [121](../../src/PinDock/LibraryWindow.xaml.cs#L121) |
-| Window_Drop | method_declaration | PinDock::LibraryWindow | [136](../../src/PinDock/LibraryWindow.xaml.cs#L136) |
-| OnClosing | method_declaration | PinDock::LibraryWindow | [145](../../src/PinDock/LibraryWindow.xaml.cs#L145) |
+| PinDock | file_scoped_namespace_declaration |  | [8](../../src/PinDock/LibraryWindow.xaml.cs#L8) |
+| LibraryWindow | class_declaration | PinDock | [10](../../src/PinDock/LibraryWindow.xaml.cs#L10) |
+| LibraryWindow | constructor_declaration | PinDock::LibraryWindow | [18](../../src/PinDock/LibraryWindow.xaml.cs#L18) |
+| ShowLibrary | method_declaration | PinDock::LibraryWindow | [25](../../src/PinDock/LibraryWindow.xaml.cs#L25) |
+| Refresh | method_declaration | PinDock::LibraryWindow | [47](../../src/PinDock/LibraryWindow.xaml.cs#L47) |
+| Filter_Changed | method_declaration | PinDock::LibraryWindow | [94](../../src/PinDock/LibraryWindow.xaml.cs#L94) |
+| FilterButton_Click | method_declaration | PinDock::LibraryWindow | [100](../../src/PinDock/LibraryWindow.xaml.cs#L100) |
+| Add_Click | method_declaration | PinDock::LibraryWindow | [107](../../src/PinDock/LibraryWindow.xaml.cs#L107) |
+| AddFolder_Click | method_declaration | PinDock::LibraryWindow | [121](../../src/PinDock/LibraryWindow.xaml.cs#L121) |
+| Edit_Click | method_declaration | PinDock::LibraryWindow | [133](../../src/PinDock/LibraryWindow.xaml.cs#L133) |
+| RowOpen_Click | method_declaration | PinDock::LibraryWindow | [144](../../src/PinDock/LibraryWindow.xaml.cs#L144) |
+| Open_Click | method_declaration | PinDock::LibraryWindow | [150](../../src/PinDock/LibraryWindow.xaml.cs#L150) |
+| Remove_Click | method_declaration | PinDock::LibraryWindow | [156](../../src/PinDock/LibraryWindow.xaml.cs#L156) |
+| Pin_Click | method_declaration | PinDock::LibraryWindow | [164](../../src/PinDock/LibraryWindow.xaml.cs#L164) |
+| Row_RightClick | method_declaration | PinDock::LibraryWindow | [180](../../src/PinDock/LibraryWindow.xaml.cs#L180) |
+| RevealInExplorer | method_declaration | PinDock::LibraryWindow | [212](../../src/PinDock/LibraryWindow.xaml.cs#L212) |
+| ManageGroups_Click | method_declaration | PinDock::LibraryWindow | [224](../../src/PinDock/LibraryWindow.xaml.cs#L224) |
+| Window_Drop | method_declaration | PinDock::LibraryWindow | [232](../../src/PinDock/LibraryWindow.xaml.cs#L232) |
+| OnClosing | method_declaration | PinDock::LibraryWindow | [241](../../src/PinDock/LibraryWindow.xaml.cs#L241) |

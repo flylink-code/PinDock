@@ -3,37 +3,58 @@ using System.Windows.Media;
 namespace PinDock;
 
 public readonly record struct PaletteColors(
-    Color Ink, Color Muted, Color Paper, Color Line, Color Accent, Color Soft, Color Selected, Color Glass);
+    Color Ink,
+    Color Muted,
+    Color Paper,
+    Color Line,
+    Color Accent,
+    Color Soft,
+    Color Selected,
+    Color Glass,
+    Color GlassBorder,
+    Color InputBackground,
+    Color SwitchOff,
+    Color FolderBg,
+    Color FolderFg,
+    Color TooltipBg);
 
 public static class Palettes
 {
     public static PaletteColors Resolve(Palette palette, bool dark) => (palette, dark) switch
     {
-        (Palette.Forest, false) => C("#233B38", "#71817A", "#F7F8F2", "#DCE3DA", "#236950", "#E4EDDF", "#EDF3E7", 0.88, "#F9FBF5"),
-        (Palette.Forest, true) => C("#E0E8DE", "#A4B3A7", "#28382F", "#435347", "#80B294", "#394F3D", "#354A3B", 0.96, "#26372D"),
-        (Palette.Ocean, false) => C("#283E53", "#6C8191", "#F3F7FA", "#D6E1E9", "#306B94", "#DCEBF4", "#E8F2F9", 0.94, "#F2F8FC"),
-        (Palette.Ocean, true) => C("#DEEBF5", "#A0B6C7", "#243440", "#415563", "#86B8D9", "#344C60", "#2E4557", 0.96, "#1F303D"),
-        (Palette.Sand, false) => C("#514433", "#8A7A65", "#FAF6EE", "#E6DDCC", "#936A36", "#EFE3CE", "#F5EDDF", 0.94, "#FCF7EC"),
-        (Palette.Sand, true) => C("#EEE5D4", "#BAAC95", "#393329", "#564C3C", "#CFAD75", "#514635", "#473E30", 0.96, "#332D23"),
-        (Palette.Clay, false) => C("#563B35", "#947B72", "#FCF4EF", "#EAD8CE", "#AD5F48", "#F1DDD1", "#F7E7DE", 0.94, "#FCF2EC"),
-        (Palette.Clay, true) => C("#F4E4DD", "#C3A69A", "#3E2E2A", "#61463E", "#DF9B80", "#583C33", "#4D352E", 0.96, "#382621"),
-        (Palette.Graphite, false) => C("#353C42", "#77828A", "#F4F5F6", "#DCE0E3", "#546574", "#E0E5E9", "#EBEFF2", 0.94, "#F6F8F9"),
-        (Palette.Graphite, true) => C("#E5E9ED", "#AAB4BC", "#2B3035", "#464E55", "#B0C5D5", "#414B54", "#364049", 0.96, "#242A2F"),
+        (Palette.Forest, false) => C("#1F3530", "#6A7B74", "#F8F9F5", "#DDE4DC", "#236950", "#E6EFE3", "#EDF4EA", 0.92, "#FAFBF7", dark: false),
+        (Palette.Forest, true) => C("#EDF2EE", "#94A39B", "#181E1C", "#2B3531", "#52B788", "#232D29", "#283831", 0.94, "#1B2220", dark: true),
+        (Palette.Ocean, false) => C("#1F3447", "#667B8C", "#F6F9FC", "#DAE3EC", "#2B6CB0", "#E3EEF7", "#EBF3FA", 0.92, "#F8FBFE", dark: false),
+        (Palette.Ocean, true) => C("#EDF2F7", "#93A4B4", "#171D24", "#2A3440", "#5FA8D3", "#222B35", "#263544", 0.94, "#1A2129", dark: true),
+        (Palette.Sand, false) => C("#3D3326", "#827463", "#FBF8F2", "#E6DFD1", "#9C6B30", "#F1E8D8", "#F6EFE2", 0.92, "#FCF9F4", dark: false),
+        (Palette.Sand, true) => C("#F2EFE9", "#A69E93", "#1C1B19", "#33302B", "#D4A359", "#292622", "#352F26", 0.94, "#201E1B", dark: true),
+        (Palette.Clay, false) => C("#402C27", "#8A726B", "#FCF6F3", "#EBDCD5", "#B8563E", "#F4E4DC", "#F9ECE6", 0.92, "#FDF8F5", dark: false),
+        (Palette.Clay, true) => C("#F4EEEB", "#A89A94", "#1D1A19", "#352E2C", "#E07A5F", "#2B2523", "#382C28", 0.94, "#211D1C", dark: true),
+        (Palette.Graphite, false) => C("#262C32", "#6E7881", "#F7F8FA", "#DFE3E7", "#475B6D", "#E7EBEF", "#EFF2F5", 0.92, "#F9FAFB", dark: false),
+        (Palette.Graphite, true) => C("#EEF0F2", "#98A1A8", "#181A1D", "#2C3137", "#7C98B3", "#23272C", "#2B323A", 0.94, "#1B1E22", dark: true),
         _ => throw new ArgumentOutOfRangeException(nameof(palette), palette, null)
     };
 
-    private static PaletteColors C(string ink, string muted, string paper, string line, string accent, string soft, string selected, double glassAlpha, string glassRgb)
+    private static PaletteColors C(string ink, string muted, string paper, string line, string accent, string soft, string selected, double glassAlpha, string glassRgb, bool dark)
     {
-        var baseGlass = (Color)ColorConverter.ConvertFromString(glassRgb)!;
+        var baseGlass = Parse(glassRgb);
         baseGlass.A = (byte)(glassAlpha * 255);
         return new(
-            (Color)ColorConverter.ConvertFromString(ink)!,
-            (Color)ColorConverter.ConvertFromString(muted)!,
-            (Color)ColorConverter.ConvertFromString(paper)!,
-            (Color)ColorConverter.ConvertFromString(line)!,
-            (Color)ColorConverter.ConvertFromString(accent)!,
-            (Color)ColorConverter.ConvertFromString(soft)!,
-            (Color)ColorConverter.ConvertFromString(selected)!,
-            baseGlass);
+            Parse(ink),
+            Parse(muted),
+            Parse(paper),
+            Parse(line),
+            Parse(accent),
+            Parse(soft),
+            Parse(selected),
+            baseGlass,
+            Parse(dark ? "#2EFFFFFF" : "#C8FFFFFF"),
+            Parse(dark ? "#13171B" : "#B8FFFFFF"),
+            Parse(dark ? "#38414A" : "#BCC5BB"),
+            Parse(dark ? "#383020" : "#EEE2BD"),
+            Parse(dark ? "#E0B86B" : "#A47C2F"),
+            Parse(dark ? "#10151A" : "#253E34"));
     }
+
+    private static Color Parse(string hex) => (Color)ColorConverter.ConvertFromString(hex)!;
 }

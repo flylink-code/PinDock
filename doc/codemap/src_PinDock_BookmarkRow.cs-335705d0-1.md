@@ -4,17 +4,23 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkRow.cs) · page 1/1
 
-Source SHA-256: d302f2cdb356ef34ef16bea770048e076a594c2254a75e5d16ab553718ef2ddb
+Source SHA-256: a3ec7216084012d7d5bcf47338b8b350ad7e0ad15de9e162085714e33a4903e6
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/BookmarkRow.cs#L5) |
-| BookmarkRow | class_declaration | PinDock | [7](../../src/PinDock/BookmarkRow.cs#L7) |
-| Bookmark | property_declaration | PinDock::BookmarkRow | [9](../../src/PinDock/BookmarkRow.cs#L9) |
-| Icon | property_declaration | PinDock::BookmarkRow | [10](../../src/PinDock/BookmarkRow.cs#L10) |
-| IconError | property_declaration | PinDock::BookmarkRow | [11](../../src/PinDock/BookmarkRow.cs#L11) |
-| Subtitle | property_declaration | PinDock::BookmarkRow | [12](../../src/PinDock/BookmarkRow.cs#L12) |
-| PinLabel | property_declaration | PinDock::BookmarkRow | [13](../../src/PinDock/BookmarkRow.cs#L13) |
-| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [16](../../src/PinDock/BookmarkRow.cs#L16) |
-| NotifyPinChanged | method_declaration | PinDock::BookmarkRow | [22](../../src/PinDock/BookmarkRow.cs#L22) |
-| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [28](../../src/PinDock/BookmarkRow.cs#L28) |
+| PinDock | file_scoped_namespace_declaration |  | [6](../../src/PinDock/BookmarkRow.cs#L6) |
+| BookmarkRow | class_declaration | PinDock | [8](../../src/PinDock/BookmarkRow.cs#L8) |
+| Bookmark | property_declaration | PinDock::BookmarkRow | [10](../../src/PinDock/BookmarkRow.cs#L10) |
+| IsInstalledCandidate | property_declaration | PinDock::BookmarkRow | [11](../../src/PinDock/BookmarkRow.cs#L11) |
+| CandidateCategory | property_declaration | PinDock::BookmarkRow | [12](../../src/PinDock/BookmarkRow.cs#L12) |
+| Icon | property_declaration | PinDock::BookmarkRow | [13](../../src/PinDock/BookmarkRow.cs#L13) |
+| IconError | property_declaration | PinDock::BookmarkRow | [14](../../src/PinDock/BookmarkRow.cs#L14) |
+| Kind | property_declaration | PinDock::BookmarkRow | [16](../../src/PinDock/BookmarkRow.cs#L16) |
+| FallbackGlyph | property_declaration | PinDock::BookmarkRow | [18](../../src/PinDock/BookmarkRow.cs#L18) |
+| Subtitle | property_declaration | PinDock::BookmarkRow | [25](../../src/PinDock/BookmarkRow.cs#L25) |
+| PinLabel | property_declaration | PinDock::BookmarkRow | [29](../../src/PinDock/BookmarkRow.cs#L29) |
+| IsPinnedOrCandidate | property_declaration | PinDock::BookmarkRow | [33](../../src/PinDock/BookmarkRow.cs#L33) |
+| SavedActionsVisibility | property_declaration | PinDock::BookmarkRow | [35](../../src/PinDock/BookmarkRow.cs#L35) |
+| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [39](../../src/PinDock/BookmarkRow.cs#L39) |
+| NotifyPinChanged | method_declaration | PinDock::BookmarkRow | [47](../../src/PinDock/BookmarkRow.cs#L47) |
+| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [55](../../src/PinDock/BookmarkRow.cs#L55) |

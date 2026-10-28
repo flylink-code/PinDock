@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppSettings.cs) · page 1/1
 
-Source SHA-256: 63c75a7f3b2e5d881ef9bde164385037c4569b489f1c0db314d5800846a6f9ae
+Source SHA-256: 4b87d39d59d9a2d74bfd7719fcf66f7f64c52bf52b10d252ddc44adde8e6befe
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -50,9 +50,11 @@ Source SHA-256: 63c75a7f3b2e5d881ef9bde164385037c4569b489f1c0db314d5800846a6f9ae
 | CollapseAfterLaunch | property_declaration | PinDock::AppSettings | [26](../../src/PinDock/AppSettings.cs#L26) |
 | EdgeOffset | property_declaration | PinDock::AppSettings | [27](../../src/PinDock/AppSettings.cs#L27) |
 | MonitorDeviceName | property_declaration | PinDock::AppSettings | [28](../../src/PinDock/AppSettings.cs#L28) |
-| HotkeyModifiers | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
-| HotkeyKey | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
-| BookmarkKind | enum_declaration | PinDock | [33](../../src/PinDock/AppSettings.cs#L33) |
-| Application | enum_member_declaration | PinDock::BookmarkKind | [33](../../src/PinDock/AppSettings.cs#L33) |
-| Folder | enum_member_declaration | PinDock::BookmarkKind | [33](../../src/PinDock/AppSettings.cs#L33) |
-| File | enum_member_declaration | PinDock::BookmarkKind | [33](../../src/PinDock/AppSettings.cs#L33) |
+| ExplorerContextMenu | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
+| HotkeyModifiers | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
+| HotkeyKey | property_declaration | PinDock::AppSettings | [31](../../src/PinDock/AppSettings.cs#L31) |
+| HasHotkey | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
+| BookmarkKind | enum_declaration | PinDock | [36](../../src/PinDock/AppSettings.cs#L36) |
+| Application | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |
+| Folder | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |
+| File | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |

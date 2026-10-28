@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace PinDock;
@@ -13,13 +14,54 @@ public sealed class HotkeyService : IDisposable
 
     public void Register(string modifiers, string key)
     {
-        EnsureWindow();
         Unregister();
+        if (string.IsNullOrWhiteSpace(modifiers) || string.IsNullOrWhiteSpace(key))
+            return;
+
+        EnsureWindow();
         uint mod = ParseModifiers(modifiers);
         uint vk = ParseKey(key);
         if (!RegisterHotKey(source!.Handle, HotkeyId, mod, vk))
-            throw new InvalidOperationException($"无法注册全局快捷键 {modifiers}+{key}，可能已被其他程序占用。");
+            throw new InvalidOperationException($"无法注册全局快捷键 {FormatDisplay(modifiers, key)}，可能已被其他程序占用。");
         registered = true;
+    }
+
+    public static string FormatDisplay(string modifiers, string key)
+    {
+        if (string.IsNullOrWhiteSpace(modifiers) || string.IsNullOrWhiteSpace(key))
+            return "不使用";
+        return $"{modifiers.Replace("+", " + ")} + {key}";
+    }
+
+    public static bool TryFormatKey(Key wpfKey, out string keyText)
+    {
+        keyText = "";
+        if (wpfKey is >= Key.A and <= Key.Z)
+        {
+            keyText = wpfKey.ToString();
+            return true;
+        }
+        if (wpfKey is >= Key.D0 and <= Key.D9)
+        {
+            keyText = ((char)('0' + (wpfKey - Key.D0))).ToString();
+            return true;
+        }
+        if (wpfKey is >= Key.F1 and <= Key.F12)
+        {
+            keyText = wpfKey.ToString();
+            return true;
+        }
+        if (wpfKey == Key.Space)
+        {
+            keyText = "Space";
+            return true;
+        }
+        if (wpfKey == Key.Oem3)
+        {
+            keyText = "`";
+            return true;
+        }
+        return false;
     }
 
     public void Dispose()
@@ -45,7 +87,7 @@ public sealed class HotkeyService : IDisposable
         source.AddHook(Hook);
     }
 
-    private void Unregister()
+    public void Unregister()
     {
         if (!registered || source is null) return;
         UnregisterHotKey(source.Handle, HotkeyId);
@@ -62,7 +104,7 @@ public sealed class HotkeyService : IDisposable
         return IntPtr.Zero;
     }
 
-    private static uint ParseModifiers(string modifiers)
+    public static uint ParseModifiers(string modifiers)
     {
         uint value = 0;
         foreach (string part in modifiers.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
@@ -77,16 +119,23 @@ public sealed class HotkeyService : IDisposable
             };
             value |= flag;
         }
+        if (value == 0)
+            throw new InvalidOperationException("快捷键需要至少包含一个修饰键（Ctrl / Alt / Shift / Win）。");
         return value;
     }
 
-    private static uint ParseKey(string key)
+    public static uint ParseKey(string key)
     {
-        if (key.Length == 1)
+        string normalized = key.Trim().ToUpperInvariant();
+        if (normalized.Length == 1)
         {
-            char c = char.ToUpperInvariant(key[0]);
+            char c = normalized[0];
             if (c is >= 'A' and <= 'Z' or >= '0' and <= '9') return c;
+            if (c == '`') return 0xC0u;
         }
+        if (normalized == "SPACE") return 0x20u;
+        if (normalized.StartsWith('F') && int.TryParse(normalized[1..], out int fn) && fn is >= 1 and <= 12)
+            return (uint)(0x70 + fn - 1);
         throw new InvalidOperationException($"不支持的快捷键：{key}");
     }
 

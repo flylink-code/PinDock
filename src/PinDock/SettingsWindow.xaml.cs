@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace PinDock;
 
@@ -10,6 +11,7 @@ public partial class SettingsWindow : CardWindowBase
 {
     private readonly AppController controller;
     private bool loading = true;
+    private bool recordingHotkey;
 
     public SettingsWindow(AppController controller)
     {
@@ -19,6 +21,7 @@ public partial class SettingsWindow : CardWindowBase
 
     public void ShowSettings()
     {
+        recordingHotkey = false;
         LoadFromSettings();
         NavGeneral.IsChecked = true;
         Show();
@@ -33,7 +36,7 @@ public partial class SettingsWindow : CardWindowBase
         ModeHotkey.IsChecked = s.DisplayMode == DisplayMode.Hotkey;
         ModeAutoHide.IsChecked = s.DisplayMode == DisplayMode.EdgeAutoHide;
         CollapseAfterLaunch.IsChecked = s.CollapseAfterLaunch;
-        HotkeyText.Text = $"{s.HotkeyModifiers.Replace("+", " + ")} + {s.HotkeyKey}";
+        RefreshHotkeyUi(s);
         PaletteForest.IsChecked = s.Palette == Palette.Forest;
         PaletteOcean.IsChecked = s.Palette == Palette.Ocean;
         PaletteSand.IsChecked = s.Palette == Palette.Sand;
@@ -46,6 +49,7 @@ public partial class SettingsWindow : CardWindowBase
         TopmostBox.IsChecked = s.Topmost;
         AvoidFullscreenBox.IsChecked = s.AvoidFullscreen;
         LockPositionBox.IsChecked = s.LockPosition;
+        ExplorerMenuBox.IsChecked = s.ExplorerContextMenu || ExplorerMenuService.IsRegistered();
         EdgeTop.IsChecked = s.DockEdge == DockEdge.Top;
         EdgeLeft.IsChecked = s.DockEdge == DockEdge.Left;
         EdgeRight.IsChecked = s.DockEdge == DockEdge.Right;
@@ -53,6 +57,110 @@ public partial class SettingsWindow : CardWindowBase
         SelectCombo(MonitorPolicyBox, s.MonitorPolicy.ToString());
         BuildMonitorCards(s);
         loading = false;
+    }
+
+    private void RefreshHotkeyUi(AppSettings s)
+    {
+        HotkeyText.Text = recordingHotkey
+            ? "请按下组合键… (Esc 取消)"
+            : HotkeyService.FormatDisplay(s.HotkeyModifiers, s.HotkeyKey);
+        ClearHotkeyButton.IsEnabled = s.HasHotkey || recordingHotkey;
+        HotkeyHintText.Text = !s.HasHotkey && s.DisplayMode == DisplayMode.Hotkey
+            ? "当前未设置快捷键；在“快捷键呼出”模式下请通过系统托盘图标呼出 Dock"
+            : "点击快捷键可重新录制，或点击“清除”设为不使用";
+    }
+
+    private void HotkeyCapture_Click(object sender, RoutedEventArgs e)
+    {
+        recordingHotkey = !recordingHotkey;
+        RefreshHotkeyUi(controller.Data.Settings);
+    }
+
+    private void ClearHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        recordingHotkey = false;
+        var s = controller.Data.Settings;
+        s.HotkeyModifiers = "";
+        s.HotkeyKey = "";
+        RefreshHotkeyUi(s);
+        controller.UpdateHotkey();
+    }
+
+    private void ResetHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        recordingHotkey = false;
+        var s = controller.Data.Settings;
+        s.HotkeyModifiers = "Alt+Shift";
+        s.HotkeyKey = "P";
+        RefreshHotkeyUi(s);
+        controller.UpdateHotkey();
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!recordingHotkey) return;
+        e.Handled = true;
+        Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+
+        if (key == Key.Escape)
+        {
+            recordingHotkey = false;
+            RefreshHotkeyUi(controller.Data.Settings);
+            return;
+        }
+        if (key is Key.Back or Key.Delete)
+        {
+            ClearHotkey_Click(sender, e);
+            return;
+        }
+        if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or
+            Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin)
+        {
+            return;
+        }
+
+        var mods = new List<string>();
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) mods.Add("Ctrl");
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)) mods.Add("Alt");
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) mods.Add("Shift");
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Windows)) mods.Add("Win");
+
+        if (mods.Count == 0)
+        {
+            HotkeyHintText.Text = "请至少搭配一个修饰键（Ctrl / Alt / Shift / Win）";
+            return;
+        }
+        if (!HotkeyService.TryFormatKey(key, out string keyName))
+        {
+            HotkeyHintText.Text = "仅支持字母 A-Z、数字 0-9、F1-F12、Space 或 ` 键";
+            return;
+        }
+
+        recordingHotkey = false;
+        var s = controller.Data.Settings;
+        s.HotkeyModifiers = string.Join("+", mods);
+        s.HotkeyKey = keyName;
+        RefreshHotkeyUi(s);
+        controller.UpdateHotkey();
+    }
+
+    private void ExplorerMenu_Changed(object sender, RoutedEventArgs e)
+    {
+        if (loading) return;
+        bool wantEnabled = ExplorerMenuBox.IsChecked == true;
+        try
+        {
+            ExplorerMenuService.SetRegistered(wantEnabled);
+            controller.Data.Settings.ExplorerContextMenu = wantEnabled;
+            controller.ApplySettings();
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or InvalidOperationException or System.Security.SecurityException)
+        {
+            MessageBox.Show(this, $"无法更新资源管理器右键菜单：{ex.Message}");
+            loading = true;
+            ExplorerMenuBox.IsChecked = ExplorerMenuService.IsRegistered();
+            loading = false;
+        }
     }
 
     private void BuildMonitorCards(AppSettings s)
@@ -162,6 +270,7 @@ public partial class SettingsWindow : CardWindowBase
             : s.MonitorPolicy == MonitorPolicy.Primary
                 ? "Dock 始终显示在系统主显示器上。"
                 : "每次呼出时，Dock 出现在鼠标所在的显示器上。";
+        RefreshHotkeyUi(s);
         controller.ApplySettings();
     }
 

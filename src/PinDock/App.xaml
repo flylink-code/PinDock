@@ -7,14 +7,20 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush x:Key="InkBrush" Color="#233B38"/>
-            <SolidColorBrush x:Key="MutedBrush" Color="#71817A"/>
-            <SolidColorBrush x:Key="PaperBrush" Color="#F7F8F2"/>
-            <SolidColorBrush x:Key="LineBrush" Color="#DCE3DA"/>
+            <SolidColorBrush x:Key="InkBrush" Color="#1F3530"/>
+            <SolidColorBrush x:Key="MutedBrush" Color="#6A7B74"/>
+            <SolidColorBrush x:Key="PaperBrush" Color="#F8F9F5"/>
+            <SolidColorBrush x:Key="LineBrush" Color="#DDE4DC"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#236950"/>
-            <SolidColorBrush x:Key="SoftBrush" Color="#E4EDDF"/>
-            <SolidColorBrush x:Key="SelectedBrush" Color="#EDF3E7"/>
-            <SolidColorBrush x:Key="GlassBrush" Color="#E0F9FBF5"/>
+            <SolidColorBrush x:Key="SoftBrush" Color="#E6EFE3"/>
+            <SolidColorBrush x:Key="SelectedBrush" Color="#EDF4EA"/>
+            <SolidColorBrush x:Key="GlassBrush" Color="#EBFAFBF7"/>
+            <SolidColorBrush x:Key="GlassBorderBrush" Color="#C8FFFFFF"/>
+            <SolidColorBrush x:Key="InputBackgroundBrush" Color="#B8FFFFFF"/>
+            <SolidColorBrush x:Key="SwitchOffBrush" Color="#BCC5BB"/>
+            <SolidColorBrush x:Key="FolderBgBrush" Color="#EEE2BD"/>
+            <SolidColorBrush x:Key="FolderFgBrush" Color="#A47C2F"/>
+            <SolidColorBrush x:Key="TooltipBgBrush" Color="#253E34"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

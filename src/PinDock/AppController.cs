@@ -25,9 +25,10 @@ public sealed class AppController : IDisposable
     private bool toggled;
 
     public LibraryData Data { get; }
+    public InstalledAppsService InstalledApps { get; } = new();
     public IReadOnlyList<Bookmark> OverflowItems => dock.OverflowItems;
 
-    public AppController()
+    public AppController(string? initialAddPath = null)
     {
         store = new LibraryStore(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PinDock"));
         try { Data = store.Load(); }
@@ -43,9 +44,16 @@ public sealed class AppController : IDisposable
         settings = new SettingsWindow(this);
 
         dock.LaunchRequested += bookmark => _ = LaunchAsync(bookmark);
+        dock.EditRequested += EditBookmarkInteractive;
+        dock.UnpinRequested += TogglePin;
+        dock.RemoveRequested += RemoveBookmarkWithConfirm;
         dock.LibraryRequested += () => library.ShowLibrary();
+        dock.InstalledAppsRequested += () => library.ShowLibrary(focusInstalledApps: true);
         dock.OverflowRequested += () => library.ShowLibrary(true);
         dock.AddRequested += AddBookmarkInteractive;
+        dock.AddFolderRequested += AddFolderInteractive;
+        dock.AddFileRequested += AddFileInteractive;
+        dock.FilesDropped += AddPaths;
         dock.SettingsRequested += () => settings.ShowSettings();
         dock.DragEnded += Persist;
 
@@ -72,6 +80,26 @@ public sealed class AppController : IDisposable
         ApplyDisplayMode();
         RegisterHotkey();
         fullscreen.SetEnabled(Data.Settings.AvoidFullscreen);
+
+        if (!string.IsNullOrWhiteSpace(initialAddPath))
+            AddPaths([initialAddPath]);
+    }
+
+    public void UpdateHotkey()
+    {
+        RegisterHotkey();
+        Persist();
+    }
+
+    public void RevealDock()
+    {
+        if (appliedMode == DisplayMode.EdgeAutoHide)
+        {
+            autoHide.Reveal(true);
+            return;
+        }
+        toggled = appliedMode == DisplayMode.Hotkey;
+        SyncVisuals();
     }
 
     public void ApplySettings()
@@ -107,10 +135,16 @@ public sealed class AppController : IDisposable
     {
         var items = new List<Bookmark>(Data.Items);
         int duplicates = 0;
-        foreach (string path in paths)
+        foreach (string rawPath in paths)
         {
-            var item = new Bookmark { Name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)), Path = path, Pinned = true };
-            if (string.IsNullOrWhiteSpace(item.Name)) item.Name = path;
+            string path = rawPath.Trim();
+            if (path.Length == 0) continue;
+            var item = new Bookmark
+            {
+                Name = BookmarkEditor.SuggestDisplayName(path),
+                Path = path,
+                Pinned = true
+            };
             if (!LibraryStore.IsDuplicate(items, item)) items.Add(item);
             else duplicates++;
         }
@@ -177,8 +211,70 @@ public sealed class AppController : IDisposable
         dialogOpen = true;
         try
         {
-            var editor = new BookmarkEditor(new Bookmark { Pinned = true }, Data.Groups) { Owner = library.IsVisible ? library : null, Title = "添加收藏" };
+            var editor = new BookmarkEditor(new Bookmark { Pinned = true }, Data.Groups, InstalledApps.GetInstalledApps())
+            {
+                Owner = library.IsVisible ? library : null,
+                Title = "添加收藏"
+            };
             if (editor.ShowDialog() == true) SaveEdited(editor.Result, null);
+        }
+        finally { dialogOpen = false; }
+    }
+
+    private void EditBookmarkInteractive(Bookmark target)
+    {
+        dialogOpen = true;
+        try
+        {
+            var editor = new BookmarkEditor(target, Data.Groups, InstalledApps.GetInstalledApps())
+            {
+                Owner = library.IsVisible ? library : null,
+                Title = "编辑收藏"
+            };
+            if (editor.ShowDialog() == true) SaveEdited(editor.Result, target);
+        }
+        finally { dialogOpen = false; }
+    }
+
+    private void AddFolderInteractive()
+    {
+        dialogOpen = true;
+        try
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog
+            {
+                Title = "选择要添加到 PinDock 的文件夹",
+                Multiselect = true
+            };
+            if (dialog.ShowDialog() == true) AddPaths(dialog.FolderNames);
+        }
+        finally { dialogOpen = false; }
+    }
+
+    private void AddFileInteractive()
+    {
+        dialogOpen = true;
+        try
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "选择要添加到 PinDock 的应用或文件",
+                Filter = "常用目标 (*.exe;*.lnk;*.bat;*.cmd;*.*)|*.exe;*.lnk;*.bat;*.cmd;*.*|所有文件 (*.*)|*.*",
+                Multiselect = true,
+                DereferenceLinks = false
+            };
+            if (dialog.ShowDialog() == true) AddPaths(dialog.FileNames);
+        }
+        finally { dialogOpen = false; }
+    }
+
+    private void RemoveBookmarkWithConfirm(Bookmark item)
+    {
+        dialogOpen = true;
+        try
+        {
+            if (MessageBox.Show($"移除收藏“{item.Name}”？不会删除目标文件。", "PinDock", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                Remove(item);
         }
         finally { dialogOpen = false; }
     }

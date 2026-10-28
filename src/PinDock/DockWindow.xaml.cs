@@ -21,9 +21,16 @@ public partial class DockWindow : Window
     private int fadeVersion;
 
     public event Action<Bookmark>? LaunchRequested;
+    public event Action<Bookmark>? EditRequested;
+    public event Action<Bookmark>? UnpinRequested;
+    public event Action<Bookmark>? RemoveRequested;
     public event Action? LibraryRequested;
+    public event Action? InstalledAppsRequested;
     public event Action? OverflowRequested;
     public event Action? AddRequested;
+    public event Action? AddFolderRequested;
+    public event Action? AddFileRequested;
+    public event Action<string[]>? FilesDropped;
     public event Action? SettingsRequested;
     public event Action? DragEnded;
 
@@ -126,7 +133,9 @@ public partial class DockWindow : Window
     private void Rebuild(IReadOnlyList<Bookmark> pinned)
     {
         ItemsPanel.Children.Clear();
-        ItemsPanel.Orientation = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right ? Orientation.Vertical : Orientation.Horizontal;
+        bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        ItemsPanel.Orientation = vertical ? Orientation.Vertical : Orientation.Horizontal;
+        DockChrome.Padding = vertical ? new Thickness(10, 12, 10, 12) : new Thickness(12, 10, 12, 10);
         double icon = DockLayout.IconPixels(data.Settings.IconSize);
 
         var pinnedButtons = pinned.Select(item => (FrameworkElement)CreateBookmarkButton(item, icon)).ToList();
@@ -136,12 +145,16 @@ public partial class DockWindow : Window
             .ToList();
         var utilityButtons = new List<FrameworkElement>();
         if (overflow.Count > 0)
-            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", "更多固定收藏", icon, () => OverflowRequested?.Invoke()));
-        utilityButtons.Add(CreateUtilityButton("▦", "全部收藏", icon, () => LibraryRequested?.Invoke()));
-        utilityButtons.Add(CreateUtilityButton("＋", "添加收藏", icon, () => AddRequested?.Invoke()));
-        utilityButtons.Add(CreateUtilityButton("⚙", "设置", icon, () => SettingsRequested?.Invoke()));
+            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", $"更多固定项 · {overflow.Count}", icon, () => OverflowRequested?.Invoke(), isGear: false));
+        utilityButtons.Add(CreateUtilityButton("▦", "全部收藏", icon, () => LibraryRequested?.Invoke(), isGear: false));
+        utilityButtons.Add(CreateUtilityButton("＋", "添加收藏（右键可快速选文件夹/本机应用）", icon, () => AddRequested?.Invoke(), isGear: false));
 
-        foreach (var section in new[] { pinnedButtons, groupButtons, utilityButtons })
+        var gearSection = new List<FrameworkElement>
+        {
+            CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true)
+        };
+
+        foreach (var section in new[] { pinnedButtons, groupButtons, utilityButtons, gearSection })
         {
             if (section.Count == 0) continue;
             if (ItemsPanel.Children.Count > 0) ItemsPanel.Children.Add(CreateSeparator(icon));
@@ -152,25 +165,50 @@ public partial class DockWindow : Window
 
     private Button CreateBookmarkButton(Bookmark item, double icon)
     {
-        var button = CreateChrome(icon, item.Name);
-        var image = new Image { Width = icon * 0.65, Height = icon * 0.65, Stretch = Stretch.Uniform, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-        ((Border)button.Content).Child = image;
+        bool isFolder = BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Folder;
+        var button = CreateChrome(icon, item.Name, isFolder ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"));
+        var host = new Grid();
+        var fallback = new TextBlock
+        {
+            Text = isFolder ? "▰" : "◇",
+            FontSize = icon * 0.42,
+            Foreground = isFolder ? (Brush)FindResource("FolderFgBrush") : (Brush)FindResource("AccentBrush"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        var image = new Image
+        {
+            Width = icon * 0.65,
+            Height = icon * 0.65,
+            Stretch = Stretch.Uniform,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+        host.Children.Add(fallback);
+        host.Children.Add(image);
+        ((Border)button.Content).Child = host;
         button.Click += (_, _) => LaunchRequested?.Invoke(item);
-        _ = LoadIcon(image, item.Path);
+        button.MouseRightButtonUp += (_, e) =>
+        {
+            ShowBookmarkContextMenu(item);
+            e.Handled = true;
+        };
+        _ = LoadIcon(image, fallback, item.Path);
         return button;
     }
 
     private Button CreateGroupButton(string group, double icon)
     {
-        var button = CreateChrome(icon, group);
-        var grid = new Grid { Width = icon * 0.45, Height = icon * 0.45, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"));
+        var grid = new Grid { Width = icon * 0.44, Height = icon * 0.44, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         grid.RowDefinitions.Add(new RowDefinition());
         grid.RowDefinitions.Add(new RowDefinition());
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         for (int i = 0; i < 4; i++)
         {
-            var cell = new Border { Background = (Brush)FindResource("AccentBrush"), CornerRadius = new CornerRadius(2), Margin = new Thickness(1.5) };
+            var cell = new Border { Background = (Brush)FindResource("AccentBrush"), CornerRadius = new CornerRadius(2), Margin = new Thickness(1.6) };
             Grid.SetRow(cell, i / 2);
             Grid.SetColumn(cell, i % 2);
             grid.Children.Add(cell);
@@ -184,14 +222,14 @@ public partial class DockWindow : Window
         return button;
     }
 
-    private Button CreateUtilityButton(string glyph, string tip, double icon, Action action)
+    private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear)
     {
-        var button = CreateChrome(icon, tip);
+        var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"));
         ((Border)button.Content).Child = new TextBlock
         {
             Text = glyph,
-            FontSize = icon * 0.4,
-            Foreground = (Brush)FindResource("AccentBrush"),
+            FontSize = isGear ? icon * 0.46 : icon * 0.4,
+            Foreground = (Brush)FindResource(isGear ? "MutedBrush" : "AccentBrush"),
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
@@ -202,25 +240,25 @@ public partial class DockWindow : Window
     private FrameworkElement CreateSeparator(double icon)
     {
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
-        return new Rectangle
+        return new Border
         {
-            Width = vertical ? icon * 0.65 : 1,
-            Height = vertical ? 1 : icon * 0.65,
-            Fill = new SolidColorBrush(Color.FromArgb(0x60, 0x99, 0xAD, 0x92)),
+            Width = vertical ? icon * 0.62 : 1,
+            Height = vertical ? 1 : icon * 0.62,
+            Background = (Brush)FindResource("LineBrush"),
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         };
     }
 
-    private Button CreateChrome(double icon, string tip)
+    private Button CreateChrome(double icon, string tip, Brush background)
     {
         var border = new Border
         {
             Width = icon,
             Height = icon,
             CornerRadius = new CornerRadius(11),
-            Background = (Brush)FindResource("SoftBrush"),
+            Background = background,
             RenderTransformOrigin = new Point(0.5, 0.5)
         };
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
@@ -250,10 +288,82 @@ public partial class DockWindow : Window
         }
     }
 
-    private async Task LoadIcon(Image image, string path)
+    private async Task LoadIcon(Image image, UIElement fallback, string path)
     {
-        try { image.Source = await icons.GetAsync(path); }
+        try
+        {
+            image.Source = await icons.GetAsync(path);
+            fallback.Visibility = Visibility.Collapsed;
+        }
         catch (System.ComponentModel.Win32Exception) { }
+    }
+
+    private void ShowBookmarkContextMenu(Bookmark item)
+    {
+        var menu = new ContextMenu();
+        var openItem = new MenuItem { Header = $"打开“{item.Name}”" };
+        openItem.Click += (_, _) => LaunchRequested?.Invoke(item);
+        menu.Items.Add(openItem);
+
+        var revealItem = new MenuItem { Header = "在资源管理器中显示" };
+        revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
+        menu.Items.Add(revealItem);
+
+        menu.Items.Add(new Separator());
+
+        var editItem = new MenuItem { Header = "编辑收藏…" };
+        editItem.Click += (_, _) => EditRequested?.Invoke(item);
+        menu.Items.Add(editItem);
+
+        var unpinItem = new MenuItem { Header = "从 Dock 取消固定" };
+        unpinItem.Click += (_, _) => UnpinRequested?.Invoke(item);
+        menu.Items.Add(unpinItem);
+
+        var removeItem = new MenuItem { Header = "从收藏中移除" };
+        removeItem.Click += (_, _) => RemoveRequested?.Invoke(item);
+        menu.Items.Add(removeItem);
+
+        menu.IsOpen = true;
+    }
+
+    private void Window_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        var menu = new ContextMenu();
+
+        var addFolder = new MenuItem { Header = "＋ 添加文件夹到 Dock…" };
+        addFolder.Click += (_, _) => AddFolderRequested?.Invoke();
+        menu.Items.Add(addFolder);
+
+        var addApps = new MenuItem { Header = "⌕ 检索本机已安装应用…" };
+        addApps.Click += (_, _) => InstalledAppsRequested?.Invoke();
+        menu.Items.Add(addApps);
+
+        var addFile = new MenuItem { Header = "＋ 添加应用 / 文件…" };
+        addFile.Click += (_, _) => AddFileRequested?.Invoke();
+        menu.Items.Add(addFile);
+
+        var addCustom = new MenuItem { Header = "自定义添加收藏…" };
+        addCustom.Click += (_, _) => AddRequested?.Invoke();
+        menu.Items.Add(addCustom);
+
+        menu.Items.Add(new Separator());
+
+        var allLibrary = new MenuItem { Header = "▦ 打开全部收藏" };
+        allLibrary.Click += (_, _) => LibraryRequested?.Invoke();
+        menu.Items.Add(allLibrary);
+
+        var openSettings = new MenuItem { Header = "⚙ PinDock 设置" };
+        openSettings.Click += (_, _) => SettingsRequested?.Invoke();
+        menu.Items.Add(openSettings);
+
+        menu.IsOpen = true;
+        e.Handled = true;
+    }
+
+    private void Window_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(DataFormats.FileDrop) is string[] { Length: > 0 } files)
+            FilesDropped?.Invoke(files);
     }
 
     private void AttachDrag(Button button)
