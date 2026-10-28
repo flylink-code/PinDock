@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 using System.ComponentModel;
 using System.Text.Json;
@@ -76,12 +75,12 @@ public partial class MainWindow : Window
     {
         if (e.Data.GetData(DataFormats.FileDrop) is string[] files) Add(files);
     }
-    private void Open_Click(object sender, RoutedEventArgs e)
+    private async void Open_Click(object sender, RoutedEventArgs e)
     {
         if (ItemsList.SelectedItem is not BookmarkRow row) return;
         var item = row.Bookmark;
-        try { Process.Start(new ProcessStartInfo(item.Path) { UseShellExecute = true, Arguments = item.Arguments, WorkingDirectory = item.WorkingDirectory }); }
-        catch (Exception ex) when (ex is Win32Exception or IOException or UnauthorizedAccessException or InvalidOperationException) { MessageBox.Show($"无法打开收藏：{ex.Message}"); }
+        try { await Task.Run(() => BookmarkLauncher.Open(item)); }
+        catch (Exception ex) when (ex is Win32Exception or IOException or UnauthorizedAccessException or InvalidOperationException) { MessageBox.Show($"无法打开收藏“{item.Name}”（{item.Path}）：{ex.Message}"); }
     }
     private void Remove_Click(object sender, RoutedEventArgs e)
     {

@@ -4,21 +4,21 @@
 
 [Module](app.md) · [Source](../../src/PinDock/MainWindow.xaml.cs) · page 1/1
 
-Source SHA-256: c07f77a5e55a504e73b09e6a452dd427160ae04f71ebf8de92c7bab0dea1a7ae
+Source SHA-256: 5c9cdd0923e6b998c8b5e3b7b5860fb3665c82743bd189b4ce220b0285d6c441
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [7](../../src/PinDock/MainWindow.xaml.cs#L7) |
-| MainWindow | class_declaration | PinDock | [9](../../src/PinDock/MainWindow.xaml.cs#L9) |
-| MainWindow | constructor_declaration | PinDock::MainWindow | [15](../../src/PinDock/MainWindow.xaml.cs#L15) |
-| Refresh | method_declaration | PinDock::MainWindow | [24](../../src/PinDock/MainWindow.xaml.cs#L24) |
-| Add | method_declaration | PinDock::MainWindow | [25](../../src/PinDock/MainWindow.xaml.cs#L25) |
-| Save | method_declaration | PinDock::MainWindow | [39](../../src/PinDock/MainWindow.xaml.cs#L39) |
-| AddFile_Click | method_declaration | PinDock::MainWindow | [44](../../src/PinDock/MainWindow.xaml.cs#L44) |
-| AddFolder_Click | method_declaration | PinDock::MainWindow | [49](../../src/PinDock/MainWindow.xaml.cs#L49) |
-| AddPath_Click | method_declaration | PinDock::MainWindow | [54](../../src/PinDock/MainWindow.xaml.cs#L54) |
-| Edit_Click | method_declaration | PinDock::MainWindow | [59](../../src/PinDock/MainWindow.xaml.cs#L59) |
-| SaveEdited | method_declaration | PinDock::MainWindow | [66](../../src/PinDock/MainWindow.xaml.cs#L66) |
-| Window_Drop | method_declaration | PinDock::MainWindow | [75](../../src/PinDock/MainWindow.xaml.cs#L75) |
-| Open_Click | method_declaration | PinDock::MainWindow | [79](../../src/PinDock/MainWindow.xaml.cs#L79) |
-| Remove_Click | method_declaration | PinDock::MainWindow | [86](../../src/PinDock/MainWindow.xaml.cs#L86) |
+| PinDock | file_scoped_namespace_declaration |  | [6](../../src/PinDock/MainWindow.xaml.cs#L6) |
+| MainWindow | class_declaration | PinDock | [8](../../src/PinDock/MainWindow.xaml.cs#L8) |
+| MainWindow | constructor_declaration | PinDock::MainWindow | [14](../../src/PinDock/MainWindow.xaml.cs#L14) |
+| Refresh | method_declaration | PinDock::MainWindow | [23](../../src/PinDock/MainWindow.xaml.cs#L23) |
+| Add | method_declaration | PinDock::MainWindow | [24](../../src/PinDock/MainWindow.xaml.cs#L24) |
+| Save | method_declaration | PinDock::MainWindow | [38](../../src/PinDock/MainWindow.xaml.cs#L38) |
+| AddFile_Click | method_declaration | PinDock::MainWindow | [43](../../src/PinDock/MainWindow.xaml.cs#L43) |
+| AddFolder_Click | method_declaration | PinDock::MainWindow | [48](../../src/PinDock/MainWindow.xaml.cs#L48) |
+| AddPath_Click | method_declaration | PinDock::MainWindow | [53](../../src/PinDock/MainWindow.xaml.cs#L53) |
+| Edit_Click | method_declaration | PinDock::MainWindow | [58](../../src/PinDock/MainWindow.xaml.cs#L58) |
+| SaveEdited | method_declaration | PinDock::MainWindow | [65](../../src/PinDock/MainWindow.xaml.cs#L65) |
+| Window_Drop | method_declaration | PinDock::MainWindow | [74](../../src/PinDock/MainWindow.xaml.cs#L74) |
+| Open_Click | method_declaration | PinDock::MainWindow | [78](../../src/PinDock/MainWindow.xaml.cs#L78) |
+| Remove_Click | method_declaration | PinDock::MainWindow | [85](../../src/PinDock/MainWindow.xaml.cs#L85) |

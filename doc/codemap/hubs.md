@@ -4,7 +4,7 @@
 
 [Root index](../CODE_MAP_INDEX.md)
 
-9 files · 372 symbols · import edges: 0 resolved, 0 ambiguous, 7 unresolved.
+10 files · 375 symbols · import edges: 0 resolved, 0 ambiguous, 7 unresolved.
 
 Edges come from `use`/`import` statements: relative specifiers for TypeScript, `crate`/`self`/`super` module paths plus a unique-name fallback for Rust. Lexical evidence, not type-checked resolution: an ambiguous or unresolved import is counted, never guessed.
 
