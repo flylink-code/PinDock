@@ -1,0 +1,36 @@
+{
+  "roots": ["src", "tests", "doc"],
+  "extensions": [".rs", ".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".py", ".cs", ".go", ".java", ".c", ".h", ".cc", ".cpp", ".cxx", ".hpp", ".hh", ".hxx", ".ps1", ".bat", ".cmd", ".sh"],
+  "excludeSegments": [
+    ".cargo",
+    ".devcontainer",
+    ".git",
+    ".github",
+    ".husky",
+    "artifacts",
+    "bin",
+    "obj",
+    "__pycache__",
+    "dist",
+    "docs",
+    "examples",
+    "gen",
+    "generated",
+    "node_modules",
+    "release",
+    "target",
+    "template"
+  ],
+  "excludePatterns": [],
+  "outputDir": "doc/codemap",
+  "indexFile": "doc/CODE_MAP_INDEX.md",
+  "cacheFile": "doc/.codemap-cache.json",
+  "pageRows": 100,
+  "hubCount": 40,
+  "defaultModule": "tooling",
+  "modules": {
+    "src/PinDock/": "app",
+    "tests/PinDock.Tests/": "tests",
+    "doc/": "tooling"
+  }
+}
