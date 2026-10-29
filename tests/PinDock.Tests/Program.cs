@@ -165,22 +165,27 @@ try
     if (discovered.Count != 2 || discovered[0].Name != "Everything" || discovered[1].Name != "Visual Studio Code")
         throw new Exception("InstalledAppsService discovery or filtering failed");
 
-    // 文件夹悬停目录浏览与系统目录过滤测试
+    // 文件夹悬停目录浏览、系统目录过滤与多维排序测试
     string browseRoot = Path.Combine(directory, "DriveRoot");
-    Directory.CreateDirectory(Path.Combine(browseRoot, "ProjectB"));
-    Directory.CreateDirectory(Path.Combine(browseRoot, "ProjectA"));
+    Directory.CreateDirectory(Path.Combine(browseRoot, "Project10"));
+    Directory.CreateDirectory(Path.Combine(browseRoot, "Project2"));
     Directory.CreateDirectory(Path.Combine(browseRoot, "$RECYCLE.BIN"));
     Directory.CreateDirectory(Path.Combine(browseRoot, "System Volume Information"));
     File.WriteAllText(Path.Combine(browseRoot, "readme.md"), "ok");
     File.WriteAllText(Path.Combine(browseRoot, "pagefile.sys"), "sys");
-    var browseEntries = DirectoryBrowserService.ListEntries(browseRoot);
+    Directory.SetLastWriteTime(Path.Combine(browseRoot, "Project2"), new DateTime(2025, 1, 1));
+    Directory.SetLastWriteTime(Path.Combine(browseRoot, "Project10"), new DateTime(2026, 10, 29));
+    var browseEntries = DirectoryBrowserService.ListEntries(browseRoot, DirectorySortMode.NameAsc);
     if (browseEntries.Count != 3 ||
-        !browseEntries[0].IsDirectory || browseEntries[0].Name != "ProjectA" ||
-        !browseEntries[1].IsDirectory || browseEntries[1].Name != "ProjectB" ||
+        !browseEntries[0].IsDirectory || browseEntries[0].Name != "Project2" ||
+        !browseEntries[1].IsDirectory || browseEntries[1].Name != "Project10" ||
         browseEntries[2].IsDirectory || browseEntries[2].Name != "readme.md")
     {
-        throw new Exception("DirectoryBrowserService listing or sorting failed");
+        throw new Exception("DirectoryBrowserService natural name sorting failed");
     }
+    var byModified = DirectoryBrowserService.ListEntries(browseRoot, DirectorySortMode.ModifiedDesc);
+    if (byModified[0].Name != "Project10" || byModified[1].Name != "Project2")
+        throw new Exception("DirectoryBrowserService ModifiedDesc sorting failed");
 
     // 资源管理器右键命令与参数提取测试
     if (ExplorerMenuService.TryExtractAddPath(["--add", @"D:\Work\ProjectA"]) != @"D:\Work\ProjectA")
@@ -212,8 +217,8 @@ try
     {
         Items =
         [
-            new Bookmark { Name = "App1", Path = Environment.ProcessPath!, Group = "开发工具", Pinned = true },
-            new Bookmark { Name = "Folder1", Path = directory, Group = "", Pinned = true }
+            new Bookmark { Name = "App1", Path = Environment.ProcessPath!, Group = "开发工具", Pinned = true, IconKind = BookmarkIconKind.Preset, IconValue = "drive" },
+            new Bookmark { Name = "Folder1", Path = directory, Group = "", Pinned = true, IconKind = BookmarkIconKind.CustomFile, IconValue = Environment.ProcessPath! }
         ],
         Groups = ["开发工具"],
         GroupIcons = new Dictionary<string, GroupIconConfig>
@@ -223,6 +228,7 @@ try
         Settings = new AppSettings
         {
             Language = "en-US",
+            ShowIconLabels = true,
             UtilityCollapsed = true,
             ShowLibraryButton = false,
             ShowAddButton = true,
@@ -236,6 +242,7 @@ try
         }
     };
     customGroupData.SetFolderHidden(@"E:\W-STM32IDE\", true);
+    customGroupData.SetFolderSortMode(@"E:\", DirectorySortMode.ModifiedDesc);
     if (!customGroupData.IsFolderHidden(@"e:\w-stm32ide"))
         throw new Exception("HiddenFolderPaths case-insensitive check failed");
 
@@ -250,6 +257,11 @@ try
     if (!reloadedCustom.GroupIcons.TryGetValue("开发工具", out var loadedIconCfg) ||
         loadedIconCfg.Kind != GroupIconKind.Preset || loadedIconCfg.Value != "code")
         throw new Exception("GroupIcons round trip failed");
+    if (reloadedCustom.Items[0].IconKind != BookmarkIconKind.Preset || reloadedCustom.Items[0].IconValue != "drive" ||
+        reloadedCustom.Items[1].IconKind != BookmarkIconKind.CustomFile)
+        throw new Exception("Bookmark custom icon round trip failed");
+    if (reloadedCustom.GetFolderSortMode(@"e:") != DirectorySortMode.ModifiedDesc)
+        throw new Exception("FolderSortModes round trip failed");
     if (!reloadedCustom.IsFolderHidden(@"E:\W-STM32IDE"))
         throw new Exception("HiddenFolderPaths round trip failed");
     reloadedCustom.SetFolderHidden(@"E:\W-STM32IDE", false);
@@ -257,6 +269,7 @@ try
         throw new Exception("Unhide folder failed");
 
     if (reloadedCustom.Settings.ShowLibraryButton ||
+        !reloadedCustom.Settings.ShowIconLabels ||
         !reloadedCustom.Settings.UtilityCollapsed ||
         !reloadedCustom.Settings.IsEnglish ||
         I18n.T(reloadedCustom.Settings, "中文", "English") != "English" ||
@@ -272,11 +285,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.2")
-        throw new Exception($"Expected version 0.1.2, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.2", "v0.1.3") ||
-        !UpdateService.IsNewerVersion("0.1.2", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.2", "v0.1.2"))
+    if (UpdateService.GetCurrentVersion() != "0.1.3")
+        throw new Exception($"Expected version 0.1.3, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.3", "v0.1.4") ||
+        !UpdateService.IsNewerVersion("0.1.3", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.3", "v0.1.3"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";

@@ -283,6 +283,10 @@ public partial class WebPanelWindow : Window
                 HandlePickIconForGroup();
                 break;
 
+            case "pickIconForBookmark":
+                HandlePickIconForBookmark();
+                break;
+
             case "autoSeparateDock":
                 controller.AutoSeparateDockItems();
                 PostToast("已按类型（应用 / 文件夹 / 分组）插入分隔符");
@@ -460,6 +464,14 @@ public partial class WebPanelWindow : Window
         string workDir = root.TryGetProperty("workingDirectory", out var wEl) ? (wEl.GetString() ?? "").Trim() : "";
         bool pinned = !root.TryGetProperty("pinned", out var pinEl) || pinEl.GetBoolean();
 
+        var iconKind = original?.IconKind ?? BookmarkIconKind.Default;
+        string iconValue = original?.IconValue ?? "";
+        if (root.TryGetProperty("iconKind", out var ikEl) && Enum.TryParse<BookmarkIconKind>(ikEl.GetString(), ignoreCase: true, out var parsedIk))
+        {
+            iconKind = parsedIk;
+            iconValue = root.TryGetProperty("iconValue", out var ivEl) ? (ivEl.GetString() ?? "").Trim() : "";
+        }
+
         var result = new Bookmark
         {
             Id = original?.Id ?? Guid.NewGuid(),
@@ -468,7 +480,11 @@ public partial class WebPanelWindow : Window
             Group = group is "未分组" ? "" : group,
             Arguments = args,
             WorkingDirectory = workDir,
-            Pinned = pinned
+            Pinned = pinned,
+            IconKind = iconKind,
+            IconValue = iconValue,
+            LastLaunchedTicks = original?.LastLaunchedTicks ?? 0,
+            LaunchCount = original?.LaunchCount ?? 0
         };
         controller.SaveEdited(result, original);
         PushState(null, false, null);
@@ -504,6 +520,24 @@ public partial class WebPanelWindow : Window
                 suggestedName = BookmarkEditor.SuggestDisplayName(dlg.FileName)
             });
         }
+    }
+
+    private async void HandlePickIconForBookmark()
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "选择收藏项自定义图标或程序文件",
+            Filter = "图标、图片或程序 (*.png;*.ico;*.jpg;*.jpeg;*.bmp;*.exe;*.lnk)|*.png;*.ico;*.jpg;*.jpeg;*.bmp;*.exe;*.lnk|所有文件 (*.*)|*.*",
+            DereferenceLinks = false
+        };
+        if (dlg.ShowDialog(this) != true) return;
+        string? dataUri = await icons.GetDataUriAsync(dlg.FileName);
+        PostJson(new
+        {
+            type = "pickedBookmarkIcon",
+            path = dlg.FileName,
+            dataUri
+        });
     }
 
     private async void HandlePickIconForGroup()
@@ -611,6 +645,8 @@ public partial class WebPanelWindow : Window
                 catch (Exception) { }
             }
         }
+        if (sEl.TryGetProperty("showIconLabels", out var silEl))
+            s.ShowIconLabels = silEl.GetBoolean();
         if (sEl.TryGetProperty("utilityCollapsed", out var ucEl))
             s.UtilityCollapsed = ucEl.GetBoolean();
         if (sEl.TryGetProperty("showLibraryButton", out var slb))
@@ -712,6 +748,11 @@ public partial class WebPanelWindow : Window
         {
             if (icons.TryGetCachedDataUri(item.Path) is string uri)
                 cachedIcons[item.Path] = uri;
+            if (item.IconKind == BookmarkIconKind.CustomFile && !string.IsNullOrWhiteSpace(item.IconValue) &&
+                icons.TryGetCachedDataUri(item.IconValue) is string customUri)
+            {
+                cachedIcons[item.IconValue] = customUri;
+            }
         }
         foreach (var gIcon in controller.Data.GroupIcons.Values)
         {
@@ -736,6 +777,8 @@ public partial class WebPanelWindow : Window
                 arguments = i.Arguments,
                 workingDirectory = i.WorkingDirectory,
                 pinned = i.Pinned,
+                iconKind = i.IconKind.ToString(),
+                iconValue = i.IconValue,
                 kind = BookmarkKindHelper.ToDisplayName(BookmarkKindHelper.FromPath(i.Path))
             }).ToList(),
             ["overflowIds"] = controller.OverflowItems.Select(i => i.Id.ToString()).ToList(),
@@ -782,6 +825,7 @@ public partial class WebPanelWindow : Window
                 hotkeyModifiers = s.HotkeyModifiers,
                 hotkeyKey = s.HotkeyKey,
                 language = s.Language,
+                showIconLabels = s.ShowIconLabels,
                 utilityCollapsed = s.UtilityCollapsed,
                 showLibraryButton = s.ShowLibraryButton,
                 showAddButton = s.ShowAddButton,
@@ -820,7 +864,9 @@ public partial class WebPanelWindow : Window
                 group = editorItem.Group,
                 arguments = editorItem.Arguments,
                 workingDirectory = editorItem.WorkingDirectory,
-                pinned = editorItem.Pinned
+                pinned = editorItem.Pinned,
+                iconKind = editorItem.IconKind.ToString(),
+                iconValue = editorItem.IconValue
             };
         }
 

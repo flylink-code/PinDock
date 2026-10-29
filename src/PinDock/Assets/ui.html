@@ -558,6 +558,16 @@ input[type="range"] {
           </div>
           <div class="row">
             <span>
+              Dock 图标显示样式
+              <small>支持纯图标（macOS 风格）或图标+底部文字（手机桌面风格，Dock 右键也可切换）</small>
+            </span>
+            <select id="sel-icon-label-mode" aria-label="图标显示样式">
+              <option value="false">纯图标显示</option>
+              <option value="true">图标 + 文字显示</option>
+            </select>
+          </div>
+          <div class="row">
+            <span>
               折叠 Dock 右侧功能按钮（全部收藏 / 添加 / 设置）
               <small>可以直接在 Dock 右侧末端点击「‹ / ›」展开或折叠按钮区</small>
             </span>
@@ -760,6 +770,26 @@ input[type="range"] {
           <span>工作目录（仅 EXE 可选）</span>
           <input class="field-input" id="editor-workdir" placeholder="可选工作目录">
         </label>
+      </div>
+      <div class="field-label">
+        <span>显示图标样式（可为不同文件夹或应用设置专属图标）</span>
+        <select id="editor-icon-kind" class="field-input">
+          <option value="Default">默认图标（自动提取应用图标 / 默认文件夹图标）</option>
+          <option value="Preset">内置分类矢量图标（磁盘、代码、芯片、文档等）</option>
+          <option value="CustomFile">自定义本地图片或程序图标 (.png / .ico / .exe)</option>
+        </select>
+      </div>
+      <div class="field-label" id="editor-preset-wrap" hidden>
+        <span>选择内置分类图标</span>
+        <div id="editor-preset-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+      <div class="field-label" id="editor-custom-file-wrap" hidden>
+        <span>自定义图标文件（支持 .png / .ico / .jpg / .exe / .lnk）</span>
+        <div class="field-row">
+          <span class="entry-icon" id="editor-custom-icon-preview" style="width:32px;height:32px"><svg><use href="#ico-app"/></svg></span>
+          <input class="field-input" id="editor-custom-icon-path" placeholder="选择本地图片或应用程序提取图标…">
+          <button class="chip-btn" type="button" id="btn-pick-bookmark-icon">浏览…</button>
+        </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-top:2px">
         <input type="checkbox" id="editor-pinned" checked style="accent-color:var(--accent);width:15px;height:15px">
@@ -1011,14 +1041,37 @@ function renderLibrary() {
 
     const iconWrap = document.createElement('span');
     iconWrap.className = 'entry-icon';
-    iconWrap.dataset.iconPath = item.path;
-    const cachedUri = state.icons[item.path];
-    if (cachedUri && item.kind !== '文件夹') {
-      iconWrap.innerHTML = `<img src="${cachedUri}" alt="">`;
+    if (!item.isCandidate) {
+      iconWrap.style.cursor = 'pointer';
+      iconWrap.title = tr('点击修改图标或编辑收藏', 'Click to change icon or edit');
+      iconWrap.onclick = () => openEditor(item);
+    }
+
+    const presetObj = (item.iconKind === 'Preset' && item.iconValue)
+      ? (state.groupIconPresets || []).find(p => p.key.toLowerCase() === item.iconValue.toLowerCase())
+      : null;
+
+    if (presetObj) {
+      iconWrap.innerHTML = `<svg viewBox="0 0 24 24"><path d="${presetObj.pathData}"/></svg>`;
+    } else if (item.iconKind === 'CustomFile' && item.iconValue) {
+      iconWrap.dataset.iconPath = item.iconValue;
+      const customUri = state.icons[item.iconValue];
+      if (customUri) {
+        iconWrap.innerHTML = `<img src="${customUri}" alt="">`;
+      } else {
+        iconWrap.innerHTML = fallbackSvg(item.kind);
+        if (missingIconPaths.length < 40) missingIconPaths.push(item.iconValue);
+      }
     } else {
-      iconWrap.innerHTML = fallbackSvg(item.kind);
-      if (item.kind !== '文件夹' && cachedUri === undefined && missingIconPaths.length < 40) {
-        missingIconPaths.push(item.path);
+      iconWrap.dataset.iconPath = item.path;
+      const cachedUri = state.icons[item.path];
+      if (cachedUri && item.kind !== '文件夹') {
+        iconWrap.innerHTML = `<img src="${cachedUri}" alt="">`;
+      } else {
+        iconWrap.innerHTML = fallbackSvg(item.kind);
+        if (item.kind !== '文件夹' && cachedUri === undefined && missingIconPaths.length < 40) {
+          missingIconPaths.push(item.path);
+        }
       }
     }
 
@@ -1132,16 +1185,69 @@ function renderLibrary() {
   }
 }
 
+let selectedBookmarkPresetKey = 'drive';
+
+function renderEditorPresetGrid() {
+  const grid = $('#editor-preset-grid');
+  grid.replaceChildren();
+  (state.groupIconPresets || []).forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn';
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+    btn.style.gap = '6px';
+    btn.setAttribute('aria-pressed', String(selectedBookmarkPresetKey === p.key));
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="${p.pathData}"/></svg><span>${p.label}</span>`;
+    btn.onclick = () => {
+      selectedBookmarkPresetKey = p.key;
+      renderEditorPresetGrid();
+    };
+    grid.append(btn);
+  });
+}
+
+function updateEditorIconKindVisibility() {
+  const kind = $('#editor-icon-kind').value;
+  $('#editor-preset-wrap').hidden = kind !== 'Preset';
+  $('#editor-custom-file-wrap').hidden = kind !== 'CustomFile';
+  if (kind === 'Preset') renderEditorPresetGrid();
+}
+
+function updateEditorCustomIconPreview(path, dataUri) {
+  const wrap = $('#editor-custom-icon-preview');
+  const uri = dataUri || (path && state.icons[path]);
+  if (uri) {
+    wrap.innerHTML = `<img src="${uri}" alt="">`;
+  } else {
+    wrap.innerHTML = `<svg><use href="#ico-app"/></svg>`;
+  }
+}
+
+$('#editor-icon-kind').onchange = updateEditorIconKindVisibility;
+$('#btn-pick-bookmark-icon').onclick = () => send('pickIconForBookmark');
+
 // 添加 / 编辑弹窗
 function openEditor(item = null) {
   editingId = item ? item.id : null;
-  $('#editor-title').textContent = item ? '编辑收藏' : '添加收藏';
+  $('#editor-title').textContent = item ? tr('编辑收藏 / 修改图标', 'Edit Bookmark / Change Icon') : tr('添加收藏', 'Add Bookmark');
   $('#editor-path').value = item ? item.path : '';
   $('#editor-name').value = item ? item.name : '';
   $('#editor-group').value = item ? (item.group || '') : '';
   $('#editor-args').value = item ? (item.arguments || '') : '';
   $('#editor-workdir').value = item ? (item.workingDirectory || '') : '';
   $('#editor-pinned').checked = item ? !!item.pinned : true;
+
+  const iconKind = (item && item.iconKind) || 'Default';
+  $('#editor-icon-kind').value = iconKind;
+  if (iconKind === 'Preset' && item && item.iconValue) {
+    selectedBookmarkPresetKey = item.iconValue;
+  } else if (state.groupIconPresets && state.groupIconPresets.length > 0) {
+    selectedBookmarkPresetKey = state.groupIconPresets[0].key;
+  }
+  $('#editor-custom-icon-path').value = (iconKind === 'CustomFile' && item) ? (item.iconValue || '') : '';
+  updateEditorCustomIconPreview($('#editor-custom-icon-path').value);
+  updateEditorIconKindVisibility();
 
   const sel = $('#editor-installed-select');
   sel.innerHTML = '<option value="">— 选择开始菜单 / 桌面已安装应用 —</option>';
@@ -1181,7 +1287,12 @@ $('#btn-quick-folder').onclick = () => send('quickAddFolder');
 
 $('#btn-save-editor').onclick = () => {
   const path = $('#editor-path').value.trim();
-  if (!path) { notify('请选择或输入目标路径'); return; }
+  if (!path) { notify(tr('请选择或输入目标路径', 'Please select or enter a path')); return; }
+  const iconKind = $('#editor-icon-kind').value;
+  let iconValue = '';
+  if (iconKind === 'Preset') iconValue = selectedBookmarkPresetKey;
+  else if (iconKind === 'CustomFile') iconValue = $('#editor-custom-icon-path').value.trim();
+
   send('saveBookmark', {
     id: editingId,
     name: $('#editor-name').value.trim(),
@@ -1189,7 +1300,9 @@ $('#btn-save-editor').onclick = () => {
     group: $('#editor-group').value.trim(),
     arguments: $('#editor-args').value,
     workingDirectory: $('#editor-workdir').value.trim(),
-    pinned: $('#editor-pinned').checked
+    pinned: $('#editor-pinned').checked,
+    iconKind,
+    iconValue
   });
   $('#modal-editor').classList.remove('open');
 };
@@ -1365,6 +1478,12 @@ $('#sel-size').onchange = e => {
   state.settings.iconSize = e.target.value;
   send('updateSettings', { settings: state.settings });
 };
+if ($('#sel-icon-label-mode')) {
+  $('#sel-icon-label-mode').onchange = e => {
+    state.settings.showIconLabels = e.target.value === 'true';
+    send('updateSettings', { settings: state.settings });
+  };
+}
 $('#sel-monitor-policy').onchange = e => {
   state.settings.monitorPolicy = e.target.value;
   applySettingsToUi();
@@ -1590,6 +1709,7 @@ function applySettingsToUi() {
 
   $('#sel-theme').value = s.themeMode || 'Light';
   $('#sel-size').value = s.iconSize || 'Standard';
+  if ($('#sel-icon-label-mode')) $('#sel-icon-label-mode').value = String(!!s.showIconLabels);
   $('#sel-monitor-policy').value = s.monitorPolicy || 'Primary';
 
   const op = Math.round((s.opacity || 0.94) * 100);
@@ -1697,6 +1817,10 @@ if (window.chrome && window.chrome.webview) {
       $('#group-custom-icon-path').value = msg.path || '';
       if (msg.path && msg.dataUri) state.icons[msg.path] = msg.dataUri;
       updateGroupCustomIconPreview(msg.path, msg.dataUri);
+    } else if (msg.type === 'pickedBookmarkIcon') {
+      $('#editor-custom-icon-path').value = msg.path || '';
+      if (msg.path && msg.dataUri) state.icons[msg.path] = msg.dataUri;
+      updateEditorCustomIconPreview(msg.path, msg.dataUri);
     } else if (msg.type === 'updateChecking') {
       $('#btn-check-update').disabled = true;
       $('#btn-check-update').textContent = '正在检查…';

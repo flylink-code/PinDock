@@ -4,6 +4,8 @@ using System.Text.Json;
 namespace PinDock;
 
 public enum GroupIconKind { DefaultGrid, MemberPreview, Preset, CustomFile }
+public enum BookmarkIconKind { Default, Preset, CustomFile }
+public enum DirectorySortMode { NameAsc, NameDesc, ModifiedDesc, ModifiedAsc, CreatedDesc }
 
 public sealed class GroupIconConfig
 {
@@ -20,6 +22,8 @@ public sealed class Bookmark
     public string WorkingDirectory { get; set; } = "";
     public string Group { get; set; } = "";
     public bool Pinned { get; set; }
+    public BookmarkIconKind IconKind { get; set; } = BookmarkIconKind.Default;
+    public string IconValue { get; set; } = "";
     public long LastLaunchedTicks { get; set; }
     public int LaunchCount { get; set; }
 }
@@ -32,7 +36,33 @@ public sealed class LibraryData
     public Dictionary<string, GroupIconConfig> GroupIcons { get; set; } = new(StringComparer.Ordinal);
     public List<string> DockOrder { get; set; } = [];
     public List<string> HiddenFolderPaths { get; set; } = [];
+    public Dictionary<string, DirectorySortMode> FolderSortModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public AppSettings Settings { get; set; } = new();
+
+    public DirectorySortMode GetFolderSortMode(string directoryPath)
+    {
+        if (string.IsNullOrWhiteSpace(directoryPath) || FolderSortModes is null)
+            return DirectorySortMode.NameAsc;
+        string key = NormalizePathKey(directoryPath);
+        if (FolderSortModes.TryGetValue(key, out var mode) && Enum.IsDefined(mode))
+            return mode;
+        foreach (var kv in FolderSortModes)
+        {
+            if (string.Equals(NormalizePathKey(kv.Key), key, StringComparison.OrdinalIgnoreCase) && Enum.IsDefined(kv.Value))
+                return kv.Value;
+        }
+        return DirectorySortMode.NameAsc;
+    }
+
+    public void SetFolderSortMode(string directoryPath, DirectorySortMode mode)
+    {
+        if (string.IsNullOrWhiteSpace(directoryPath)) return;
+        FolderSortModes ??= new(StringComparer.OrdinalIgnoreCase);
+        string key = NormalizePathKey(directoryPath);
+        foreach (string existing in FolderSortModes.Keys.Where(k => string.Equals(NormalizePathKey(k), key, StringComparison.OrdinalIgnoreCase)).ToList())
+            FolderSortModes.Remove(existing);
+        FolderSortModes[key] = mode;
+    }
 
     public bool IsFolderHidden(string fullPath)
     {
@@ -59,6 +89,9 @@ public sealed class LibraryData
         DockOrder ??= [];
         GroupIcons ??= new(StringComparer.Ordinal);
         HiddenFolderPaths ??= [];
+        FolderSortModes ??= new(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in Items)
+            item.IconValue ??= "";
 
         var pinnedIds = Items.Where(i => i.Pinned).Select(i => "bm:" + i.Id.ToString("D")).ToList();
         var pinnedSet = new HashSet<string>(pinnedIds, StringComparer.OrdinalIgnoreCase);

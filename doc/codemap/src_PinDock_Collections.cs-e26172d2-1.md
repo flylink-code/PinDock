@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Collections.cs) · page 1/1
 
-Source SHA-256: d89cc2d75e3180878d5d9075effac6ad792fefd34a8adbc81da700b876190237
+Source SHA-256: b07593b7a944dc1da7098ac91d7063734c2f5b7e792a143f4607b4b4e449c627
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -14,40 +14,55 @@ Source SHA-256: d89cc2d75e3180878d5d9075effac6ad792fefd34a8adbc81da700b876190237
 | MemberPreview | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | Preset | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | CustomFile | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
-| GroupIconConfig | class_declaration | PinDock | [8](../../src/PinDock/Collections.cs#L8) |
-| Kind | property_declaration | PinDock::GroupIconConfig | [10](../../src/PinDock/Collections.cs#L10) |
-| Value | property_declaration | PinDock::GroupIconConfig | [11](../../src/PinDock/Collections.cs#L11) |
-| Bookmark | class_declaration | PinDock | [14](../../src/PinDock/Collections.cs#L14) |
-| Id | property_declaration | PinDock::Bookmark | [16](../../src/PinDock/Collections.cs#L16) |
-| Name | property_declaration | PinDock::Bookmark | [17](../../src/PinDock/Collections.cs#L17) |
-| Path | property_declaration | PinDock::Bookmark | [18](../../src/PinDock/Collections.cs#L18) |
-| Arguments | property_declaration | PinDock::Bookmark | [19](../../src/PinDock/Collections.cs#L19) |
-| WorkingDirectory | property_declaration | PinDock::Bookmark | [20](../../src/PinDock/Collections.cs#L20) |
-| Group | property_declaration | PinDock::Bookmark | [21](../../src/PinDock/Collections.cs#L21) |
-| Pinned | property_declaration | PinDock::Bookmark | [22](../../src/PinDock/Collections.cs#L22) |
-| LastLaunchedTicks | property_declaration | PinDock::Bookmark | [23](../../src/PinDock/Collections.cs#L23) |
-| LaunchCount | property_declaration | PinDock::Bookmark | [24](../../src/PinDock/Collections.cs#L24) |
-| LibraryData | class_declaration | PinDock | [27](../../src/PinDock/Collections.cs#L27) |
-| Version | property_declaration | PinDock::LibraryData | [29](../../src/PinDock/Collections.cs#L29) |
-| Items | property_declaration | PinDock::LibraryData | [30](../../src/PinDock/Collections.cs#L30) |
-| Groups | property_declaration | PinDock::LibraryData | [31](../../src/PinDock/Collections.cs#L31) |
-| GroupIcons | property_declaration | PinDock::LibraryData | [32](../../src/PinDock/Collections.cs#L32) |
-| DockOrder | property_declaration | PinDock::LibraryData | [33](../../src/PinDock/Collections.cs#L33) |
-| HiddenFolderPaths | property_declaration | PinDock::LibraryData | [34](../../src/PinDock/Collections.cs#L34) |
-| Settings | property_declaration | PinDock::LibraryData | [35](../../src/PinDock/Collections.cs#L35) |
-| IsFolderHidden | method_declaration | PinDock::LibraryData | [37](../../src/PinDock/Collections.cs#L37) |
-| SetFolderHidden | method_declaration | PinDock::LibraryData | [44](../../src/PinDock/Collections.cs#L44) |
-| NormalizePathKey | method_declaration | PinDock::LibraryData | [54](../../src/PinDock/Collections.cs#L54) |
-| NormalizeDockOrder | method_declaration | PinDock::LibraryData | [57](../../src/PinDock/Collections.cs#L57) |
-| AutoSeparateByKind | method_declaration | PinDock::LibraryData | [111](../../src/PinDock/Collections.cs#L111) |
-| UnsupportedLibraryVersionException | class_declaration | PinDock | [138](../../src/PinDock/Collections.cs#L138) |
-| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [140](../../src/PinDock/Collections.cs#L140) |
-| LibraryStore | class_declaration | PinDock | [143](../../src/PinDock/Collections.cs#L143) |
-| Load | method_declaration | PinDock::LibraryStore | [149](../../src/PinDock/Collections.cs#L149) |
-| Read | method_declaration | PinDock::LibraryStore | [162](../../src/PinDock/Collections.cs#L162) |
-| ValidateSettings | method_declaration | PinDock::LibraryStore | [184](../../src/PinDock/Collections.cs#L184) |
-| Save | method_declaration | PinDock::LibraryStore | [198](../../src/PinDock/Collections.cs#L198) |
-| IsDuplicate | method_declaration | PinDock::LibraryStore | [210](../../src/PinDock/Collections.cs#L210) |
+| BookmarkIconKind | enum_declaration | PinDock | [7](../../src/PinDock/Collections.cs#L7) |
+| Default | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
+| Preset | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
+| CustomFile | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
+| DirectorySortMode | enum_declaration | PinDock | [8](../../src/PinDock/Collections.cs#L8) |
+| NameAsc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |
+| NameDesc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |
+| ModifiedDesc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |
+| ModifiedAsc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |
+| CreatedDesc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |
+| GroupIconConfig | class_declaration | PinDock | [10](../../src/PinDock/Collections.cs#L10) |
+| Kind | property_declaration | PinDock::GroupIconConfig | [12](../../src/PinDock/Collections.cs#L12) |
+| Value | property_declaration | PinDock::GroupIconConfig | [13](../../src/PinDock/Collections.cs#L13) |
+| Bookmark | class_declaration | PinDock | [16](../../src/PinDock/Collections.cs#L16) |
+| Id | property_declaration | PinDock::Bookmark | [18](../../src/PinDock/Collections.cs#L18) |
+| Name | property_declaration | PinDock::Bookmark | [19](../../src/PinDock/Collections.cs#L19) |
+| Path | property_declaration | PinDock::Bookmark | [20](../../src/PinDock/Collections.cs#L20) |
+| Arguments | property_declaration | PinDock::Bookmark | [21](../../src/PinDock/Collections.cs#L21) |
+| WorkingDirectory | property_declaration | PinDock::Bookmark | [22](../../src/PinDock/Collections.cs#L22) |
+| Group | property_declaration | PinDock::Bookmark | [23](../../src/PinDock/Collections.cs#L23) |
+| Pinned | property_declaration | PinDock::Bookmark | [24](../../src/PinDock/Collections.cs#L24) |
+| IconKind | property_declaration | PinDock::Bookmark | [25](../../src/PinDock/Collections.cs#L25) |
+| IconValue | property_declaration | PinDock::Bookmark | [26](../../src/PinDock/Collections.cs#L26) |
+| LastLaunchedTicks | property_declaration | PinDock::Bookmark | [27](../../src/PinDock/Collections.cs#L27) |
+| LaunchCount | property_declaration | PinDock::Bookmark | [28](../../src/PinDock/Collections.cs#L28) |
+| LibraryData | class_declaration | PinDock | [31](../../src/PinDock/Collections.cs#L31) |
+| Version | property_declaration | PinDock::LibraryData | [33](../../src/PinDock/Collections.cs#L33) |
+| Items | property_declaration | PinDock::LibraryData | [34](../../src/PinDock/Collections.cs#L34) |
+| Groups | property_declaration | PinDock::LibraryData | [35](../../src/PinDock/Collections.cs#L35) |
+| GroupIcons | property_declaration | PinDock::LibraryData | [36](../../src/PinDock/Collections.cs#L36) |
+| DockOrder | property_declaration | PinDock::LibraryData | [37](../../src/PinDock/Collections.cs#L37) |
+| HiddenFolderPaths | property_declaration | PinDock::LibraryData | [38](../../src/PinDock/Collections.cs#L38) |
+| FolderSortModes | property_declaration | PinDock::LibraryData | [39](../../src/PinDock/Collections.cs#L39) |
+| Settings | property_declaration | PinDock::LibraryData | [40](../../src/PinDock/Collections.cs#L40) |
+| GetFolderSortMode | method_declaration | PinDock::LibraryData | [42](../../src/PinDock/Collections.cs#L42) |
+| SetFolderSortMode | method_declaration | PinDock::LibraryData | [57](../../src/PinDock/Collections.cs#L57) |
+| IsFolderHidden | method_declaration | PinDock::LibraryData | [67](../../src/PinDock/Collections.cs#L67) |
+| SetFolderHidden | method_declaration | PinDock::LibraryData | [74](../../src/PinDock/Collections.cs#L74) |
+| NormalizePathKey | method_declaration | PinDock::LibraryData | [84](../../src/PinDock/Collections.cs#L84) |
+| NormalizeDockOrder | method_declaration | PinDock::LibraryData | [87](../../src/PinDock/Collections.cs#L87) |
+| AutoSeparateByKind | method_declaration | PinDock::LibraryData | [144](../../src/PinDock/Collections.cs#L144) |
+| UnsupportedLibraryVersionException | class_declaration | PinDock | [171](../../src/PinDock/Collections.cs#L171) |
+| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [173](../../src/PinDock/Collections.cs#L173) |
+| LibraryStore | class_declaration | PinDock | [176](../../src/PinDock/Collections.cs#L176) |
+| Load | method_declaration | PinDock::LibraryStore | [182](../../src/PinDock/Collections.cs#L182) |
+| Read | method_declaration | PinDock::LibraryStore | [195](../../src/PinDock/Collections.cs#L195) |
+| ValidateSettings | method_declaration | PinDock::LibraryStore | [217](../../src/PinDock/Collections.cs#L217) |
+| Save | method_declaration | PinDock::LibraryStore | [231](../../src/PinDock/Collections.cs#L231) |
+| IsDuplicate | method_declaration | PinDock::LibraryStore | [243](../../src/PinDock/Collections.cs#L243) |
 
 Parser recovery: 1 diagnostic(s). Inspect source; extraction may be incomplete.
-- line 143: ERROR
+- line 176: ERROR

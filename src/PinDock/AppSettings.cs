@@ -35,6 +35,9 @@ public sealed class AppSettings
     // 语言设置 (zh-CN / en-US)
     public string Language { get; set; } = "zh-CN";
 
+    // Dock 图标样式：false = 纯图标，true = 图标 + 文字（手机桌面式）
+    public bool ShowIconLabels { get; set; }
+
     // Dock 功能按钮折叠开关（右侧/底部展开折叠抽屉）
     public bool UtilityCollapsed { get; set; }
     public bool ShowLibraryButton { get; set; } = true;

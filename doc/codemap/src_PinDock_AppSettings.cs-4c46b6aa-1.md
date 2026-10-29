@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppSettings.cs) · page 1/1
 
-Source SHA-256: 75a9dd1563e41f74079882da4c8dd1b981462fda7a476cee0af5cecad75c0470
+Source SHA-256: 630f84640678a5a4d9ff09c91a05eb083de846e38abd1f2db21c532121dc9997
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -57,20 +57,21 @@ Source SHA-256: 75a9dd1563e41f74079882da4c8dd1b981462fda7a476cee0af5cecad75c0470
 | HotkeyModifiers | property_declaration | PinDock::AppSettings | [32](../../src/PinDock/AppSettings.cs#L32) |
 | HotkeyKey | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
 | Language | property_declaration | PinDock::AppSettings | [36](../../src/PinDock/AppSettings.cs#L36) |
-| UtilityCollapsed | property_declaration | PinDock::AppSettings | [39](../../src/PinDock/AppSettings.cs#L39) |
-| ShowLibraryButton | property_declaration | PinDock::AppSettings | [40](../../src/PinDock/AppSettings.cs#L40) |
-| ShowAddButton | property_declaration | PinDock::AppSettings | [41](../../src/PinDock/AppSettings.cs#L41) |
-| ShowSettingsButton | property_declaration | PinDock::AppSettings | [42](../../src/PinDock/AppSettings.cs#L42) |
-| AutoHideUtilityButtons | property_declaration | PinDock::AppSettings | [43](../../src/PinDock/AppSettings.cs#L43) |
-| Win11ClassicMenu | property_declaration | PinDock::AppSettings | [46](../../src/PinDock/AppSettings.cs#L46) |
-| LaunchAtStartup | property_declaration | PinDock::AppSettings | [49](../../src/PinDock/AppSettings.cs#L49) |
-| ClosePanelBehavior | property_declaration | PinDock::AppSettings | [50](../../src/PinDock/AppSettings.cs#L50) |
-| ConfirmBeforeExit | property_declaration | PinDock::AppSettings | [51](../../src/PinDock/AppSettings.cs#L51) |
-| UseGithubMirror | property_declaration | PinDock::AppSettings | [54](../../src/PinDock/AppSettings.cs#L54) |
-| GithubMirrorUrl | property_declaration | PinDock::AppSettings | [55](../../src/PinDock/AppSettings.cs#L55) |
-| HasHotkey | property_declaration | PinDock::AppSettings | [57](../../src/PinDock/AppSettings.cs#L57) |
-| IsEnglish | property_declaration | PinDock::AppSettings | [58](../../src/PinDock/AppSettings.cs#L58) |
-| BookmarkKind | enum_declaration | PinDock | [61](../../src/PinDock/AppSettings.cs#L61) |
-| Application | enum_member_declaration | PinDock::BookmarkKind | [61](../../src/PinDock/AppSettings.cs#L61) |
-| Folder | enum_member_declaration | PinDock::BookmarkKind | [61](../../src/PinDock/AppSettings.cs#L61) |
-| File | enum_member_declaration | PinDock::BookmarkKind | [61](../../src/PinDock/AppSettings.cs#L61) |
+| ShowIconLabels | property_declaration | PinDock::AppSettings | [39](../../src/PinDock/AppSettings.cs#L39) |
+| UtilityCollapsed | property_declaration | PinDock::AppSettings | [42](../../src/PinDock/AppSettings.cs#L42) |
+| ShowLibraryButton | property_declaration | PinDock::AppSettings | [43](../../src/PinDock/AppSettings.cs#L43) |
+| ShowAddButton | property_declaration | PinDock::AppSettings | [44](../../src/PinDock/AppSettings.cs#L44) |
+| ShowSettingsButton | property_declaration | PinDock::AppSettings | [45](../../src/PinDock/AppSettings.cs#L45) |
+| AutoHideUtilityButtons | property_declaration | PinDock::AppSettings | [46](../../src/PinDock/AppSettings.cs#L46) |
+| Win11ClassicMenu | property_declaration | PinDock::AppSettings | [49](../../src/PinDock/AppSettings.cs#L49) |
+| LaunchAtStartup | property_declaration | PinDock::AppSettings | [52](../../src/PinDock/AppSettings.cs#L52) |
+| ClosePanelBehavior | property_declaration | PinDock::AppSettings | [53](../../src/PinDock/AppSettings.cs#L53) |
+| ConfirmBeforeExit | property_declaration | PinDock::AppSettings | [54](../../src/PinDock/AppSettings.cs#L54) |
+| UseGithubMirror | property_declaration | PinDock::AppSettings | [57](../../src/PinDock/AppSettings.cs#L57) |
+| GithubMirrorUrl | property_declaration | PinDock::AppSettings | [58](../../src/PinDock/AppSettings.cs#L58) |
+| HasHotkey | property_declaration | PinDock::AppSettings | [60](../../src/PinDock/AppSettings.cs#L60) |
+| IsEnglish | property_declaration | PinDock::AppSettings | [61](../../src/PinDock/AppSettings.cs#L61) |
+| BookmarkKind | enum_declaration | PinDock | [64](../../src/PinDock/AppSettings.cs#L64) |
+| Application | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |
+| Folder | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |
+| File | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |

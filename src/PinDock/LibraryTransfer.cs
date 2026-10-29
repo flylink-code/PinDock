@@ -17,6 +17,7 @@ public static class LibraryTransfer
             GroupIcons = data.GroupIcons.ToDictionary(k => k.Key, v => new GroupIconConfig { Kind = v.Value.Kind, Value = v.Value.Value }, StringComparer.Ordinal),
             DockOrder = [.. data.DockOrder],
             HiddenFolderPaths = [.. data.HiddenFolderPaths],
+            FolderSortModes = new Dictionary<string, DirectorySortMode>(data.FolderSortModes, StringComparer.OrdinalIgnoreCase),
             Settings = CloneSettings(data.Settings)
         };
         File.WriteAllText(filePath, JsonSerializer.Serialize(copy, Options));
@@ -51,6 +52,8 @@ public static class LibraryTransfer
                 WorkingDirectory = item.WorkingDirectory,
                 Group = item.Group,
                 Pinned = item.Pinned,
+                IconKind = item.IconKind,
+                IconValue = item.IconValue ?? "",
                 LastLaunchedTicks = item.LastLaunchedTicks,
                 LaunchCount = item.LaunchCount
             });
@@ -105,6 +108,8 @@ public static class LibraryTransfer
         WorkingDirectory = item.WorkingDirectory,
         Group = item.Group,
         Pinned = item.Pinned,
+        IconKind = item.IconKind,
+        IconValue = item.IconValue ?? "",
         LastLaunchedTicks = item.LastLaunchedTicks,
         LaunchCount = item.LaunchCount
     };
@@ -128,6 +133,7 @@ public static class LibraryTransfer
         HotkeyModifiers = s.HotkeyModifiers,
         HotkeyKey = s.HotkeyKey,
         Language = s.Language,
+        ShowIconLabels = s.ShowIconLabels,
         UtilityCollapsed = s.UtilityCollapsed,
         ShowLibraryButton = s.ShowLibraryButton,
         ShowAddButton = s.ShowAddButton,

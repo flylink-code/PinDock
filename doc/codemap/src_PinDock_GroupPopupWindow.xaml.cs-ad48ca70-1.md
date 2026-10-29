@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/GroupPopupWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 35f74d7af7cad8ff3d1f052e9ea74d44d99bbd2467cc29197017460551ae1730
+Source SHA-256: e06947a849554f26f7ad2775a79083708f265c91c8aadaafb64a54a4b44d9030
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -14,7 +14,8 @@ Source SHA-256: 35f74d7af7cad8ff3d1f052e9ea74d44d99bbd2467cc29197017460551ae1730
 | ShowGroup | method_declaration | PinDock::GroupPopupWindow | [26](../../src/PinDock/GroupPopupWindow.xaml.cs#L26) |
 | Place | method_declaration | PinDock::GroupPopupWindow | [46](../../src/PinDock/GroupPopupWindow.xaml.cs#L46) |
 | RenderList | method_declaration | PinDock::GroupPopupWindow | [75](../../src/PinDock/GroupPopupWindow.xaml.cs#L75) |
-| LoadMiniIcon | method_declaration | PinDock::GroupPopupWindow | [132](../../src/PinDock/GroupPopupWindow.xaml.cs#L132) |
-| SearchBox_TextChanged | method_declaration | PinDock::GroupPopupWindow | [142](../../src/PinDock/GroupPopupWindow.xaml.cs#L142) |
-| Window_PreviewKeyDown | method_declaration | PinDock::GroupPopupWindow | [144](../../src/PinDock/GroupPopupWindow.xaml.cs#L144) |
-| Window_Deactivated | method_declaration | PinDock::GroupPopupWindow | [153](../../src/PinDock/GroupPopupWindow.xaml.cs#L153) |
+| ApplyBookmarkIcon | method_declaration | PinDock::GroupPopupWindow | [132](../../src/PinDock/GroupPopupWindow.xaml.cs#L132) |
+| LoadMiniIcon | method_declaration | PinDock::GroupPopupWindow | [159](../../src/PinDock/GroupPopupWindow.xaml.cs#L159) |
+| SearchBox_TextChanged | method_declaration | PinDock::GroupPopupWindow | [169](../../src/PinDock/GroupPopupWindow.xaml.cs#L169) |
+| Window_PreviewKeyDown | method_declaration | PinDock::GroupPopupWindow | [171](../../src/PinDock/GroupPopupWindow.xaml.cs#L171) |
+| Window_Deactivated | method_declaration | PinDock::GroupPopupWindow | [180](../../src/PinDock/GroupPopupWindow.xaml.cs#L180) |

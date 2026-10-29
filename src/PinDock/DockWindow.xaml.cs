@@ -250,20 +250,20 @@ public partial class DockWindow : Window
         bool collapsed = data.Settings.UtilityCollapsed;
         var utilityButtons = new List<FrameworkElement>();
         if (overflow.Count > 0)
-            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", T($"更多固定项 · {overflow.Count}", $"More pinned · {overflow.Count}"), icon, () => OverflowRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", T($"更多固定项 · {overflow.Count}", $"More pinned · {overflow.Count}"), icon, () => OverflowRequested?.Invoke(), isGear: false, T("更多", "More")));
         if (!collapsed)
         {
-            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏（支持直接拖入文件夹或应用）", "All Bookmarks (Drag & drop folders/apps)"), icon, () => LibraryRequested?.Invoke(), isGear: false));
-            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏（右键可快速选文件夹/本机应用）", "Add Bookmark (Right-click for quick options)"), icon, () => AddRequested?.Invoke(), isGear: false));
-            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true));
+            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏（支持直接拖入文件夹或应用）", "All Bookmarks (Drag & drop folders/apps)"), icon, () => LibraryRequested?.Invoke(), isGear: false, T("收藏库", "Library")));
+            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏（右键可快速选文件夹/本机应用）", "Add Bookmark (Right-click for quick options)"), icon, () => AddRequested?.Invoke(), isGear: false, T("添加", "Add")));
+            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true, T("设置", "Settings")));
         }
 
         // 若主区域为空且功能区被折叠，自动展开功能区防止 Dock 仅剩一个折叠箭头
         if (mainElements.Count == 0 && utilityButtons.Count == 0)
         {
-            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏", "All Bookmarks"), icon, () => LibraryRequested?.Invoke(), isGear: false));
-            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏", "Add Bookmark"), icon, () => AddRequested?.Invoke(), isGear: false));
-            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true));
+            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏", "All Bookmarks"), icon, () => LibraryRequested?.Invoke(), isGear: false, T("收藏库", "Library")));
+            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏", "Add Bookmark"), icon, () => AddRequested?.Invoke(), isGear: false, T("添加", "Add")));
+            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true, T("设置", "Settings")));
         }
 
         foreach (var element in mainElements)
@@ -353,10 +353,18 @@ public partial class DockWindow : Window
     private Button CreateBookmarkButton(Bookmark item, double icon, string token)
     {
         bool isFolder = BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Folder;
-        var button = CreateChrome(icon, item.Name, isFolder ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"), token);
+        var button = CreateChrome(
+            icon,
+            item.Name,
+            isFolder && item.IconKind == BookmarkIconKind.Default ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"),
+            token,
+            out var iconBorder,
+            item.Name);
+
+        iconBorder.Child = BuildBookmarkIconVisual(item, icon, isFolder);
+
         if (isFolder)
         {
-            ((Border)button.Content).Child = CreatePrototypeFolderIcon(icon * 0.62);
             button.ToolTip = null; // 文件夹悬停直接弹出子目录面板，不叠加文字 ToolTip 遮挡
             button.MouseEnter += (_, _) =>
             {
@@ -380,28 +388,6 @@ public partial class DockWindow : Window
         else
         {
             button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
-            var host = new Grid();
-            var fallback = new TextBlock
-            {
-                Text = "◇",
-                FontSize = icon * 0.42,
-                Foreground = (Brush)FindResource("AccentBrush"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            var image = new Image
-            {
-                Width = icon * 0.65,
-                Height = icon * 0.65,
-                Stretch = Stretch.Uniform,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
-            host.Children.Add(fallback);
-            host.Children.Add(image);
-            ((Border)button.Content).Child = host;
-            _ = LoadIcon(image, fallback, item.Path);
         }
         button.Click += (_, _) =>
         {
@@ -418,6 +404,86 @@ public partial class DockWindow : Window
             e.Handled = true;
         };
         return button;
+    }
+
+    private UIElement BuildBookmarkIconVisual(Bookmark item, double icon, bool isFolder)
+    {
+        if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            string? pathData = GroupIconPresets.FindPathData(item.IconValue);
+            if (!string.IsNullOrWhiteSpace(pathData))
+            {
+                var pathShape = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse(pathData),
+                    Fill = (Brush)FindResource("AccentBrush"),
+                    Stretch = Stretch.Uniform
+                };
+                return new Viewbox
+                {
+                    Width = icon * 0.54,
+                    Height = icon * 0.54,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Child = pathShape
+                };
+            }
+        }
+        else if (item.IconKind == BookmarkIconKind.CustomFile && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            var host = new Grid();
+            var fallback = isFolder
+                ? CreatePrototypeFolderIcon(icon * 0.62)
+                : new TextBlock
+                {
+                    Text = "◇",
+                    FontSize = icon * 0.42,
+                    Foreground = (Brush)FindResource("AccentBrush"),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+            var image = new Image
+            {
+                Width = icon * 0.65,
+                Height = icon * 0.65,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            host.Children.Add(fallback);
+            host.Children.Add(image);
+            _ = LoadIcon(image, fallback, item.IconValue);
+            return host;
+        }
+
+        if (isFolder)
+        {
+            return CreatePrototypeFolderIcon(icon * 0.62);
+        }
+
+        var defaultHost = new Grid();
+        var defaultFallback = new TextBlock
+        {
+            Text = "◇",
+            FontSize = icon * 0.42,
+            Foreground = (Brush)FindResource("AccentBrush"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        var defaultImage = new Image
+        {
+            Width = icon * 0.65,
+            Height = icon * 0.65,
+            Stretch = Stretch.Uniform,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        RenderOptions.SetBitmapScalingMode(defaultImage, BitmapScalingMode.HighQuality);
+        defaultHost.Children.Add(defaultFallback);
+        defaultHost.Children.Add(defaultImage);
+        _ = LoadIcon(defaultImage, defaultFallback, item.Path);
+        return defaultHost;
     }
 
     private void OpenFolderPopupFor(Bookmark folderItem, Button anchorButton)
@@ -490,9 +556,9 @@ public partial class DockWindow : Window
 
     private Button CreateGroupButton(string group, double icon, string token)
     {
-        var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"), token);
+        var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"), token, out var iconBorder, group);
         button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
-        ((Border)button.Content).Child = BuildGroupIconVisual(group, icon);
+        iconBorder.Child = BuildGroupIconVisual(group, icon);
         button.Click += (_, _) =>
         {
             if (isReordering || IsDragging) return;
@@ -645,11 +711,11 @@ public partial class DockWindow : Window
         return grid;
     }
 
-    private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear)
+    private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear, string? labelText = null)
     {
-        var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"), reorderItemToken: null);
+        var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"), reorderItemToken: null, out var iconBorder, labelText);
         button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
-        ((Border)button.Content).Child = new TextBlock
+        iconBorder.Child = new TextBlock
         {
             Text = glyph,
             FontSize = isGear ? icon * 0.46 : icon * 0.4,
@@ -713,11 +779,11 @@ public partial class DockWindow : Window
         return hitBox;
     }
 
-    private Button CreateChrome(double icon, string tip, Brush background, string? reorderItemToken)
+    private Button CreateChrome(double icon, string tip, Brush background, string? reorderItemToken, out Border iconBorder, string? labelText = null)
     {
         var scale = new ScaleTransform(1, 1);
         var translate = new TranslateTransform(0, 0);
-        var border = new Border
+        iconBorder = new Border
         {
             Width = icon,
             Height = icon,
@@ -728,10 +794,35 @@ public partial class DockWindow : Window
             RenderTransformOrigin = new Point(0.5, 0.5),
             RenderTransform = new TransformGroup { Children = { scale, translate } }
         };
+
+        object contentElement = iconBorder;
+        if (data.Settings.ShowIconLabels && !string.IsNullOrWhiteSpace(labelText))
+        {
+            var stack = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Width = icon + 10
+            };
+            stack.Children.Add(iconBorder);
+            stack.Children.Add(new TextBlock
+            {
+                Text = labelText,
+                FontSize = 10,
+                Foreground = (Brush)FindResource("InkBrush"),
+                MaxWidth = icon + 10,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                TextAlignment = TextAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 3.5, 0, 0)
+            });
+            contentElement = stack;
+        }
+
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
         var button = new Button
         {
-            Content = border,
+            Content = contentElement,
             Style = (Style)FindResource("DockButton"),
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
             ToolTip = tip,
@@ -755,6 +846,9 @@ public partial class DockWindow : Window
         AttachReorderOrDrag(button, reorderItemToken);
         return button;
     }
+
+    private static Border? ExtractIconBorder(Button btn) =>
+        btn.Content as Border ?? (btn.Content as Panel)?.Children.OfType<Border>().FirstOrDefault();
 
     private async Task LoadIcon(Image image, UIElement fallback, string path)
     {
@@ -797,7 +891,7 @@ public partial class DockWindow : Window
 
         menu.Items.Add(new Separator());
 
-        var editItem = new MenuItem { Tag = "✎", Header = T("编辑收藏…", "Edit bookmark…") };
+        var editItem = new MenuItem { Tag = "✎", Header = T("编辑收藏 / 修改图标…", "Edit bookmark / Change icon…") };
         editItem.Click += (_, _) => EditRequested?.Invoke(item);
         menu.Items.Add(editItem);
 
@@ -959,6 +1053,21 @@ public partial class DockWindow : Window
             };
             menu.Items.Add(clearSeps);
         }
+
+        var toggleLabels = new MenuItem
+        {
+            Tag = "Aa",
+            Header = data.Settings.ShowIconLabels
+                ? T("切换为纯图标显示", "Switch to Icon Only mode")
+                : T("切换为图标 + 文字显示", "Switch to Icon + Label mode")
+        };
+        toggleLabels.Click += (_, _) =>
+        {
+            data.Settings.ShowIconLabels = !data.Settings.ShowIconLabels;
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        menu.Items.Add(toggleLabels);
 
         var toggleDrawer = new MenuItem
         {
@@ -1192,7 +1301,7 @@ public partial class DockWindow : Window
     {
         ClearDropHighlights();
         var target = FindTargetElementAt(posInPanel, vertical, out _);
-        if (target is Button { Content: Border b })
+        if (target is Button btn && ExtractIconBorder(btn) is Border b)
         {
             b.BorderBrush = (Brush)FindResource("AccentBrush");
         }
@@ -1206,7 +1315,7 @@ public partial class DockWindow : Window
     {
         foreach (UIElement child in ItemsPanel.Children)
         {
-            if (child is Button { Content: Border b })
+            if (child is Button btn && ExtractIconBorder(btn) is Border b)
                 b.BorderBrush = Brushes.Transparent;
             else if (child is Border sepHit && sepHit != reorderElement)
                 sepHit.Opacity = 1.0;

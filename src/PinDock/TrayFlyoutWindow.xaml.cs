@@ -348,7 +348,28 @@ public partial class TrayFlyoutWindow : Window
             Hide();
             _ = controller.LaunchAsync(item);
         };
-        _ = LoadMiniIconAsync(iconHost, item.Path);
+        if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue) &&
+            GroupIconPresets.FindPathData(item.IconValue) is string pathData && !string.IsNullOrWhiteSpace(pathData))
+        {
+            iconHost.Child = new Viewbox
+            {
+                Width = 18,
+                Height = 18,
+                Child = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse(pathData),
+                    Fill = (Brush)FindResource("AccentBrush"),
+                    Stretch = Stretch.Uniform
+                }
+            };
+        }
+        else
+        {
+            string targetIconPath = item.IconKind == BookmarkIconKind.CustomFile && !string.IsNullOrWhiteSpace(item.IconValue)
+                ? item.IconValue
+                : item.Path;
+            _ = LoadMiniIconAsync(iconHost, targetIconPath);
+        }
         return button;
     }
 

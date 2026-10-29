@@ -18,24 +18,29 @@
             </DockPanel>
             <TextBlock x:Name="PathText" DockPanel.Dock="Top" FontSize="10" FontFamily="Consolas, Microsoft YaHei UI"
                        Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,10" TextTrimming="CharacterEllipsis"/>
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
-                <TextBox x:Name="SearchBox" Padding="10,7" FontSize="12"
-                         Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}"
-                         TextChanged="SearchBox_TextChanged"/>
-                <TextBlock x:Name="SearchHintText" Text="搜索当前目录下的文件夹或文件…" IsHitTestVisible="False" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource MutedBrush}" Margin="13,0,0,0">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </Grid>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                <Button x:Name="SortButton" DockPanel.Dock="Right" Style="{StaticResource SubtleButton}"
+                        Content="⇅ 名称 A-Z" Padding="9,7" FontSize="11" Margin="6,0,0,0"
+                        Click="SortButton_Click" ToolTip="切换目录排序方式（自动按目录记忆）"/>
+                <Grid>
+                    <TextBox x:Name="SearchBox" Padding="10,7" FontSize="12"
+                             Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}"
+                             TextChanged="SearchBox_TextChanged"/>
+                    <TextBlock x:Name="SearchHintText" Text="搜索当前目录下的文件夹或文件…" IsHitTestVisible="False" FontSize="12" VerticalAlignment="Center"
+                               Foreground="{DynamicResource MutedBrush}" Margin="13,0,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </DockPanel>
             <Border DockPanel.Dock="Bottom" Margin="0,8,0,0" Padding="0,9,0,0" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

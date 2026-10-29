@@ -4,10 +4,10 @@
 
 [Module](app.md) · [Source](../../src/PinDock/GroupIconPresets.cs) · page 1/1
 
-Source SHA-256: 9d46b83fa316c51c3932f863bd7b271279d6b64c2d893162a6869c46a9007eaf
+Source SHA-256: c49d694ff1471f6827685e48d5cb920189aa2c9e169cef6c1916428263897615
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [1](../../src/PinDock/GroupIconPresets.cs#L1) |
 | GroupIconPresets | class_declaration | PinDock | [5](../../src/PinDock/GroupIconPresets.cs#L5) |
-| FindPathData | method_declaration | PinDock::GroupIconPresets | [19](../../src/PinDock/GroupIconPresets.cs#L19) |
+| FindPathData | method_declaration | PinDock::GroupIconPresets | [22](../../src/PinDock/GroupIconPresets.cs#L22) |

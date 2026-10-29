@@ -4,11 +4,16 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DirectoryBrowserService.cs) · page 1/1
 
-Source SHA-256: 181b564f4206f2b1aa2f55ca003746cafdba84372c6f5778716c453c8507ece5
+Source SHA-256: 1c410a288da4969aae626dc635a18ebbd1e27257bd1c9da0b90f4214c457cf97
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/DirectoryBrowserService.cs#L3) |
-| DirectoryBrowserService | class_declaration | PinDock | [7](../../src/PinDock/DirectoryBrowserService.cs#L7) |
-| ListEntries | method_declaration | PinDock::DirectoryBrowserService | [23](../../src/PinDock/DirectoryBrowserService.cs#L23) |
-| ShouldSkip | method_declaration | PinDock::DirectoryBrowserService | [67](../../src/PinDock/DirectoryBrowserService.cs#L67) |
+| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/DirectoryBrowserService.cs#L4) |
+| DirectoryBrowserService | class_declaration | PinDock | [13](../../src/PinDock/DirectoryBrowserService.cs#L13) |
+| ListEntries | method_declaration | PinDock::DirectoryBrowserService | [29](../../src/PinDock/DirectoryBrowserService.cs#L29) |
+| SortGroup | method_declaration | PinDock::DirectoryBrowserService | [85](../../src/PinDock/DirectoryBrowserService.cs#L85) |
+| CompareNatural | method_declaration | PinDock::DirectoryBrowserService | [97](../../src/PinDock/DirectoryBrowserService.cs#L97) |
+| CompareTimeThenName | method_declaration | PinDock::DirectoryBrowserService | [99](../../src/PinDock/DirectoryBrowserService.cs#L99) |
+| SafeTime | method_declaration | PinDock::DirectoryBrowserService | [105](../../src/PinDock/DirectoryBrowserService.cs#L105) |
+| ShouldSkip | method_declaration | PinDock::DirectoryBrowserService | [111](../../src/PinDock/DirectoryBrowserService.cs#L111) |
+| StrCmpLogicalW | method_declaration | PinDock::DirectoryBrowserService | [120](../../src/PinDock/DirectoryBrowserService.cs#L120) |

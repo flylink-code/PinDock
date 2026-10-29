@@ -15,6 +15,7 @@ public partial class FolderPopupWindow : Window
     private LibraryData data = new();
     private string rootDirectory = "";
     private string currentDirectory = "";
+    private DirectorySortMode currentSortMode = DirectorySortMode.NameAsc;
     private IReadOnlyList<DirectoryEntryItem> entries = [];
     private ScreenRect anchorRect;
     private ScreenRect workArea;
@@ -46,6 +47,7 @@ public partial class FolderPopupWindow : Window
     {
         if (!Directory.Exists(folderPath)) return;
         rootDirectory = Path.GetFullPath(folderPath);
+        currentSortMode = data.GetFolderSortMode(rootDirectory);
         anchorRect = anchor;
         workArea = monitorWorkArea;
         dockEdge = edge;
@@ -55,6 +57,7 @@ public partial class FolderPopupWindow : Window
         OpenCurrentButton.Content = T("↗ 打开当前目录", "↗ Open Folder");
         SearchHintText.Text = T("搜索当前目录下的文件夹或文件…", "Search folders or files…");
         FooterTipText.Text = T("单击直接打开 · 悬停或右键可隐藏", "Click to open · Hover or right-click to hide");
+        UpdateSortButtonLabel();
         NavigateTo(rootDirectory, displayName);
 
         if (!IsVisible)
@@ -81,9 +84,61 @@ public partial class FolderPopupWindow : Window
         var parent = Directory.GetParent(directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
         UpButton.Visibility = parent is not null ? Visibility.Visible : Visibility.Collapsed;
 
-        entries = DirectoryBrowserService.ListEntries(directoryPath);
+        entries = DirectoryBrowserService.ListEntries(directoryPath, currentSortMode);
         SearchBox.Text = "";
         RenderList("");
+    }
+
+    private void UpdateSortButtonLabel()
+    {
+        SortButton.Content = currentSortMode switch
+        {
+            DirectorySortMode.NameAsc => T("⇅ 名称 A-Z", "⇅ Name A-Z"),
+            DirectorySortMode.NameDesc => T("⇅ 名称 Z-A", "⇅ Name Z-A"),
+            DirectorySortMode.ModifiedDesc => T("⇅ 最近修改", "⇅ Modified ↓"),
+            DirectorySortMode.ModifiedAsc => T("⇅ 最早修改", "⇅ Modified ↑"),
+            DirectorySortMode.CreatedDesc => T("⇅ 最近创建", "⇅ Created ↓"),
+            _ => T("⇅ 名称 A-Z", "⇅ Name A-Z")
+        };
+    }
+
+    private void SortButton_Click(object sender, RoutedEventArgs e)
+    {
+        var menu = new ContextMenu();
+        menu.Opened += (_, _) => IsContextMenuOpen = true;
+        menu.Closed += (_, _) => IsContextMenuOpen = false;
+
+        var modes = new (DirectorySortMode Mode, string Zh, string En)[]
+        {
+            (DirectorySortMode.NameAsc, "按名称 (A → Z，自然排序)", "Name (A → Z, Natural)"),
+            (DirectorySortMode.NameDesc, "按名称 (Z → A)", "Name (Z → A)"),
+            (DirectorySortMode.ModifiedDesc, "按修改时间 (最新优先)", "Date Modified (Newest first)"),
+            (DirectorySortMode.ModifiedAsc, "按修改时间 (最早优先)", "Date Modified (Oldest first)"),
+            (DirectorySortMode.CreatedDesc, "按创建时间 (最新优先)", "Date Created (Newest first)")
+        };
+
+        foreach (var (mode, zh, en) in modes)
+        {
+            bool active = mode == currentSortMode;
+            var item = new MenuItem
+            {
+                Tag = active ? "✓" : "",
+                Header = T(zh, en),
+                FontWeight = active ? FontWeights.SemiBold : FontWeights.Normal
+            };
+            item.Click += (_, _) =>
+            {
+                currentSortMode = mode;
+                data.SetFolderSortMode(rootDirectory, mode);
+                HiddenFoldersChanged?.Invoke();
+                UpdateSortButtonLabel();
+                entries = DirectoryBrowserService.ListEntries(currentDirectory, currentSortMode);
+                RenderList(SearchBox.Text.Trim());
+            };
+            menu.Items.Add(item);
+        }
+
+        menu.IsOpen = true;
     }
 
     private static Point Place(ScreenRect anchor, ScreenRect workArea, DockEdge edge, double width, double height)
@@ -310,6 +365,28 @@ public partial class FolderPopupWindow : Window
             var innerRow = new DockPanel();
             DockPanel.SetDock(iconHost, Dock.Left);
             innerRow.Children.Add(iconHost);
+
+            if (currentSortMode is DirectorySortMode.ModifiedDesc or DirectorySortMode.ModifiedAsc or DirectorySortMode.CreatedDesc)
+            {
+                DateTime ts = currentSortMode == DirectorySortMode.CreatedDesc ? entry.CreationTime : entry.LastWriteTime;
+                if (ts > DateTime.MinValue)
+                {
+                    string timeStr = ts.Year == DateTime.Now.Year
+                        ? ts.ToString("MM-dd HH:mm")
+                        : ts.ToString("yyyy-MM-dd");
+                    var timeBlock = new TextBlock
+                    {
+                        Text = timeStr,
+                        FontSize = 10,
+                        Foreground = (Brush)FindResource("MutedBrush"),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(8, 0, 2, 0)
+                    };
+                    DockPanel.SetDock(timeBlock, Dock.Right);
+                    innerRow.Children.Add(timeBlock);
+                }
+            }
+
             innerRow.Children.Add(nameBlock);
             mainBtn.Content = innerRow;
 

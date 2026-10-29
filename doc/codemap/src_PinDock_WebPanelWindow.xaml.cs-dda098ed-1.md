@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/WebPanelWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 5049974fe0968c11e777b61664bc498a4d05ef007716bfeac2c9e9821e10227b
+Source SHA-256: bea8754a9e01c2303e2744bb735233226c55910b4efc8bb2a81274c790b82ea1
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -22,22 +22,23 @@ Source SHA-256: 5049974fe0968c11e777b61664bc498a4d05ef007716bfeac2c9e9821e10227b
 | EnsureInitializedAsync | method_declaration | PinDock::WebPanelWindow | [127](../../src/PinDock/WebPanelWindow.xaml.cs#L127) |
 | InitializeCoreAsync | method_declaration | PinDock::WebPanelWindow | [129](../../src/PinDock/WebPanelWindow.xaml.cs#L129) |
 | OnWebMessageReceived | method_declaration | PinDock::WebPanelWindow | [153](../../src/PinDock/WebPanelWindow.xaml.cs#L153) |
-| HandleLaunch | method_declaration | PinDock::WebPanelWindow | [435](../../src/PinDock/WebPanelWindow.xaml.cs#L435) |
-| HandleSaveBookmark | method_declaration | PinDock::WebPanelWindow | [448](../../src/PinDock/WebPanelWindow.xaml.cs#L448) |
-| HandlePickPathForEditor | method_declaration | PinDock::WebPanelWindow | [478](../../src/PinDock/WebPanelWindow.xaml.cs#L478) |
-| HandlePickIconForGroup | method_declaration | PinDock::WebPanelWindow | [509](../../src/PinDock/WebPanelWindow.xaml.cs#L509) |
-| HandleCheckUpdateAsync | method_declaration | PinDock::WebPanelWindow | [527](../../src/PinDock/WebPanelWindow.xaml.cs#L527) |
-| HandleDownloadAndInstallUpdateAsync | method_declaration | PinDock::WebPanelWindow | [560](../../src/PinDock/WebPanelWindow.xaml.cs#L560) |
-| HandleUpdateSettings | method_declaration | PinDock::WebPanelWindow | [580](../../src/PinDock/WebPanelWindow.xaml.cs#L580) |
-| HandleImport | method_declaration | PinDock::WebPanelWindow | [638](../../src/PinDock/WebPanelWindow.xaml.cs#L638) |
-| HandleExport | method_declaration | PinDock::WebPanelWindow | [654](../../src/PinDock/WebPanelWindow.xaml.cs#L654) |
-| LoadIconsAsync | method_declaration | PinDock::WebPanelWindow | [669](../../src/PinDock/WebPanelWindow.xaml.cs#L669) |
-| TryFindBookmark | method_declaration | PinDock::WebPanelWindow | [683](../../src/PinDock/WebPanelWindow.xaml.cs#L683) |
-| PushState | method_declaration | PinDock::WebPanelWindow | [698](../../src/PinDock/WebPanelWindow.xaml.cs#L698) |
-| PostToast | method_declaration | PinDock::WebPanelWindow | [830](../../src/PinDock/WebPanelWindow.xaml.cs#L830) |
-| PostJson | method_declaration | PinDock::WebPanelWindow | [832](../../src/PinDock/WebPanelWindow.xaml.cs#L832) |
-| BeginNativeDrag | method_declaration | PinDock::WebPanelWindow | [838](../../src/PinDock/WebPanelWindow.xaml.cs#L838) |
-| Window_Drop | method_declaration | PinDock::WebPanelWindow | [845](../../src/PinDock/WebPanelWindow.xaml.cs#L845) |
-| OnClosing | method_declaration | PinDock::WebPanelWindow | [855](../../src/PinDock/WebPanelWindow.xaml.cs#L855) |
-| ReleaseCapture | method_declaration | PinDock::WebPanelWindow | [867](../../src/PinDock/WebPanelWindow.xaml.cs#L867) |
-| SendMessage | method_declaration | PinDock::WebPanelWindow | [870](../../src/PinDock/WebPanelWindow.xaml.cs#L870) |
+| HandleLaunch | method_declaration | PinDock::WebPanelWindow | [439](../../src/PinDock/WebPanelWindow.xaml.cs#L439) |
+| HandleSaveBookmark | method_declaration | PinDock::WebPanelWindow | [452](../../src/PinDock/WebPanelWindow.xaml.cs#L452) |
+| HandlePickPathForEditor | method_declaration | PinDock::WebPanelWindow | [494](../../src/PinDock/WebPanelWindow.xaml.cs#L494) |
+| HandlePickIconForBookmark | method_declaration | PinDock::WebPanelWindow | [525](../../src/PinDock/WebPanelWindow.xaml.cs#L525) |
+| HandlePickIconForGroup | method_declaration | PinDock::WebPanelWindow | [543](../../src/PinDock/WebPanelWindow.xaml.cs#L543) |
+| HandleCheckUpdateAsync | method_declaration | PinDock::WebPanelWindow | [561](../../src/PinDock/WebPanelWindow.xaml.cs#L561) |
+| HandleDownloadAndInstallUpdateAsync | method_declaration | PinDock::WebPanelWindow | [594](../../src/PinDock/WebPanelWindow.xaml.cs#L594) |
+| HandleUpdateSettings | method_declaration | PinDock::WebPanelWindow | [614](../../src/PinDock/WebPanelWindow.xaml.cs#L614) |
+| HandleImport | method_declaration | PinDock::WebPanelWindow | [674](../../src/PinDock/WebPanelWindow.xaml.cs#L674) |
+| HandleExport | method_declaration | PinDock::WebPanelWindow | [690](../../src/PinDock/WebPanelWindow.xaml.cs#L690) |
+| LoadIconsAsync | method_declaration | PinDock::WebPanelWindow | [705](../../src/PinDock/WebPanelWindow.xaml.cs#L705) |
+| TryFindBookmark | method_declaration | PinDock::WebPanelWindow | [719](../../src/PinDock/WebPanelWindow.xaml.cs#L719) |
+| PushState | method_declaration | PinDock::WebPanelWindow | [734](../../src/PinDock/WebPanelWindow.xaml.cs#L734) |
+| PostToast | method_declaration | PinDock::WebPanelWindow | [876](../../src/PinDock/WebPanelWindow.xaml.cs#L876) |
+| PostJson | method_declaration | PinDock::WebPanelWindow | [878](../../src/PinDock/WebPanelWindow.xaml.cs#L878) |
+| BeginNativeDrag | method_declaration | PinDock::WebPanelWindow | [884](../../src/PinDock/WebPanelWindow.xaml.cs#L884) |
+| Window_Drop | method_declaration | PinDock::WebPanelWindow | [891](../../src/PinDock/WebPanelWindow.xaml.cs#L891) |
+| OnClosing | method_declaration | PinDock::WebPanelWindow | [901](../../src/PinDock/WebPanelWindow.xaml.cs#L901) |
+| ReleaseCapture | method_declaration | PinDock::WebPanelWindow | [913](../../src/PinDock/WebPanelWindow.xaml.cs#L913) |
+| SendMessage | method_declaration | PinDock::WebPanelWindow | [916](../../src/PinDock/WebPanelWindow.xaml.cs#L916) |

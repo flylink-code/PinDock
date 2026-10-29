@@ -125,8 +125,35 @@ public partial class GroupPopupWindow : Window
             button.Content = row;
             button.Click += (_, _) => LaunchRequested?.Invoke(item);
             ListPanel.Children.Add(button);
-            _ = LoadMiniIcon(iconHost, item.Path);
+            ApplyBookmarkIcon(iconHost, item);
         }
+    }
+
+    private void ApplyBookmarkIcon(Border host, Bookmark item)
+    {
+        if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            string? pathData = GroupIconPresets.FindPathData(item.IconValue);
+            if (!string.IsNullOrWhiteSpace(pathData))
+            {
+                host.Child = new Viewbox
+                {
+                    Width = 20,
+                    Height = 20,
+                    Child = new System.Windows.Shapes.Path
+                    {
+                        Data = Geometry.Parse(pathData),
+                        Fill = (Brush)FindResource("AccentBrush"),
+                        Stretch = Stretch.Uniform
+                    }
+                };
+                return;
+            }
+        }
+        string iconPath = item.IconKind == BookmarkIconKind.CustomFile && !string.IsNullOrWhiteSpace(item.IconValue)
+            ? item.IconValue
+            : item.Path;
+        _ = LoadMiniIcon(host, iconPath);
     }
 
     private async Task LoadMiniIcon(Border host, string path)
