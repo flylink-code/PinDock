@@ -272,11 +272,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.1")
-        throw new Exception($"Expected version 0.1.1, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.1", "v0.1.2") ||
-        !UpdateService.IsNewerVersion("0.1.1", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.1", "v0.1.1"))
+    if (UpdateService.GetCurrentVersion() != "0.1.2")
+        throw new Exception($"Expected version 0.1.2, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.2", "v0.1.3") ||
+        !UpdateService.IsNewerVersion("0.1.2", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.2", "v0.1.2"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";

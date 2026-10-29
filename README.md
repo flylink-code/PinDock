@@ -2,7 +2,7 @@
 
 Windows 独立快捷启动工具。悬浮 Dock、本地收藏、分组与主题，不替换系统任务栏。
 
-## 已实现 (v0.1.1)
+## 已实现 (v0.1.2)
 
 - **混合架构（C# .NET 10 + WebView2 HTML/CSS）**：系统底层（全局热键、48×48 高清图标提取、全屏避让、资源管理器右键、开机自启、单实例 IPC）采用 C# 原生实现；《全部收藏》《设置》《添加/编辑收藏》面板采用预热 WebView2 1:1 渲染 HTML/CSS 原型（[Assets/ui.html](src/PinDock/Assets/ui.html)），GPU 硬件加速
 - **悬浮 Dock**：四边停靠、固定项、溢出入口、收藏组弹层、**文件夹悬停子目录快速浏览（支持多级展开、搜索、一键固定、子文件夹隐藏与恢复）**、**直接拖拽图标排序与自由插入/删除分隔符（支持按应用/文件夹一键自动分隔）**、**自定义分组图标（支持组内 2×2 缩略宫格、内置分类矢量图标、本地图片/程序图标）**、**右侧末端展开/折叠功能按钮抽屉 (`‹ / ›`)**
@@ -23,7 +23,7 @@ dotnet build PinDock.sln
 dotnet run --project tests/PinDock.Tests
 dotnet run --project src/PinDock
 
-# 一键编译生成安装包 (输出至 dist\PinDock-Setup-0.1.1.exe)
+# 一键编译生成安装包 (输出至 dist\PinDock-Setup-0.1.2.exe)
 powershell -ExecutionPolicy Bypass -File scripts\build-installer.ps1
 ```
 

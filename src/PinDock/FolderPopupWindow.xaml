@@ -23,7 +23,7 @@
                          Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}"
                          TextChanged="SearchBox_TextChanged"/>
                 <TextBlock x:Name="SearchHintText" Text="搜索当前目录下的文件夹或文件…" IsHitTestVisible="False" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource MutedBrush}" Margin="12,0,0,0">
+                           Foreground="{DynamicResource MutedBrush}" Margin="13,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -39,11 +39,11 @@
             <Border DockPanel.Dock="Bottom" Margin="0,8,0,0" Padding="0,9,0,0" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="ToggleHiddenBtn" Content="👁 已隐藏 0" Padding="7,3" FontSize="10" Margin="0,0,8,0"
+                        <Button x:Name="ToggleHiddenBtn" Style="{StaticResource SubtleButton}" Content="已隐藏 0 项" Padding="8,3" FontSize="10.5" Margin="0,0,8,0"
                                 Visibility="Collapsed" Click="ToggleHiddenBtn_Click"/>
-                        <TextBlock x:Name="CountText" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
+                        <TextBlock x:Name="CountText" FontSize="10.5" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
                     </StackPanel>
-                    <TextBlock x:Name="FooterTipText" FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Text="单击直接打开 · 悬停可隐藏或展开"/>
+                    <TextBlock x:Name="FooterTipText" FontSize="10.5" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Text="单击直接打开 · 右键或悬停可隐藏"/>
                 </DockPanel>
             </Border>
             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">

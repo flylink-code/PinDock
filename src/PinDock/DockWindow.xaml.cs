@@ -17,6 +17,7 @@ public partial class DockWindow : Window
     private readonly DispatcherTimer utilityHoverHideTimer = new() { Interval = TimeSpan.FromMilliseconds(260) };
     private Bookmark? pendingHoverFolder;
     private Button? pendingHoverButton;
+    private ScreenRect activeFolderButtonRect;
     private LibraryData data = new();
     private DockPlacement placement;
     private ScreenRect workArea;
@@ -321,7 +322,7 @@ public partial class DockWindow : Window
         ToolTipService.SetInitialShowDelay(button, 120);
         button.MouseEnter += (_, _) =>
         {
-            folderOpenTimer.Stop();
+            CloseFolderPopupOnOtherHover();
             border.Background = (Brush)FindResource("SoftBrush");
         };
         button.MouseLeave += (_, _) =>
@@ -335,6 +336,18 @@ public partial class DockWindow : Window
             DragEnded?.Invoke();
         };
         return button;
+    }
+
+    private void CloseFolderPopupOnOtherHover()
+    {
+        folderOpenTimer.Stop();
+        pendingHoverFolder = null;
+        pendingHoverButton = null;
+        if (folderPopup.IsVisible)
+        {
+            folderPopup.Hide();
+            folderCloseTimer.Stop();
+        }
     }
 
     private Button CreateBookmarkButton(Bookmark item, double icon, string token)
@@ -366,7 +379,7 @@ public partial class DockWindow : Window
         }
         else
         {
-            button.MouseEnter += (_, _) => folderOpenTimer.Stop();
+            button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
             var host = new Grid();
             var fallback = new TextBlock
             {
@@ -417,6 +430,7 @@ public partial class DockWindow : Window
             topLeft.Y,
             anchorButton.ActualWidth * scale,
             anchorButton.ActualHeight * scale);
+        activeFolderButtonRect = buttonRect;
         var anchor = data.Settings.DockEdge is DockEdge.Bottom or DockEdge.Top
             ? new ScreenRect(buttonRect.X, placement.Bounds.Y, buttonRect.Width, placement.Bounds.Height)
             : new ScreenRect(placement.Bounds.X, buttonRect.Y, placement.Bounds.Width, buttonRect.Height);
@@ -435,9 +449,9 @@ public partial class DockWindow : Window
         if (folderPopup.IsKeyboardFocusWithin || folderPopup.IsContextMenuOpen) return;
         if (!AutoHideController.TryGetCursorPoint(out var pt)) return;
 
-        var dockRect = ExpandRect(placement.Bounds, 16);
+        var btnRect = ExpandRect(activeFolderButtonRect, 14);
         var popRect = ExpandRect(NativeWindow.GetPixelBounds(folderPopup), 18);
-        if (!dockRect.Contains(pt.X, pt.Y) && !popRect.Contains(pt.X, pt.Y))
+        if (!btnRect.Contains(pt.X, pt.Y) && !popRect.Contains(pt.X, pt.Y))
         {
             folderPopup.Hide();
             folderCloseTimer.Stop();
@@ -477,7 +491,7 @@ public partial class DockWindow : Window
     private Button CreateGroupButton(string group, double icon, string token)
     {
         var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"), token);
-        button.MouseEnter += (_, _) => folderOpenTimer.Stop();
+        button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
         ((Border)button.Content).Child = BuildGroupIconVisual(group, icon);
         button.Click += (_, _) =>
         {
@@ -634,7 +648,7 @@ public partial class DockWindow : Window
     private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear)
     {
         var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"), reorderItemToken: null);
-        button.MouseEnter += (_, _) => folderOpenTimer.Stop();
+        button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
         ((Border)button.Content).Child = new TextBlock
         {
             Text = glyph,
@@ -755,43 +769,43 @@ public partial class DockWindow : Window
     private void ShowBookmarkContextMenu(Bookmark item, string token)
     {
         var menu = new ContextMenu();
-        var openItem = new MenuItem { Header = T($"打开“{item.Name}”", $"Open \"{item.Name}\"") };
+        var openItem = new MenuItem { Tag = "↗", Header = T($"打开“{item.Name}”", $"Open \"{item.Name}\"") };
         openItem.Click += (_, _) => LaunchRequested?.Invoke(item);
         menu.Items.Add(openItem);
 
-        var revealItem = new MenuItem { Header = T("在资源管理器中显示", "Show in Explorer") };
+        var revealItem = new MenuItem { Tag = "📂", Header = T("在资源管理器中显示", "Show in Explorer") };
         revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
         menu.Items.Add(revealItem);
 
         menu.Items.Add(new Separator());
 
-        var sepBefore = new MenuItem { Header = T("｜ 在前面插入分隔符", "｜ Insert separator before") };
+        var sepBefore = new MenuItem { Tag = "｜", Header = T("在前面插入分隔符", "Insert separator before") };
         sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
         menu.Items.Add(sepBefore);
 
-        var sepAfter = new MenuItem { Header = T("｜ 在后面插入分隔符", "｜ Insert separator after") };
+        var sepAfter = new MenuItem { Tag = "｜", Header = T("在后面插入分隔符", "Insert separator after") };
         sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
         menu.Items.Add(sepAfter);
 
-        var movePrev = new MenuItem { Header = T("← 向前移动一位", "← Move backward") };
+        var movePrev = new MenuItem { Tag = "←", Header = T("向前移动一位", "Move backward") };
         movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
         menu.Items.Add(movePrev);
 
-        var moveNext = new MenuItem { Header = T("→ 向后移动一位", "→ Move forward") };
+        var moveNext = new MenuItem { Tag = "→", Header = T("向后移动一位", "Move forward") };
         moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
         menu.Items.Add(moveNext);
 
         menu.Items.Add(new Separator());
 
-        var editItem = new MenuItem { Header = T("编辑收藏…", "Edit bookmark…") };
+        var editItem = new MenuItem { Tag = "✎", Header = T("编辑收藏…", "Edit bookmark…") };
         editItem.Click += (_, _) => EditRequested?.Invoke(item);
         menu.Items.Add(editItem);
 
-        var unpinItem = new MenuItem { Header = T("从 Dock 取消固定", "Unpin from Dock") };
+        var unpinItem = new MenuItem { Tag = "☆", Header = T("从 Dock 取消固定", "Unpin from Dock") };
         unpinItem.Click += (_, _) => UnpinRequested?.Invoke(item);
         menu.Items.Add(unpinItem);
 
-        var removeItem = new MenuItem { Header = T("从收藏中移除", "Remove bookmark") };
+        var removeItem = new MenuItem { Tag = "✕", Header = T("从收藏中移除", "Remove bookmark") };
         removeItem.Click += (_, _) => RemoveRequested?.Invoke(item);
         menu.Items.Add(removeItem);
 
@@ -801,7 +815,7 @@ public partial class DockWindow : Window
     private void ShowGroupContextMenu(string group, string token)
     {
         var menu = new ContextMenu();
-        var openGrp = new MenuItem { Header = T($"打开分组“{group}”", $"Open group \"{group}\"") };
+        var openGrp = new MenuItem { Tag = "▦", Header = T($"打开分组“{group}”", $"Open group \"{group}\"") };
         openGrp.Click += (_, _) =>
         {
             var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
@@ -809,25 +823,25 @@ public partial class DockWindow : Window
         };
         menu.Items.Add(openGrp);
 
-        var configGrp = new MenuItem { Header = T("配置分组与自定义图标…", "Configure group & icon…") };
+        var configGrp = new MenuItem { Tag = "⚙", Header = T("配置分组与自定义图标…", "Configure group & icon…") };
         configGrp.Click += (_, _) => ConfigureGroupRequested?.Invoke(group);
         menu.Items.Add(configGrp);
 
         menu.Items.Add(new Separator());
 
-        var sepBefore = new MenuItem { Header = T("｜ 在前面插入分隔符", "｜ Insert separator before") };
+        var sepBefore = new MenuItem { Tag = "｜", Header = T("在前面插入分隔符", "Insert separator before") };
         sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
         menu.Items.Add(sepBefore);
 
-        var sepAfter = new MenuItem { Header = T("｜ 在后面插入分隔符", "｜ Insert separator after") };
+        var sepAfter = new MenuItem { Tag = "｜", Header = T("在后面插入分隔符", "Insert separator after") };
         sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
         menu.Items.Add(sepAfter);
 
-        var movePrev = new MenuItem { Header = T("← 向前移动一位", "← Move backward") };
+        var movePrev = new MenuItem { Tag = "←", Header = T("向前移动一位", "Move backward") };
         movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
         menu.Items.Add(movePrev);
 
-        var moveNext = new MenuItem { Header = T("→ 向后移动一位", "→ Move forward") };
+        var moveNext = new MenuItem { Tag = "→", Header = T("向后移动一位", "Move forward") };
         moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
         menu.Items.Add(moveNext);
 
@@ -837,7 +851,7 @@ public partial class DockWindow : Window
     private void ShowSeparatorContextMenu(string sepToken)
     {
         var menu = new ContextMenu();
-        var removeSep = new MenuItem { Header = T("删除此分隔符", "Remove separator") };
+        var removeSep = new MenuItem { Tag = "✕", Header = T("删除此分隔符", "Remove separator") };
         removeSep.Click += (_, _) =>
         {
             data.DockOrder.Remove(sepToken);
@@ -896,25 +910,25 @@ public partial class DockWindow : Window
     {
         var menu = new ContextMenu();
 
-        var addFolder = new MenuItem { Header = T("＋ 添加文件夹到 Dock…", "＋ Add folder to Dock…") };
+        var addFolder = new MenuItem { Tag = "＋", Header = T("添加文件夹到 Dock…", "Add folder to Dock…") };
         addFolder.Click += (_, _) => AddFolderRequested?.Invoke();
         menu.Items.Add(addFolder);
 
-        var addApps = new MenuItem { Header = T("⌕ 检索本机已安装应用…", "⌕ Browse installed apps…") };
+        var addApps = new MenuItem { Tag = "⌕", Header = T("检索本机已安装应用…", "Browse installed apps…") };
         addApps.Click += (_, _) => InstalledAppsRequested?.Invoke();
         menu.Items.Add(addApps);
 
-        var addFile = new MenuItem { Header = T("＋ 添加应用 / 文件…", "＋ Add app / file…") };
+        var addFile = new MenuItem { Tag = "＋", Header = T("添加应用 / 文件…", "Add app / file…") };
         addFile.Click += (_, _) => AddFileRequested?.Invoke();
         menu.Items.Add(addFile);
 
-        var addCustom = new MenuItem { Header = T("自定义添加收藏…", "Custom bookmark…") };
+        var addCustom = new MenuItem { Tag = "✎", Header = T("自定义添加收藏…", "Custom bookmark…") };
         addCustom.Click += (_, _) => AddRequested?.Invoke();
         menu.Items.Add(addCustom);
 
         menu.Items.Add(new Separator());
 
-        var autoSep = new MenuItem { Header = T("｜ 按类型自动分隔（应用 / 文件夹 / 分组）", "｜ Auto-separate by type (Apps / Folders / Groups)") };
+        var autoSep = new MenuItem { Tag = "｜", Header = T("按类型自动分隔（应用 / 文件夹 / 分组）", "Auto-separate by type (Apps / Folders / Groups)") };
         autoSep.Click += (_, _) =>
         {
             data.AutoSeparateByKind();
@@ -924,7 +938,7 @@ public partial class DockWindow : Window
         };
         menu.Items.Add(autoSep);
 
-        var addSepEnd = new MenuItem { Header = T("｜ 插入分隔符", "｜ Insert separator") };
+        var addSepEnd = new MenuItem { Tag = "｜", Header = T("插入分隔符", "Insert separator") };
         addSepEnd.Click += (_, _) =>
         {
             data.NormalizeDockOrder();
@@ -936,7 +950,7 @@ public partial class DockWindow : Window
 
         if (data.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase)))
         {
-            var clearSeps = new MenuItem { Header = T("✕ 清除所有自定义分隔符", "✕ Clear custom separators") };
+            var clearSeps = new MenuItem { Tag = "✕", Header = T("清除所有自定义分隔符", "Clear custom separators") };
             clearSeps.Click += (_, _) =>
             {
                 data.DockOrder.RemoveAll(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase));
@@ -948,9 +962,10 @@ public partial class DockWindow : Window
 
         var toggleDrawer = new MenuItem
         {
+            Tag = data.Settings.UtilityCollapsed ? "›" : "‹",
             Header = data.Settings.UtilityCollapsed
-                ? T("› 展开右侧功能按钮", "› Expand tool buttons")
-                : T("‹ 折叠右侧功能按钮", "‹ Collapse tool buttons")
+                ? T("展开右侧功能按钮", "Expand tool buttons")
+                : T("折叠右侧功能按钮", "Collapse tool buttons")
         };
         toggleDrawer.Click += (_, _) =>
         {
@@ -962,21 +977,27 @@ public partial class DockWindow : Window
 
         menu.Items.Add(new Separator());
 
-        var toggleTheme = new MenuItem { Header = T("☀ / 🌙 快速切换浅色/深色主题", "☀ / 🌙 Toggle Light / Dark theme") };
+        bool isDarkNow = data.Settings.ThemeMode == PinDock.ThemeMode.Dark ||
+                         (data.Settings.ThemeMode == PinDock.ThemeMode.System && ThemeService.IsSystemDark());
+        var toggleTheme = new MenuItem
+        {
+            Tag = isDarkNow ? "☀" : "🌙",
+            Header = T(isDarkNow ? "切换为浅色主题" : "切换为深色主题", isDarkNow ? "Switch to Light theme" : "Switch to Dark theme")
+        };
         toggleTheme.Click += (_, _) => ToggleThemeRequested?.Invoke();
         menu.Items.Add(toggleTheme);
 
-        var allLibrary = new MenuItem { Header = T("▦ 打开全部收藏", "▦ All Bookmarks") };
+        var allLibrary = new MenuItem { Tag = "▦", Header = T("打开全部收藏", "All Bookmarks") };
         allLibrary.Click += (_, _) => LibraryRequested?.Invoke();
         menu.Items.Add(allLibrary);
 
-        var openSettings = new MenuItem { Header = T("⚙ PinDock 设置", "⚙ PinDock Settings") };
+        var openSettings = new MenuItem { Tag = "⚙", Header = T("PinDock 设置", "PinDock Settings") };
         openSettings.Click += (_, _) => SettingsRequested?.Invoke();
         menu.Items.Add(openSettings);
 
         menu.Items.Add(new Separator());
 
-        var exitItem = new MenuItem { Header = T("⏻ 退出 PinDock", "⏻ Exit PinDock") };
+        var exitItem = new MenuItem { Tag = "⏻", Header = T("退出 PinDock", "Exit PinDock") };
         exitItem.Click += (_, _) => ExitRequested?.Invoke();
         menu.Items.Add(exitItem);
 

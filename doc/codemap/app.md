@@ -22,7 +22,7 @@
 | [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 40 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
 | [src/PinDock/DirectoryBrowserService.cs](../../src/PinDock/DirectoryBrowserService.cs) | 4 | [1](src_PinDock_DirectoryBrowserService.cs-95816456-1.md) |
 | [src/PinDock/DockLayout.cs](../../src/PinDock/DockLayout.cs) | 9 | [1](src_PinDock_DockLayout.cs-fd425178-1.md) |
-| [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 54 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
+| [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 55 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
 | [src/PinDock/EdgeHandleWindow.xaml.cs](../../src/PinDock/EdgeHandleWindow.xaml.cs) | 6 | [1](src_PinDock_EdgeHandleWindow.xaml.cs-52e7dde9-1.md) |
 | [src/PinDock/ExplorerMenuService.cs](../../src/PinDock/ExplorerMenuService.cs) | 18 | [1](src_PinDock_ExplorerMenuService.cs-64b5d39a-1.md) |
 | [src/PinDock/FolderPopupWindow.xaml.cs](../../src/PinDock/FolderPopupWindow.xaml.cs) | 19 | [1](src_PinDock_FolderPopupWindow.xaml.cs-4f16ffd1-1.md) |

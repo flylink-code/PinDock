@@ -12,10 +12,10 @@
                 <TextBlock x:Name="CountText" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
             </DockPanel>
             <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
-                <TextBox x:Name="SearchBox" Padding="10,8" FontSize="12"
+                <TextBox x:Name="SearchBox" Padding="10,7" FontSize="12"
                          Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}" TextChanged="SearchBox_TextChanged"/>
                 <TextBlock Text="搜索本组收藏…" IsHitTestVisible="False" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource MutedBrush}" Margin="12,0,0,0">
+                           Foreground="{DynamicResource MutedBrush}" Margin="13,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>

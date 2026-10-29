@@ -49,12 +49,12 @@ public partial class FolderPopupWindow : Window
         anchorRect = anchor;
         workArea = monitorWorkArea;
         dockEdge = edge;
-        Opacity = opacity;
+        Opacity = 1.0;
         showingHidden = false;
         UpButton.Content = T("⬅ 上一级", "⬅ Up");
         OpenCurrentButton.Content = T("↗ 打开当前目录", "↗ Open Folder");
         SearchHintText.Text = T("搜索当前目录下的文件夹或文件…", "Search folders or files…");
-        FooterTipText.Text = T("单击直接打开 · 悬停可隐藏或展开", "Click to open · Hover to hide or expand");
+        FooterTipText.Text = T("单击直接打开 · 悬停或右键可隐藏", "Click to open · Hover or right-click to hide");
         NavigateTo(rootDirectory, displayName);
 
         if (!IsVisible)
@@ -127,9 +127,9 @@ public partial class FolderPopupWindow : Window
         {
             ToggleHiddenBtn.Visibility = Visibility.Visible;
             ToggleHiddenBtn.Content = showingHidden
-                ? T($"👁 完成管理 ({hiddenInDirCount})", $"👁 Done ({hiddenInDirCount})")
-                : T($"👁 已隐藏 ({hiddenInDirCount})", $"👁 Hidden ({hiddenInDirCount})");
-            ToggleHiddenBtn.Style = showingHidden ? (Style)FindResource("PrimaryButton") : null;
+                ? T($"收起隐藏 ({hiddenInDirCount})", $"Hide ({hiddenInDirCount})")
+                : T($"已隐藏 {hiddenInDirCount} 项", $"{hiddenInDirCount} Hidden");
+            ToggleHiddenBtn.Style = (Style)FindResource(showingHidden ? "PrimaryButton" : "SubtleButton");
         }
         else
         {
@@ -163,11 +163,18 @@ public partial class FolderPopupWindow : Window
         foreach (var entry in visibleList)
         {
             bool isHiddenEntry = entry.IsDirectory && data.IsFolderHidden(entry.FullPath);
-            var rowDock = new DockPanel
+            var rowDock = new DockPanel();
+            var rowBorder = new Border
             {
-                Margin = new Thickness(0, 2, 0, 2),
-                Opacity = isHiddenEntry ? 0.56 : 1.0
+                CornerRadius = new CornerRadius(8),
+                Background = Brushes.Transparent,
+                Padding = new Thickness(2, 1, 2, 1),
+                Margin = new Thickness(0, 1, 0, 1),
+                Opacity = isHiddenEntry ? 0.56 : 1.0,
+                Child = rowDock
             };
+
+            Button? hoverHideBtn = null;
 
             if (entry.IsDirectory)
             {
@@ -183,11 +190,11 @@ public partial class FolderPopupWindow : Window
                 {
                     var restoreBtn = new Button
                     {
-                        Content = T("恢复显示 ↺", "Restore ↺"),
+                        Style = (Style)FindResource("SubtleButton"),
+                        Content = T("恢复 ↺", "Restore ↺"),
                         ToolTip = T("恢复在此目录预览中显示", "Restore folder visibility"),
                         Padding = new Thickness(8, 4, 8, 4),
                         FontSize = 11,
-                        Background = (Brush)FindResource("SoftBrush"),
                         Foreground = (Brush)FindResource("AccentBrush")
                     };
                     restoreBtn.Click += (_, _) =>
@@ -200,18 +207,18 @@ public partial class FolderPopupWindow : Window
                 }
                 else
                 {
-                    var hideBtn = new Button
+                    hoverHideBtn = new Button
                     {
-                        Content = "👁",
+                        Style = (Style)FindResource("SubtleButton"),
+                        Content = T("隐藏", "Hide"),
                         ToolTip = T("在此预览中隐藏此文件夹", "Hide this folder in preview"),
-                        Padding = new Thickness(6, 4, 6, 4),
-                        FontSize = 11,
-                        Margin = new Thickness(0, 0, 3, 0),
-                        Background = Brushes.Transparent,
+                        Padding = new Thickness(7, 3.5, 7, 3.5),
+                        FontSize = 10.5,
+                        Margin = new Thickness(0, 0, 4, 0),
                         Foreground = (Brush)FindResource("MutedBrush"),
-                        Opacity = 0.65
+                        Visibility = Visibility.Collapsed
                     };
-                    hideBtn.Click += (_, _) =>
+                    hoverHideBtn.Click += (_, _) =>
                     {
                         data.SetFolderHidden(entry.FullPath, true);
                         HiddenFoldersChanged?.Invoke();
@@ -237,21 +244,32 @@ public partial class FolderPopupWindow : Window
 
                     var drillBtn = new Button
                     {
+                        Style = (Style)FindResource("SubtleButton"),
                         Content = T("展开 ▸", "Expand ▸"),
                         ToolTip = T("在面板内查看下一级子目录", "Browse subfolders inside popup"),
                         Padding = new Thickness(8, 4, 8, 4),
                         FontSize = 11,
-                        Background = (Brush)FindResource("SoftBrush"),
                         Foreground = (Brush)FindResource("AccentBrush")
                     };
                     drillBtn.Click += (_, _) => NavigateTo(entry.FullPath);
 
-                    actions.Children.Add(hideBtn);
+                    actions.Children.Add(hoverHideBtn);
                     actions.Children.Add(pinBtn);
                     actions.Children.Add(drillBtn);
                 }
                 rowDock.Children.Add(actions);
             }
+
+            rowBorder.MouseEnter += (_, _) =>
+            {
+                rowBorder.Background = (Brush)FindResource("SelectedBrush");
+                if (hoverHideBtn is not null) hoverHideBtn.Visibility = Visibility.Visible;
+            };
+            rowBorder.MouseLeave += (_, _) =>
+            {
+                rowBorder.Background = Brushes.Transparent;
+                if (hoverHideBtn is not null) hoverHideBtn.Visibility = Visibility.Collapsed;
+            };
 
             var mainBtn = new Button
             {
@@ -315,7 +333,7 @@ public partial class FolderPopupWindow : Window
             }
 
             rowDock.Children.Add(mainBtn);
-            ListPanel.Children.Add(rowDock);
+            ListPanel.Children.Add(rowBorder);
         }
     }
 
@@ -325,7 +343,7 @@ public partial class FolderPopupWindow : Window
         menu.Opened += (_, _) => IsContextMenuOpen = true;
         menu.Closed += (_, _) => IsContextMenuOpen = false;
 
-        var openItem = new MenuItem { Header = T($"打开“{entry.Name}”", $"Open \"{entry.Name}\"") };
+        var openItem = new MenuItem { Tag = "↗", Header = T($"打开“{entry.Name}”", $"Open \"{entry.Name}\"") };
         openItem.Click += (_, _) =>
         {
             Hide();
@@ -333,7 +351,7 @@ public partial class FolderPopupWindow : Window
         };
         menu.Items.Add(openItem);
 
-        var pinItem = new MenuItem { Header = T("固定此文件夹到 Dock", "Pin folder to Dock") };
+        var pinItem = new MenuItem { Tag = "★", Header = T("固定此文件夹到 Dock", "Pin folder to Dock") };
         pinItem.Click += (_, _) => PinFolderRequested?.Invoke(entry.FullPath);
         menu.Items.Add(pinItem);
 
@@ -341,6 +359,7 @@ public partial class FolderPopupWindow : Window
 
         var toggleHide = new MenuItem
         {
+            Tag = isHiddenEntry ? "↺" : "◌",
             Header = isHiddenEntry
                 ? T($"恢复显示“{entry.Name}”", $"Restore \"{entry.Name}\"")
                 : T($"在此预览中隐藏“{entry.Name}”", $"Hide \"{entry.Name}\" in preview")

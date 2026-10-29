@@ -41,18 +41,14 @@
                         </Button>
                     </StackPanel>
                 </DockPanel>
-                <Border Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}"
-                        BorderThickness="1" CornerRadius="8" Padding="10,6">
-                    <Grid>
-                        <TextBox x:Name="SearchBox" Background="Transparent" BorderThickness="0"
-                                 Foreground="{DynamicResource InkBrush}" CaretBrush="{DynamicResource InkBrush}"
-                                 FontSize="12" VerticalContentAlignment="Center"
-                                 TextChanged="SearchBox_TextChanged"/>
-                        <TextBlock x:Name="SearchPlaceholder" Text="搜索收藏、文件夹或本机应用 (回车直接打开)…"
-                                   Foreground="{DynamicResource MutedBrush}" FontSize="11.5"
-                                   IsHitTestVisible="False" VerticalAlignment="Center"/>
-                    </Grid>
-                </Border>
+                <Grid>
+                    <TextBox x:Name="SearchBox" Padding="10,7" FontSize="12"
+                             Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource LineBrush}"
+                             TextChanged="SearchBox_TextChanged"/>
+                    <TextBlock x:Name="SearchPlaceholder" Text="搜索收藏、文件夹或本机应用 (回车直接打开)…"
+                               Foreground="{DynamicResource MutedBrush}" FontSize="11.5" Margin="13,0,0,0"
+                               IsHitTestVisible="False" VerticalAlignment="Center"/>
+                </Grid>
             </StackPanel>
 
             <!-- 2. 快捷状态控制栏 -->
