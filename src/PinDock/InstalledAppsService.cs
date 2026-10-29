@@ -9,20 +9,29 @@ public sealed class InstalledAppsService
     private static readonly string[] IgnoredKeywords =
         ["uninstall", "卸载", "remove", "readme", "说明", "帮助", "help", "website", "官网", "manual"];
 
+    private readonly object sync = new();
     private IReadOnlyList<InstalledApp>? cached;
+
+    public InstalledAppsService()
+    {
+        _ = Task.Run(() => GetInstalledApps());
+    }
 
     public IReadOnlyList<InstalledApp> GetInstalledApps(bool forceRefresh = false)
     {
-        if (cached is not null && !forceRefresh) return cached;
-        var roots = new List<(string Path, bool Recursive, string Category)>
+        lock (sync)
         {
-            (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs"), true, "开始菜单"),
-            (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"), true, "开始菜单"),
-            (Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), false, "桌面"),
-            (Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), false, "桌面")
-        };
-        cached = ScanRoots(roots);
-        return cached;
+            if (cached is not null && !forceRefresh) return cached;
+            var roots = new List<(string Path, bool Recursive, string Category)>
+            {
+                (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs"), true, "开始菜单"),
+                (Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"), true, "开始菜单"),
+                (Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), false, "桌面"),
+                (Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), false, "桌面")
+            };
+            cached = ScanRoots(roots);
+            return cached;
+        }
     }
 
     public static IReadOnlyList<InstalledApp> DiscoverFromDirectories(IEnumerable<string> directories, string category = "本机应用")

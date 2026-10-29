@@ -4,14 +4,15 @@
 
 [Module](app.md) · [Source](../../src/PinDock/InstalledAppsService.cs) · page 1/1
 
-Source SHA-256: 37ac0adec46af1f809b32888c851401d4ea7159eebff9558876a11d746494b2a
+Source SHA-256: 52b5914fc26e9ed461f27ed0c9fdc2282525e508b5a5f08a54fc297ed9971e40
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/InstalledAppsService.cs#L3) |
 | InstalledAppsService | class_declaration | PinDock | [7](../../src/PinDock/InstalledAppsService.cs#L7) |
-| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [14](../../src/PinDock/InstalledAppsService.cs#L14) |
-| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [28](../../src/PinDock/InstalledAppsService.cs#L28) |
-| ScanRoots | method_declaration | PinDock::InstalledAppsService | [34](../../src/PinDock/InstalledAppsService.cs#L34) |
-| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [56](../../src/PinDock/InstalledAppsService.cs#L56) |
-| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [87](../../src/PinDock/InstalledAppsService.cs#L87) |
+| InstalledAppsService | constructor_declaration | PinDock::InstalledAppsService | [15](../../src/PinDock/InstalledAppsService.cs#L15) |
+| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [20](../../src/PinDock/InstalledAppsService.cs#L20) |
+| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [37](../../src/PinDock/InstalledAppsService.cs#L37) |
+| ScanRoots | method_declaration | PinDock::InstalledAppsService | [43](../../src/PinDock/InstalledAppsService.cs#L43) |
+| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [65](../../src/PinDock/InstalledAppsService.cs#L65) |
+| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [96](../../src/PinDock/InstalledAppsService.cs#L96) |

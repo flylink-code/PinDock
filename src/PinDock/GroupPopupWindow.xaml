@@ -5,10 +5,7 @@
         ShowInTaskbar="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight" Topmost="True"
         PreviewKeyDown="Window_PreviewKeyDown" Deactivated="Window_Deactivated">
     <Border Width="330" MaxHeight="420" Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
-            BorderThickness="1" CornerRadius="15" Padding="18">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="28" ShadowDepth="10" Opacity="0.2" Color="#182A21"/>
-        </Border.Effect>
+            BorderThickness="1" CornerRadius="15" Padding="18" SnapsToDevicePixels="True">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                 <TextBlock x:Name="TitleText" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource InkBrush}"/>

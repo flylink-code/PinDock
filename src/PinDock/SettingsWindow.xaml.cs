@@ -231,7 +231,8 @@ public partial class SettingsWindow : CardWindowBase
     {
         if (loading) return;
         OpacityValue.Text = $"{(int)OpacitySlider.Value}%";
-        ApplyToSettings();
+        controller.Data.Settings.Opacity = OpacitySlider.Value / 100.0;
+        controller.UpdateOpacityOnly();
     }
 
     private void ApplyToSettings()

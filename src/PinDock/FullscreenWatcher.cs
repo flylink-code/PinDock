@@ -1,13 +1,13 @@
 using System.Runtime.InteropServices;
-using System.Windows.Threading;
+using System.Windows;
 
 namespace PinDock;
 
 public sealed class FullscreenWatcher : IDisposable
 {
-    private readonly DispatcherTimer timer;
-    private bool enabled = true;
-    private bool busy;
+    private readonly Timer timer;
+    private volatile bool enabled = true;
+    private int busy;
 
     public event Action<bool>? Changed;
 
@@ -15,9 +15,7 @@ public sealed class FullscreenWatcher : IDisposable
 
     public FullscreenWatcher()
     {
-        timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
-        timer.Tick += (_, _) => Poll();
-        timer.Start();
+        timer = new Timer(_ => Poll(), null, TimeSpan.FromMilliseconds(800), TimeSpan.FromMilliseconds(800));
     }
 
     public void SetEnabled(bool value)
@@ -30,21 +28,20 @@ public sealed class FullscreenWatcher : IDisposable
         }
     }
 
-    public void Dispose() => timer.Stop();
+    public void Dispose() => timer.Dispose();
 
     private void Poll()
     {
-        if (!enabled || busy) return;
-        busy = true;
+        if (!enabled || Interlocked.Exchange(ref busy, 1) == 1) return;
         try
         {
             if (SHQueryUserNotificationState(out int state) != 0) return;
             bool fullscreen = state is 2 or 3 or 4;
             if (fullscreen == IsFullscreen) return;
             IsFullscreen = fullscreen;
-            Changed?.Invoke(fullscreen);
+            Application.Current?.Dispatcher.BeginInvoke(() => Changed?.Invoke(fullscreen));
         }
-        finally { busy = false; }
+        finally { Interlocked.Exchange(ref busy, 0); }
     }
 
     [DllImport("shell32.dll")]

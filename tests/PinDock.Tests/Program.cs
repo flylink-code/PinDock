@@ -66,7 +66,12 @@ try
     var shortcutIcon = await icons.GetAsync(Path.Combine(directory, "快捷方式.lnk"));
     if (!folderIcon.IsFrozen || !executableIcon.IsFrozen || !fileIcon.IsFrozen || !shortcutIcon.IsFrozen) throw new Exception("Shell icon must be frozen for UI use");
     if (!ReferenceEquals(folderIcon, await icons.GetAsync(directory))) throw new Exception("Icon cache missed");
-    Console.WriteLine("PASS: Windows Shell folder, executable, file and shortcut icons, frozen images and cache reuse");
+    string? exeDataUri = await icons.GetDataUriAsync(Environment.ProcessPath!);
+    if (string.IsNullOrWhiteSpace(exeDataUri) || !exeDataUri.StartsWith("data:image/png;base64,", StringComparison.Ordinal))
+        throw new Exception("Icon DataURI generation failed");
+    if (icons.TryGetCachedDataUri(Environment.ProcessPath!) != exeDataUri)
+        throw new Exception("Icon DataURI cache missed");
+    Console.WriteLine("PASS: Windows Shell folder, executable, file and shortcut icons, frozen images, DataURI and cache reuse");
 
     string workingDirectory = Path.Combine(directory, "工作 目录");
     Directory.CreateDirectory(workingDirectory);

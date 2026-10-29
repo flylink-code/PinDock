@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/CardWindowBase.cs) · page 1/1
 
-Source SHA-256: dc0b5c02394dc91bdc200d4510c5e3556b8c8554e512623f408123e287adafa6
+Source SHA-256: 53e44ed5486192d7c029fcf7215d78967ba4e8fe15dc61992e5dd9d148db60c1
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,5 +12,5 @@ Source SHA-256: dc0b5c02394dc91bdc200d4510c5e3556b8c8554e512623f408123e287adafa6
 | CardWindowBase | class_declaration | PinDock | [11](../../src/PinDock/CardWindowBase.cs#L11) |
 | UseLargeHeader | property_declaration | PinDock::CardWindowBase | [16](../../src/PinDock/CardWindowBase.cs#L16) |
 | CardWindowBase | constructor_declaration | PinDock::CardWindowBase | [22](../../src/PinDock/CardWindowBase.cs#L22) |
-| OnApplyTemplate | method_declaration | PinDock::CardWindowBase | [27](../../src/PinDock/CardWindowBase.cs#L27) |
-| IsInsideButton | method_declaration | PinDock::CardWindowBase | [39](../../src/PinDock/CardWindowBase.cs#L39) |
+| OnApplyTemplate | method_declaration | PinDock::CardWindowBase | [28](../../src/PinDock/CardWindowBase.cs#L28) |
+| IsInsideButton | method_declaration | PinDock::CardWindowBase | [40](../../src/PinDock/CardWindowBase.cs#L40) |

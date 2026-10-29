@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/SettingsWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 09564d4eedb4d0829afb5fd77a8d6861af81cc0d25d0ec0fd680ef33f4fcd4b1
+Source SHA-256: cc387bd2f579c3fe7de85400f8f533332fa2bdc0676092a64d187fc1fb7d54c4
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -24,7 +24,7 @@ Source SHA-256: 09564d4eedb4d0829afb5fd77a8d6861af81cc0d25d0ec0fd680ef33f4fcd4b1
 | Nav_Checked | method_declaration | PinDock::SettingsWindow | [215](../../src/PinDock/SettingsWindow.xaml.cs#L215) |
 | SettingsChanged | method_declaration | PinDock::SettingsWindow | [224](../../src/PinDock/SettingsWindow.xaml.cs#L224) |
 | Opacity_Changed | method_declaration | PinDock::SettingsWindow | [230](../../src/PinDock/SettingsWindow.xaml.cs#L230) |
-| ApplyToSettings | method_declaration | PinDock::SettingsWindow | [237](../../src/PinDock/SettingsWindow.xaml.cs#L237) |
-| Import_Click | method_declaration | PinDock::SettingsWindow | [277](../../src/PinDock/SettingsWindow.xaml.cs#L277) |
-| Export_Click | method_declaration | PinDock::SettingsWindow | [292](../../src/PinDock/SettingsWindow.xaml.cs#L292) |
-| OnClosing | method_declaration | PinDock::SettingsWindow | [307](../../src/PinDock/SettingsWindow.xaml.cs#L307) |
+| ApplyToSettings | method_declaration | PinDock::SettingsWindow | [238](../../src/PinDock/SettingsWindow.xaml.cs#L238) |
+| Import_Click | method_declaration | PinDock::SettingsWindow | [278](../../src/PinDock/SettingsWindow.xaml.cs#L278) |
+| Export_Click | method_declaration | PinDock::SettingsWindow | [293](../../src/PinDock/SettingsWindow.xaml.cs#L293) |
+| OnClosing | method_declaration | PinDock::SettingsWindow | [308](../../src/PinDock/SettingsWindow.xaml.cs#L308) |

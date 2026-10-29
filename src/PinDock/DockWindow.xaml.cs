@@ -167,35 +167,69 @@ public partial class DockWindow : Window
     {
         bool isFolder = BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Folder;
         var button = CreateChrome(icon, item.Name, isFolder ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"));
-        var host = new Grid();
-        var fallback = new TextBlock
+        if (isFolder)
         {
-            Text = isFolder ? "▰" : "◇",
-            FontSize = icon * 0.42,
-            Foreground = isFolder ? (Brush)FindResource("FolderFgBrush") : (Brush)FindResource("AccentBrush"),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        var image = new Image
+            ((Border)button.Content).Child = CreatePrototypeFolderIcon(icon * 0.62);
+        }
+        else
         {
-            Width = icon * 0.65,
-            Height = icon * 0.65,
-            Stretch = Stretch.Uniform,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
-        host.Children.Add(fallback);
-        host.Children.Add(image);
-        ((Border)button.Content).Child = host;
+            var host = new Grid();
+            var fallback = new TextBlock
+            {
+                Text = "◇",
+                FontSize = icon * 0.42,
+                Foreground = (Brush)FindResource("AccentBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var image = new Image
+            {
+                Width = icon * 0.65,
+                Height = icon * 0.65,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            host.Children.Add(fallback);
+            host.Children.Add(image);
+            ((Border)button.Content).Child = host;
+            _ = LoadIcon(image, fallback, item.Path);
+        }
         button.Click += (_, _) => LaunchRequested?.Invoke(item);
         button.MouseRightButtonUp += (_, e) =>
         {
             ShowBookmarkContextMenu(item);
             e.Handled = true;
         };
-        _ = LoadIcon(image, fallback, item.Path);
         return button;
+    }
+
+    private UIElement CreatePrototypeFolderIcon(double size)
+    {
+        var fg = (Brush)FindResource("FolderFgBrush");
+        var backPath = new System.Windows.Shapes.Path
+        {
+            Data = Geometry.Parse("M3,8 A3,3 0 0 1 6,5 H13 L16,9 H26 A3,3 0 0 1 29,12 V24 A3,3 0 0 1 26,27 H6 A3,3 0 0 1 3,24 Z"),
+            Fill = fg,
+            Opacity = 0.65
+        };
+        var frontPath = new System.Windows.Shapes.Path
+        {
+            Data = Geometry.Parse("M3,13 H29 V24 A3,3 0 0 1 26,27 H6 A3,3 0 0 1 3,24 Z"),
+            Fill = fg
+        };
+        var canvas = new Canvas { Width = 32, Height = 32 };
+        canvas.Children.Add(backPath);
+        canvas.Children.Add(frontPath);
+        return new Viewbox
+        {
+            Width = size,
+            Height = size,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = canvas
+        };
     }
 
     private Button CreateGroupButton(string group, double icon)
@@ -253,13 +287,16 @@ public partial class DockWindow : Window
 
     private Button CreateChrome(double icon, string tip, Brush background)
     {
+        var scale = new ScaleTransform(1, 1);
+        var translate = new TranslateTransform(0, 0);
         var border = new Border
         {
             Width = icon,
             Height = icon,
             CornerRadius = new CornerRadius(11),
             Background = background,
-            RenderTransformOrigin = new Point(0.5, 0.5)
+            RenderTransformOrigin = new Point(0.5, 0.5),
+            RenderTransform = new TransformGroup { Children = { scale, translate } }
         };
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
         var button = new Button
@@ -269,23 +306,23 @@ public partial class DockWindow : Window
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
             ToolTip = tip
         };
-        button.MouseEnter += (_, _) => border.RenderTransform = HoverTransform(data.Settings.DockEdge);
-        button.MouseLeave += (_, _) => border.RenderTransform = null;
+        ToolTipService.SetInitialShowDelay(button, 120);
+        var dur = new Duration(TimeSpan.FromMilliseconds(140));
+        button.MouseEnter += (_, _) =>
+        {
+            double dy = data.Settings.DockEdge == DockEdge.Bottom ? -4 : data.Settings.DockEdge == DockEdge.Top ? 4 : 0;
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1.07, dur));
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.07, dur));
+            translate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(dy, dur));
+        };
+        button.MouseLeave += (_, _) =>
+        {
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1.0, dur));
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.0, dur));
+            translate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, dur));
+        };
         AttachDrag(button);
         return button;
-    }
-
-    private static Transform HoverTransform(DockEdge edge)
-    {
-        var scale = new ScaleTransform(1.07, 1.07);
-        switch (edge)
-        {
-            case DockEdge.Bottom: return new TransformGroup { Children = { scale, new TranslateTransform(0, -5) } };
-            case DockEdge.Top: return new TransformGroup { Children = { scale, new TranslateTransform(0, 5) } };
-            case DockEdge.Left:
-            case DockEdge.Right: return scale;
-            default: throw new ArgumentOutOfRangeException(nameof(edge), edge, null);
-        }
     }
 
     private async Task LoadIcon(Image image, UIElement fallback, string path)

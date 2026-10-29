@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/FullscreenWatcher.cs) · page 1/1
 
-Source SHA-256: f871945619e42aabb72f5272ab753e193173f0f2a49c2e773ea22c61d82c2422
+Source SHA-256: 83ba571c25b605ca4c676d53bdd4291e6127c12de9c42e3e3f27ae0dcf05e662
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,7 +12,7 @@ Source SHA-256: f871945619e42aabb72f5272ab753e193173f0f2a49c2e773ea22c61d82c2422
 | FullscreenWatcher | class_declaration | PinDock | [6](../../src/PinDock/FullscreenWatcher.cs#L6) |
 | IsFullscreen | property_declaration | PinDock::FullscreenWatcher | [14](../../src/PinDock/FullscreenWatcher.cs#L14) |
 | FullscreenWatcher | constructor_declaration | PinDock::FullscreenWatcher | [16](../../src/PinDock/FullscreenWatcher.cs#L16) |
-| SetEnabled | method_declaration | PinDock::FullscreenWatcher | [23](../../src/PinDock/FullscreenWatcher.cs#L23) |
-| Dispose | method_declaration | PinDock::FullscreenWatcher | [33](../../src/PinDock/FullscreenWatcher.cs#L33) |
-| Poll | method_declaration | PinDock::FullscreenWatcher | [35](../../src/PinDock/FullscreenWatcher.cs#L35) |
-| SHQueryUserNotificationState | method_declaration | PinDock::FullscreenWatcher | [50](../../src/PinDock/FullscreenWatcher.cs#L50) |
+| SetEnabled | method_declaration | PinDock::FullscreenWatcher | [21](../../src/PinDock/FullscreenWatcher.cs#L21) |
+| Dispose | method_declaration | PinDock::FullscreenWatcher | [31](../../src/PinDock/FullscreenWatcher.cs#L31) |
+| Poll | method_declaration | PinDock::FullscreenWatcher | [33](../../src/PinDock/FullscreenWatcher.cs#L33) |
+| SHQueryUserNotificationState | method_declaration | PinDock::FullscreenWatcher | [47](../../src/PinDock/FullscreenWatcher.cs#L47) |

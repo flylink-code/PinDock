@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/NativeWindow.cs) · page 1/1
 
-Source SHA-256: 85c7c1d80425b17b83271de769bbcff01b53ba46de323418e4ee9fb8b3e1b7ba
+Source SHA-256: ec5662ea5785ee3acf2811738849eacf890af7fb9a3aa7f049e57b175a44a752
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -14,8 +14,10 @@ Source SHA-256: 85c7c1d80425b17b83271de769bbcff01b53ba46de323418e4ee9fb8b3e1b7ba
 | GetPixelBounds | method_declaration | PinDock::NativeWindow | [24](../../src/PinDock/NativeWindow.cs#L24) |
 | MoveTo | method_declaration | PinDock::NativeWindow | [32](../../src/PinDock/NativeWindow.cs#L32) |
 | SetBounds | method_declaration | PinDock::NativeWindow | [39](../../src/PinDock/NativeWindow.cs#L39) |
-| Rect | struct_declaration | PinDock::NativeWindow | [46](../../src/PinDock/NativeWindow.cs#L46) |
-| GetWindowLong | method_declaration | PinDock::NativeWindow | [49](../../src/PinDock/NativeWindow.cs#L49) |
-| SetWindowLong | method_declaration | PinDock::NativeWindow | [52](../../src/PinDock/NativeWindow.cs#L52) |
-| GetWindowRect | method_declaration | PinDock::NativeWindow | [55](../../src/PinDock/NativeWindow.cs#L55) |
-| SetWindowPos | method_declaration | PinDock::NativeWindow | [59](../../src/PinDock/NativeWindow.cs#L59) |
+| EnableHardwareRoundedCorners | method_declaration | PinDock::NativeWindow | [46](../../src/PinDock/NativeWindow.cs#L46) |
+| Rect | struct_declaration | PinDock::NativeWindow | [53](../../src/PinDock/NativeWindow.cs#L53) |
+| DwmSetWindowAttribute | method_declaration | PinDock::NativeWindow | [56](../../src/PinDock/NativeWindow.cs#L56) |
+| GetWindowLong | method_declaration | PinDock::NativeWindow | [59](../../src/PinDock/NativeWindow.cs#L59) |
+| SetWindowLong | method_declaration | PinDock::NativeWindow | [62](../../src/PinDock/NativeWindow.cs#L62) |
+| GetWindowRect | method_declaration | PinDock::NativeWindow | [65](../../src/PinDock/NativeWindow.cs#L65) |
+| SetWindowPos | method_declaration | PinDock::NativeWindow | [69](../../src/PinDock/NativeWindow.cs#L69) |

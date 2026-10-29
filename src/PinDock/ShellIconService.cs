@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -14,6 +15,7 @@ namespace PinDock;
 public sealed class ShellIconService
 {
     private readonly ConcurrentDictionary<string, Task<ImageSource>> cache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> dataUriCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly BlockingCollection<(string Path, TaskCompletionSource<ImageSource> Result)> queue = [];
 
     public ShellIconService()
@@ -39,6 +41,33 @@ public sealed class ShellIconService
         }
     }
 
+    public string? TryGetCachedDataUri(string path) =>
+        dataUriCache.TryGetValue(path, out string? uri) ? uri : null;
+
+    public async Task<string?> GetDataUriAsync(string path)
+    {
+        if (dataUriCache.TryGetValue(path, out string? cachedUri))
+            return cachedUri;
+        try
+        {
+            var source = (BitmapSource)await GetAsync(path);
+            string uri = await Task.Run(() =>
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(source));
+                using var ms = new MemoryStream();
+                encoder.Save(ms);
+                return "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+            });
+            dataUriCache[path] = uri;
+            return uri;
+        }
+        catch (Win32Exception)
+        {
+            return null;
+        }
+    }
+
     private void Run()
     {
         foreach (var (path, result) in queue.GetConsumingEnumerable())
@@ -48,18 +77,39 @@ public sealed class ShellIconService
         }
     }
 
+    private static readonly Guid IidImageList = new("46EB5926-582E-4017-9FDF-E8998DAA0950");
+
     private static ImageSource Extract(string path)
     {
-        var result = SHGetFileInfo(path, 0, out var info, (uint)Marshal.SizeOf<SHFILEINFO>(), 0x100 | 0x1);
-        if (result == IntPtr.Zero || info.Icon == IntPtr.Zero)
+        var shResult = SHGetFileInfo(path, 0, out var info, (uint)Marshal.SizeOf<SHFILEINFO>(), 0x4000 | 0x100);
+        if (shResult == IntPtr.Zero)
             throw new Win32Exception($"无法提取图标：{path}");
+
+        IntPtr hIcon = IntPtr.Zero;
         try
         {
-            var image = Imaging.CreateBitmapSourceFromHIcon(info.Icon, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            var iid = IidImageList;
+            if (SHGetImageList(2 /* SHIL_EXTRALARGE 48x48 */, ref iid, out IntPtr imageList) == 0 && imageList != IntPtr.Zero)
+            {
+                hIcon = ImageList_GetIcon(imageList, info.IconIndex, 0x0001 /* ILD_TRANSPARENT */);
+            }
+            if (hIcon == IntPtr.Zero)
+            {
+                hIcon = info.Icon;
+                info.Icon = IntPtr.Zero;
+            }
+            if (hIcon == IntPtr.Zero)
+                throw new Win32Exception($"无法提取图标：{path}");
+
+            var image = Imaging.CreateBitmapSourceFromHIcon(hIcon, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             image.Freeze();
             return image;
         }
-        finally { DestroyIcon(info.Icon); }
+        finally
+        {
+            if (hIcon != IntPtr.Zero) DestroyIcon(hIcon);
+            if (info.Icon != IntPtr.Zero) DestroyIcon(info.Icon);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -74,6 +124,12 @@ public sealed class ShellIconService
 
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr SHGetFileInfo(string path, uint attributes, out SHFILEINFO info, uint size, uint flags);
+
+    [DllImport("shell32.dll", PreserveSig = true)]
+    private static extern int SHGetImageList(int iImageList, ref Guid riid, out IntPtr ppv);
+
+    [DllImport("comctl32.dll", SetLastError = true)]
+    private static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, uint flags);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

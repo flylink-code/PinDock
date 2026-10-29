@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DockWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 4325af27a727975e11c0c5144b7cbe906633a9dab7e38678c598ebb4ea8a4ebb
+Source SHA-256: 48570c40e48668580d8a7e3affc6414597bfcf387bd1723d5d561e3efeaa25d7
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -27,14 +27,14 @@ Source SHA-256: 4325af27a727975e11c0c5144b7cbe906633a9dab7e38678c598ebb4ea8a4ebb
 | Reposition | method_declaration | PinDock::DockWindow | [121](../../src/PinDock/DockWindow.xaml.cs#L121) |
 | Rebuild | method_declaration | PinDock::DockWindow | [133](../../src/PinDock/DockWindow.xaml.cs#L133) |
 | CreateBookmarkButton | method_declaration | PinDock::DockWindow | [166](../../src/PinDock/DockWindow.xaml.cs#L166) |
-| CreateGroupButton | method_declaration | PinDock::DockWindow | [201](../../src/PinDock/DockWindow.xaml.cs#L201) |
-| CreateUtilityButton | method_declaration | PinDock::DockWindow | [225](../../src/PinDock/DockWindow.xaml.cs#L225) |
-| CreateSeparator | method_declaration | PinDock::DockWindow | [240](../../src/PinDock/DockWindow.xaml.cs#L240) |
-| CreateChrome | method_declaration | PinDock::DockWindow | [254](../../src/PinDock/DockWindow.xaml.cs#L254) |
-| HoverTransform | method_declaration | PinDock::DockWindow | [278](../../src/PinDock/DockWindow.xaml.cs#L278) |
-| LoadIcon | method_declaration | PinDock::DockWindow | [291](../../src/PinDock/DockWindow.xaml.cs#L291) |
-| ShowBookmarkContextMenu | method_declaration | PinDock::DockWindow | [301](../../src/PinDock/DockWindow.xaml.cs#L301) |
-| Window_MouseRightButtonUp | method_declaration | PinDock::DockWindow | [329](../../src/PinDock/DockWindow.xaml.cs#L329) |
-| Window_Drop | method_declaration | PinDock::DockWindow | [363](../../src/PinDock/DockWindow.xaml.cs#L363) |
-| AttachDrag | method_declaration | PinDock::DockWindow | [369](../../src/PinDock/DockWindow.xaml.cs#L369) |
-| Window_PreviewKeyDown | method_declaration | PinDock::DockWindow | [401](../../src/PinDock/DockWindow.xaml.cs#L401) |
+| CreatePrototypeFolderIcon | method_declaration | PinDock::DockWindow | [208](../../src/PinDock/DockWindow.xaml.cs#L208) |
+| CreateGroupButton | method_declaration | PinDock::DockWindow | [235](../../src/PinDock/DockWindow.xaml.cs#L235) |
+| CreateUtilityButton | method_declaration | PinDock::DockWindow | [259](../../src/PinDock/DockWindow.xaml.cs#L259) |
+| CreateSeparator | method_declaration | PinDock::DockWindow | [274](../../src/PinDock/DockWindow.xaml.cs#L274) |
+| CreateChrome | method_declaration | PinDock::DockWindow | [288](../../src/PinDock/DockWindow.xaml.cs#L288) |
+| LoadIcon | method_declaration | PinDock::DockWindow | [328](../../src/PinDock/DockWindow.xaml.cs#L328) |
+| ShowBookmarkContextMenu | method_declaration | PinDock::DockWindow | [338](../../src/PinDock/DockWindow.xaml.cs#L338) |
+| Window_MouseRightButtonUp | method_declaration | PinDock::DockWindow | [366](../../src/PinDock/DockWindow.xaml.cs#L366) |
+| Window_Drop | method_declaration | PinDock::DockWindow | [400](../../src/PinDock/DockWindow.xaml.cs#L400) |
+| AttachDrag | method_declaration | PinDock::DockWindow | [406](../../src/PinDock/DockWindow.xaml.cs#L406) |
+| Window_PreviewKeyDown | method_declaration | PinDock::DockWindow | [438](../../src/PinDock/DockWindow.xaml.cs#L438) |

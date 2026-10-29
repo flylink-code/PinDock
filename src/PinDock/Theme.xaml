@@ -504,17 +504,14 @@
         <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
-        <Setter Property="HasDropShadow" Value="False"/>
+        <Setter Property="HasDropShadow" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContextMenu">
-                    <Border Margin="8" Padding="5" CornerRadius="11"
+                    <Border Padding="5" CornerRadius="10"
                             Background="{DynamicResource PaperBrush}"
                             BorderBrush="{DynamicResource LineBrush}"
                             BorderThickness="1">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.22" Color="#101815"/>
-                        </Border.Effect>
                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
                     </Border>
                 </ControlTemplate>
@@ -667,24 +664,25 @@
         </Setter>
     </Style>
 
-    <!-- 卡片式窗口：圆角纸面、阴影、支持紧凑标题栏（设置）与大标题栏（全部收藏/弹窗） -->
+    <!-- 卡片式窗口：使用硬件加速 WindowChrome + DWM 原生圆角阴影，消除 AllowsTransparency 软渲染卡顿 -->
     <Style x:Key="CardWindow" TargetType="Window" xmlns:local="clr-namespace:PinDock">
         <Setter Property="WindowStyle" Value="None"/>
-        <Setter Property="AllowsTransparency" Value="True"/>
-        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="ResizeMode" Value="NoResize"/>
+        <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
         <Setter Property="Icon" Value="pack://application:,,,/Assets/PinDock.ico"/>
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome CaptionHeight="0" CornerRadius="16" GlassFrameThickness="-1" ResizeBorderThickness="0" UseAeroCaptionButtons="False"/>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
-                    <Border Margin="16" Background="{DynamicResource PaperBrush}" BorderBrush="{DynamicResource LineBrush}"
-                            BorderThickness="1" CornerRadius="17">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="32" ShadowDepth="10" Opacity="0.22" Color="#14231C"/>
-                        </Border.Effect>
+                    <Border Background="{DynamicResource PaperBrush}" BorderBrush="{DynamicResource LineBrush}"
+                            BorderThickness="1" CornerRadius="12" SnapsToDevicePixels="True">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>

@@ -19,10 +19,7 @@
         </Style>
     </Window.Resources>
     <Border x:Name="DockChrome" Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
-            BorderThickness="1" CornerRadius="19" Padding="12,10">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="26" ShadowDepth="8" Opacity="0.2" Color="#182A21"/>
-        </Border.Effect>
+            BorderThickness="1" CornerRadius="19" Padding="12,10" SnapsToDevicePixels="True">
         <StackPanel x:Name="ItemsPanel" Orientation="Horizontal"/>
     </Border>
 </Window>

@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PinDock</title>
+<style>
+:root {
+  --ink: #233b38;
+  --muted: #6c7d76;
+  --paper: #f7f8f2;
+  --line: #dce3da;
+  --accent: #236950;
+  --soft: #e4eddf;
+  --selected: #edf3e7;
+  --input-bg: #ffffffb8;
+  --focus-ring: #bc843e;
+  --badge-bg: transparent;
+}
+body[data-palette="ocean"] {
+  --ink: #24384b; --muted: #667b8c; --accent: #2b6cb0; --paper: #f4f8fb;
+  --line: #d6e1eb; --soft: #dcebf5; --selected: #e8f2f9;
+}
+body[data-palette="sand"] {
+  --ink: #463a2b; --muted: #847561; --accent: #966932; --paper: #faf6ee;
+  --line: #e6ddcc; --soft: #efe3ce; --selected: #f5eddf;
+}
+body[data-palette="clay"] {
+  --ink: #4b332d; --muted: #8c7269; --accent: #b05a43; --paper: #fcf4ef;
+  --line: #ead8ce; --soft: #f1ddd1; --selected: #f7e7de;
+}
+body[data-palette="graphite"] {
+  --ink: #2d343a; --muted: #707b84; --accent: #4c5f70; --paper: #f5f6f8;
+  --line: #dce0e4; --soft: #e2e7eb; --selected: #eceff2;
+}
+
+/* 深色主题：对齐 preview-v2 清爽现代深色蓝灰/曜石基底 + 主题强调色 */
+body.dark {
+  --ink: #e6eef4;
+  --muted: #93a3b1;
+  --paper: #1e2933;
+  --line: #31414f;
+  --soft: #2a3947;
+  --selected: #273644;
+  --accent: #68b688;
+  --input-bg: #172028;
+  --focus-ring: #cf964e;
+}
+body.dark[data-palette="ocean"] {
+  --ink: #e6eff7; --muted: #95a8b8; --paper: #1e2933; --line: #324352;
+  --soft: #2b3c4d; --selected: #283848; --accent: #6cb0de;
+}
+body.dark[data-palette="sand"] {
+  --ink: #f0eadf; --muted: #ab9f8e; --paper: #23221f; --line: #3a3731;
+  --soft: #332f29; --selected: #2e2a24; --accent: #d6ae6c;
+}
+body.dark[data-palette="clay"] {
+  --ink: #f3e8e4; --muted: #b39d95; --paper: #25201f; --line: #3e3330;
+  --soft: #382c29; --selected: #322724; --accent: #e28f75;
+}
+body.dark[data-palette="graphite"] {
+  --ink: #e8ecef; --muted: #9aa4ad; --paper: #1f2327; --line: #333940;
+  --soft: #2b3137; --selected: #272c32; --accent: #9cb4c9;
+}
+
+* { box-sizing: border-box; user-select: none; -webkit-user-drag: none; }
+html, body {
+  margin: 0; width: 100%; height: 100%; overflow: hidden;
+  font: 13px/1.45 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  color: var(--ink); background: var(--paper);
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: transparent; transition: background .14s, border-color .14s, color .14s, filter .14s, transform .1s; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+button:hover:not(:disabled) { filter: brightness(.97); }
+button:active:not(:disabled) { transform: scale(.99); }
+input:focus-visible, select:focus-visible, .key-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 38%, transparent); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--muted) 60%, transparent); }
+
+.app-shell {
+  width: 100vw; height: 100vh; display: flex; flex-direction: column;
+  background: var(--paper); position: relative;
+}
+.view { display: none; width: 100%; height: 100%; flex-direction: column; }
+.view.active { display: flex; }
+
+/* 通用标题栏与头部 */
+.titlebar {
+  height: 57px; padding: 0 20px 0 22px; display: flex; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--line);
+  flex-shrink: 0; cursor: default;
+}
+.titlebar-left { display: flex; align-items: baseline; gap: 10px; pointer-events: none; }
+.titlebar-left strong { font-size: 13px; font-weight: 600; }
+.titlebar-left span { color: var(--muted); font-size: 11px; }
+.titlebar-actions { display: flex; align-items: center; gap: 6px; }
+.close-btn {
+  width: 32px; height: 32px; border-radius: 7px; font-size: 20px; line-height: 1;
+  color: var(--muted); display: grid; place-items: center;
+}
+.close-btn:hover { background: var(--soft); color: var(--ink); }
+.switch-view-btn {
+  padding: 6px 11px; border-radius: 7px; background: var(--soft);
+  color: var(--ink); font-size: 11px; font-weight: 500;
+}
+
+/* 设置视图（1:1 还原 prototype） */
+.settings-body { display: flex; flex: 1; min-height: 0; }
+.sidebar {
+  padding: 22px 12px; width: 162px; flex-shrink: 0;
+  border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 5px;
+}
+.nav {
+  text-align: left; padding: 11px 13px; border-radius: 7px;
+  background: transparent; color: var(--muted); font-size: 13px;
+}
+.nav:hover { background: color-mix(in srgb, var(--soft) 55%, transparent); color: var(--ink); }
+.nav.active { background: var(--soft); color: var(--ink); font-weight: 600; }
+body:not(.dark) .nav.active { color: var(--accent); }
+.side-note {
+  margin-top: auto; padding: 24px 12px 0;
+  font: 10px/1.8 Consolas, monospace; color: var(--muted);
+}
+.content {
+  padding: 26px 28px; flex: 1; min-width: 0; overflow-y: auto;
+}
+.content h2 { font-size: 21px; font-weight: 600; letter-spacing: -.4px; margin: 0 0 6px; }
+.subtitle { font-size: 12px; color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
+.section-label { font-size: 12px; font-weight: 600; margin: 0 0 10px; }
+.modes { display: grid; gap: 8px; margin-bottom: 8px; }
+.mode {
+  display: flex; text-align: left; gap: 12px; align-items: center;
+  padding: 13px 14px; border: 1px solid var(--line); border-radius: 9px;
+}
+.mode:hover { border-color: var(--accent); }
+.mode.selected { background: var(--selected); border-color: var(--accent); }
+.radio {
+  height: 15px; width: 15px; flex-shrink: 0;
+  border: 1.5px solid var(--muted); border-radius: 50%;
+}
+.mode.selected .radio { border: 4.5px solid var(--accent); background: var(--paper); }
+.mode strong { display: block; font-size: 13px; font-weight: 600; }
+.mode small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+.badge {
+  margin-left: auto; white-space: nowrap; font-size: 10px; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px;
+}
+.row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--line); font-size: 12px;
+}
+.row small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+.switch {
+  width: 34px; height: 20px; background: color-mix(in srgb, var(--muted) 45%, var(--line));
+  border-radius: 20px; padding: 3px; flex-shrink: 0; position: relative;
+}
+.switch::after {
+  content: ''; display: block; width: 14px; height: 14px;
+  background: white; border-radius: 50%; transition: transform .18s ease;
+}
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(14px); }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 14px; }
+.swatch {
+  display: flex; align-items: center; gap: 7px; padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 8px; font-size: 12px;
+}
+.swatch:hover { border-color: var(--accent); }
+.swatch[aria-pressed="true"] { border-color: var(--accent); background: var(--selected); font-weight: 600; }
+.swatch i { width: 14px; height: 14px; border-radius: 50%; background: var(--chip); display: inline-block; }
+
+select {
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 7px; padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+.range-wrap { display: flex; align-items: center; gap: 10px; }
+input[type="range"] {
+  accent-color: var(--accent); width: 150px; cursor: pointer;
+}
+.range-val { font: 11px Consolas, monospace; color: var(--muted); width: 36px; text-align: right; }
+
+.hotkey-group { display: flex; align-items: center; gap: 6px; }
+.key-btn {
+  background: var(--soft); border: 1px solid var(--line); border-radius: 6px;
+  padding: 5px 10px; font: 11px Consolas, 'Microsoft YaHei UI', monospace;
+  color: var(--ink);
+}
+.key-btn.recording {
+  border-color: var(--focus-ring); background: var(--selected); color: var(--accent); font-weight: 600;
+}
+.mini-btn {
+  padding: 5px 9px; border-radius: 6px; background: var(--soft);
+  color: var(--muted); font-size: 11px;
+}
+.mini-btn:hover:not(:disabled) { color: var(--ink); }
+
+.monitor-map { display: flex; gap: 10px; align-items: stretch; margin: 12px 0 6px; flex-wrap: wrap; }
+.monitor {
+  min-height: 62px; flex: 1; min-width: 140px; padding: 10px 12px;
+  border: 1.5px solid var(--line); border-radius: 8px; background: var(--soft);
+  font-size: 11px; line-height: 1.5; text-align: center;
+}
+.monitor[aria-pressed="true"] { border-color: var(--accent); background: var(--selected); font-weight: 600; }
+.position-picker {
+  display: grid; grid-template-columns: 64px 1fr 64px; grid-template-rows: 35px 56px 35px;
+  gap: 7px; padding: 12px; border: 1px solid var(--line); border-radius: 12px;
+  max-width: 310px; margin: 12px auto;
+}
+.position-picker button {
+  background: var(--soft); border: 1px solid transparent; border-radius: 6px; font-size: 12px;
+}
+.position-picker button[aria-pressed="true"] { background: var(--accent); color: var(--paper); font-weight: 600; }
+.position-picker .screen {
+  grid-column: 2; grid-row: 2; border: 1px solid var(--line); border-radius: 5px;
+  display: grid; place-items: center; color: var(--muted); font-size: 11px;
+}
+.edge-top { grid-column: 2; grid-row: 1; }
+.edge-left { grid-column: 1; grid-row: 2; }
+.edge-right { grid-column: 3; grid-row: 2; }
+.edge-bottom { grid-column: 2; grid-row: 3; }
+
+.notice {
+  font-size: 12px; line-height: 1.85; padding: 14px 16px;
+  background: var(--soft); border-radius: 9px; color: var(--ink); margin-top: 16px;
+}
+.footer {
+  padding: 11px 22px; border-top: 1px solid var(--line); font-size: 10px;
+  color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-shrink: 0;
+}
+.dot { color: var(--accent); margin-right: 5px; }
+
+/* 全部收藏视图（1:1 还原 preview-v3.png） */
+.lib-header {
+  padding: 20px 24px 18px; display: flex; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+.lib-header-text { pointer-events: none; }
+.lib-header h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+.lib-header small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+.library-tools {
+  padding: 14px 24px; border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+.search-input {
+  width: 100%; margin: 0 0 11px; border: 1.5px solid var(--line);
+  padding: 9px 12px; background: var(--input-bg); border-radius: 8px;
+  color: var(--ink); font-size: 12px; user-select: text;
+}
+.search-input:focus {
+  outline: none; border-color: var(--focus-ring);
+  box-shadow: 0 0 0 1px var(--focus-ring);
+}
+.filters { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.chip-btn {
+  padding: 7px 11px; border-radius: 6px; background: var(--soft);
+  color: var(--ink); font-size: 12px;
+}
+.chip-btn[aria-pressed="true"] {
+  background: var(--accent); color: var(--paper); font-weight: 600;
+}
+.filters-spacer { flex: 1; }
+
+.library-list {
+  flex: 1; overflow-y: auto; padding: 4px 24px; min-height: 0;
+}
+.entry {
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--line); padding: 11px 2px;
+}
+.entry:hover { background: color-mix(in srgb, var(--selected) 60%, transparent); border-radius: 8px; padding-left: 6px; padding-right: 6px; margin: 0 -4px; }
+.entry-icon {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--soft);
+  display: grid; place-items: center; color: var(--accent); flex-shrink: 0; overflow: hidden;
+}
+.entry-icon img { width: 22px; height: 22px; object-fit: contain; }
+.entry-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.entry-main {
+  min-width: 0; flex: 1; text-align: left; background: none; padding: 2px 4px; color: var(--ink);
+}
+.entry-main strong { display: block; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry-main small {
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 11px Consolas, 'Microsoft YaHei UI', monospace; color: var(--muted); margin-top: 4px;
+}
+.entry-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.row-act {
+  padding: 6px 8px; border-radius: 6px; font-size: 11px; color: var(--muted);
+  opacity: 0; transition: opacity .12s;
+}
+.entry:hover .row-act { opacity: 1; }
+.row-act:hover { background: var(--soft); color: var(--ink); }
+.pin {
+  background: transparent; color: var(--muted); padding: 7px 11px;
+  border-radius: 6px; font-size: 11px; font-weight: 500;
+}
+.pin:hover { background: var(--soft); color: var(--ink); }
+.pin[aria-pressed="true"] {
+  color: var(--accent); background: var(--soft); font-weight: 600;
+}
+.empty-state {
+  padding: 56px 20px; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.9;
+}
+
+/* 弹窗遮罩层（添加/编辑收藏、新建分组） */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15, 23, 20, .38);
+  backdrop-filter: blur(4px); display: none; place-items: center; z-index: 30;
+}
+.modal-backdrop.open { display: grid; }
+.modal-card {
+  width: min(520px, calc(100vw - 40px)); max-height: calc(100vh - 40px);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 15px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .28); display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.modal-header {
+  padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.modal-header small { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
+.modal-body { padding: 18px 22px; overflow-y: auto; display: grid; gap: 12px; }
+.field-label { display: grid; gap: 6px; font-size: 12px; font-weight: 500; }
+.field-row { display: flex; gap: 6px; }
+.field-row input { flex: 1; }
+.field-input {
+  padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px;
+  background: var(--input-bg); color: var(--ink); font-size: 12px; user-select: text;
+}
+.primary-btn {
+  padding: 8px 16px; border-radius: 7px; background: var(--accent);
+  color: var(--paper); font-size: 12px; font-weight: 600;
+}
+.modal-footer {
+  padding: 12px 22px; border-top: 1px solid var(--line);
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+
+.toast {
+  position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--paper); padding: 8px 16px;
+  border-radius: 8px; font-size: 12px; z-index: 50; pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+}
+</style>
+</head>
+<body data-palette="forest">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="ico-folder" viewBox="0 0 32 32">
+      <path d="M3 8a3 3 0 0 1 3-3h7l3 4h10a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z" opacity=".65"/>
+      <path d="M3 13h26v11a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z"/>
+    </symbol>
+    <symbol id="ico-app" viewBox="0 0 24 24">
+      <path d="M12 3L21 12L12 21L3 12L12 3ZM12 6.2L6.2 12L12 17.8L17.8 12L12 6.2Z"/>
+    </symbol>
+    <symbol id="ico-file" viewBox="0 0 24 24">
+      <path d="M6 3h8l5 5v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm7 1.5V9h4.5L13 4.5z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app-shell">
+  <!-- 视图 1：全部收藏（1:1 还原 preview-v3.png） -->
+  <section class="view active" id="view-library" aria-label="全部收藏面板">
+    <header class="lib-header" data-drag="true">
+      <div class="lib-header-text">
+        <h2 id="library-title">全部收藏</h2>
+        <small id="library-subtitle">收藏留在这里，常用的固定到 Dock · 支持直接拖入文件或文件夹</small>
+      </div>
+      <div class="titlebar-actions">
+        <button class="switch-view-btn" id="btn-to-settings">⚙ 设置</button>
+        <button class="close-btn" data-close="true" aria-label="关闭">×</button>
+      </div>
+    </header>
+    <div class="library-tools">
+      <input id="library-search" class="search-input" placeholder="搜索名称、路径、收藏组，或直接搜索本机已安装应用…" aria-label="搜索全部收藏">
+      <div class="filters">
+        <button class="chip-btn" data-filter="all" aria-pressed="true">全部</button>
+        <button class="chip-btn" data-filter="应用" aria-pressed="false">应用</button>
+        <button class="chip-btn" data-filter="文件夹" aria-pressed="false">文件夹</button>
+        <button class="chip-btn" data-filter="文件" aria-pressed="false">文件</button>
+        <button class="chip-btn" data-filter="installed" aria-pressed="false">本机软件库</button>
+        <span class="filters-spacer"></span>
+        <button class="chip-btn" id="btn-quick-folder">＋ 添加文件夹</button>
+        <button class="chip-btn" id="btn-open-add">＋ 添加收藏</button>
+        <button class="chip-btn" id="btn-open-group">＋ 新建分组</button>
+      </div>
+    </div>
+    <div class="library-list" id="library-list"></div>
+    <footer class="footer">
+      <span id="library-count">显示 0 项</span>
+      <span>单击条目直接打开 · 右侧一键固定到 Dock</span>
+    </footer>
+  </section>
+
+  <!-- 视图 2：PinDock 设置（1:1 还原 preview.png & preview-v2.png） -->
+  <section class="view" id="view-settings" aria-label="PinDock 设置">
+    <header class="titlebar" data-drag="true">
+      <div class="titlebar-left">
+        <strong>PinDock 设置</strong>
+        <span>让它适合你的习惯</span>
+      </div>
+      <div class="titlebar-actions">
+        <button class="switch-view-btn" id="btn-to-library">▦ 全部收藏</button>
+        <button class="close-btn" data-close="true" aria-label="关闭设置">×</button>
+      </div>
+    </header>
+    <div class="settings-body">
+      <nav class="sidebar" aria-label="设置页面">
+        <button class="nav active" data-page="general">常规</button>
+        <button class="nav" data-page="appearance">外观</button>
+        <button class="nav" data-page="behavior">位置与行为</button>
+        <button class="nav" data-page="about">数据与关于</button>
+        <div class="side-note">LESS FRICTION.<br>MORE FOCUS.<br><br>PinDock / Concept 01</div>
+      </nav>
+      <div class="content">
+        <!-- 常规 -->
+        <section data-panel="general">
+          <h2>按你的节奏出现</h2>
+          <p class="subtitle">常驻手边，或需要时再呼出。原生任务栏始终保留。</p>
+          <div class="section-label">显示模式</div>
+          <div class="modes" role="group" aria-label="显示模式">
+            <button class="mode" data-mode="Persistent">
+              <span class="radio"></span>
+              <span><strong>常驻显示</strong><small>始终在手边，快捷键可临时收起</small></span>
+              <span class="badge">默认</span>
+            </button>
+            <button class="mode" data-mode="Hotkey">
+              <span class="radio"></span>
+              <span><strong>快捷键呼出</strong><small>需要时出现，完成后安静退场</small></span>
+            </button>
+            <button class="mode" data-mode="EdgeAutoHide">
+              <span class="radio"></span>
+              <span><strong>贴边自动隐藏</strong><small>鼠标靠近屏幕边缘时展开</small></span>
+            </button>
+          </div>
+          <div class="row">
+            <span>
+              显示 / 隐藏快捷键
+              <small id="hotkey-hint">点击快捷键可重新录制，或点击“清除”设为不使用</small>
+            </span>
+            <div class="hotkey-group">
+              <button class="key-btn" id="btn-hotkey-record" title="点击后直接按下新组合键">Alt + Shift + P</button>
+              <button class="mini-btn" id="btn-hotkey-clear" title="清除快捷键，不使用全局热键">清除</button>
+              <button class="mini-btn" id="btn-hotkey-reset" title="恢复默认 Alt + Shift + P">默认</button>
+            </div>
+          </div>
+          <div class="row">
+            <span>
+              启动收藏项后收起
+              <small>仅在快捷键呼出与贴边自动隐藏模式下生效</small>
+            </span>
+            <button class="switch" id="sw-collapse" role="switch" aria-checked="true"></button>
+          </div>
+        </section>
+
+        <!-- 外观 -->
+        <section data-panel="appearance" hidden>
+          <h2>安静，也有自己的样子</h2>
+          <p class="subtitle">少一点装饰，多一点清晰。修改后可直接观察 Dock。</p>
+          <div class="section-label">配色方案 · 可搭配浅色 / 深色</div>
+          <div class="swatches" role="group" aria-label="配色方案">
+            <button class="swatch" data-palette-choice="Forest" style="--chip:#527649"><i></i>苔原绿</button>
+            <button class="swatch" data-palette-choice="Ocean" style="--chip:#568dad"><i></i>海盐蓝</button>
+            <button class="swatch" data-palette-choice="Sand" style="--chip:#b5925e"><i></i>暖砂</button>
+            <button class="swatch" data-palette-choice="Clay" style="--chip:#bc7a60"><i></i>陶土</button>
+            <button class="swatch" data-palette-choice="Graphite" style="--chip:#6b7a86"><i></i>石墨</button>
+          </div>
+          <div class="row">
+            <span>主题</span>
+            <select id="sel-theme" aria-label="主题">
+              <option value="Light">浅色</option>
+              <option value="Dark">深色</option>
+              <option value="System">跟随系统</option>
+            </select>
+          </div>
+          <div class="row">
+            <span>图标大小</span>
+            <select id="sel-size" aria-label="图标大小">
+              <option value="Compact">紧凑 (38px)</option>
+              <option value="Standard">标准 (46px)</option>
+              <option value="Comfortable">宽松 (56px)</option>
+            </select>
+          </div>
+          <div class="row">
+            <span>
+              透明度
+              <small>作用于 Dock 与收藏组弹层，最低 40%</small>
+            </span>
+            <div class="range-wrap">
+              <input type="range" id="rng-opacity" min="40" max="100" step="5" value="94">
+              <span class="range-val" id="lbl-opacity">94%</span>
+            </div>
+          </div>
+          <div class="row">
+            <span>悬停名称提示</span>
+            <span class="badge">默认开启</span>
+          </div>
+          <p class="notice">自动提取应用与快捷方式 48×48 高清系统图标，文件夹使用原型定制双层矢量图标。</p>
+        </section>
+
+        <!-- 位置与行为 -->
+        <section data-panel="behavior" hidden>
+          <h2>共存，而不是接管</h2>
+          <p class="subtitle">不替换任务栏，不占用桌面工作区。</p>
+          <div class="section-label">显示器策略</div>
+          <select id="sel-monitor-policy" aria-label="显示器策略">
+            <option value="Fixed">固定到指定显示器</option>
+            <option value="Primary">跟随系统主显示器</option>
+            <option value="FollowCursor">呼出时跟随鼠标</option>
+          </select>
+          <div class="monitor-map" id="monitor-list"></div>
+          <div class="row">
+            <span>保持在普通窗口上方</span>
+            <button class="switch" id="sw-topmost" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row">
+            <span>全屏应用时自动避让</span>
+            <button class="switch" id="sw-fullscreen" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row">
+            <span>
+              锁定 Dock 位置
+              <small>未锁定时可按住 Dock 图标沿停靠边拖动</small>
+            </span>
+            <button class="switch" id="sw-lock" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              资源管理器右键添加文件夹
+              <small>在 Windows 文件夹上右键可直接选择“添加到 PinDock”</small>
+            </span>
+            <button class="switch" id="sw-explorer-menu" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="section-label" style="margin-top:18px">停靠位置 · 点击屏幕四边切换</div>
+          <div class="position-picker" role="group" aria-label="停靠位置">
+            <span class="screen" id="screen-label">主显示器</span>
+            <button class="edge-top" data-edge-choice="Top">顶部</button>
+            <button class="edge-left" data-edge-choice="Left">左侧</button>
+            <button class="edge-right" data-edge-choice="Right">右侧</button>
+            <button class="edge-bottom" data-edge-choice="Bottom">底部</button>
+          </div>
+          <p class="notice">贴边自动隐藏：若停靠边与另一块显示器相邻，鼠标可能穿过边界，建议停靠到外侧边缘。</p>
+        </section>
+
+        <!-- 数据与关于 -->
+        <section data-panel="about" hidden>
+          <h2>你的收藏，留在本地</h2>
+          <p class="subtitle">PinDock · Windows 独立悬浮启动栏</p>
+          <p class="notice">收藏与设置保存在 %LocalAppData%\PinDock\library.json，不联网、不上传。移除收藏不会删除目标文件。</p>
+          <div class="row">
+            <span>导入收藏<small>按目标与启动配置去重，已存在的会被跳过</small></span>
+            <button class="chip-btn" id="btn-import">导入 JSON…</button>
+          </div>
+          <div class="row">
+            <span>导出收藏<small>生成可备份、可迁移的 JSON 文件</small></span>
+            <button class="chip-btn" id="btn-export">导出 JSON…</button>
+          </div>
+          <div class="row"><span>渲染架构</span><span>C# .NET 10 + WebView2 (HTML/CSS)</span></div>
+          <div class="row"><span>开源协议</span><span>MIT</span></div>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+      <span><span class="dot">●</span>仅保存在本机 · GPU 硬件加速渲染</span>
+      <span>修改即时生效并自动保存</span>
+    </footer>
+  </section>
+</div>
+
+<!-- 弹窗 1：添加 / 编辑收藏 -->
+<div class="modal-backdrop" id="modal-editor">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h3 id="editor-title">添加收藏</h3>
+        <small>从本机已安装软件快速选择，或直接浏览选择文件夹与程序</small>
+      </div>
+      <button class="close-btn" id="btn-close-editor">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label" id="quick-app-wrap">
+        <span>从本机已安装软件快速填充</span>
+        <select id="editor-installed-select">
+          <option value="">— 选择开始菜单 / 桌面已安装应用 —</option>
+        </select>
+      </label>
+      <label class="field-label">
+        <span>目标路径</span>
+        <div class="field-row">
+          <input class="field-input" id="editor-path" placeholder="例如：E:\Projects\Client-A 或 C:\App\Tool.exe">
+          <button class="chip-btn" type="button" id="btn-pick-folder">选文件夹…</button>
+          <button class="chip-btn" type="button" id="btn-pick-file">选文件…</button>
+        </div>
+      </label>
+      <label class="field-label">
+        <span>显示名称</span>
+        <input class="field-input" id="editor-name" placeholder="留空将根据路径自动生成名称" maxlength="80">
+      </label>
+      <label class="field-label">
+        <span>收藏组（可直接输入新分组名）</span>
+        <input class="field-input" id="editor-group" list="group-datalist" placeholder="未分组">
+        <datalist id="group-datalist"></datalist>
+      </label>
+      <label class="field-label">
+        <span>启动参数（仅 EXE 可选）</span>
+        <input class="field-input" id="editor-args" placeholder="可选启动参数">
+      </label>
+      <label class="field-label">
+        <span>工作目录（仅 EXE 可选）</span>
+        <input class="field-input" id="editor-workdir" placeholder="可选工作目录">
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+        <input type="checkbox" id="editor-pinned" checked style="accent-color:var(--accent);width:15px;height:15px">
+        <span>同时固定到 Dock</span>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="chip-btn" type="button" id="btn-cancel-editor">取消</button>
+      <button class="primary-btn" type="button" id="btn-save-editor">保存收藏</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗 2：新建分组 -->
+<div class="modal-backdrop" id="modal-group">
+  <div class="modal-card" style="width:min(400px,calc(100vw - 40px))">
+    <div class="modal-header">
+      <div>
+        <h3>新建收藏组</h3>
+        <small>有成员的收藏组会自动显示在 Dock 栏上</small>
+      </div>
+      <button class="close-btn" id="btn-close-group">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">
+        <span>分组名称</span>
+        <input class="field-input" id="group-name-input" placeholder="例如：开发项目、常用工具、客户资料" maxlength="40">
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="chip-btn" type="button" id="btn-cancel-group">取消</button>
+      <button class="primary-btn" type="button" id="btn-save-group">创建分组</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+let state = {
+  view: 'library',
+  overflowOnly: false,
+  filter: 'all',
+  items: [],
+  overflowIds: [],
+  groups: [],
+  installedApps: [],
+  icons: {},
+  monitors: [],
+  settings: {},
+  isDark: false
+};
+let editingId = null;
+let recordingHotkey = false;
+let toastTimer = null;
+
+function send(cmd, payload = {}) {
+  if (window.chrome && window.chrome.webview) {
+    window.chrome.webview.postMessage({ cmd, ...payload });
+  }
+}
+
+function notify(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 2400);
+}
+
+// 标题栏拖动与关闭
+document.addEventListener('mousedown', e => {
+  const dragHeader = e.target.closest('[data-drag="true"]');
+  if (dragHeader && !e.target.closest('button, input, select')) {
+    send('dragWindow');
+  }
+});
+$$('[data-close="true"]').forEach(b => b.onclick = () => send('closeWindow'));
+$('#btn-to-settings').onclick = () => switchView('settings');
+$('#btn-to-library').onclick = () => switchView('library');
+
+function switchView(viewName, options = {}) {
+  state.view = viewName;
+  if (options.overflowOnly !== undefined) state.overflowOnly = options.overflowOnly;
+  if (options.filter) setFilter(options.filter);
+  $('#view-library').classList.toggle('active', viewName === 'library');
+  $('#view-settings').classList.toggle('active', viewName === 'settings');
+  $('#library-title').textContent = state.overflowOnly ? '更多固定收藏' : '全部收藏';
+  if (viewName === 'library') {
+    renderLibrary();
+    $('#library-search').focus();
+  }
+  send('viewChanged', { view: viewName });
+}
+
+function setFilter(f) {
+  state.filter = f;
+  $$('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+}
+
+$$('[data-filter]').forEach(b => b.onclick = () => {
+  setFilter(b.dataset.filter);
+  renderLibrary();
+});
+$('#library-search').oninput = () => renderLibrary();
+
+function fallbackSvg(kind) {
+  const id = kind === '文件夹' ? 'ico-folder' : kind === '应用' ? 'ico-app' : 'ico-file';
+  return `<svg><use href="#${id}"/></svg>`;
+}
+
+function renderLibrary() {
+  const q = $('#library-search').value.trim().toLowerCase();
+  const list = $('#library-list');
+  list.replaceChildren();
+
+  const rows = [];
+  if (state.filter !== 'installed') {
+    let pool = state.items;
+    if (state.overflowOnly) {
+      const set = new Set(state.overflowIds);
+      pool = pool.filter(i => set.has(i.id));
+    }
+    if (state.filter !== 'all') {
+      pool = pool.filter(i => i.kind === state.filter);
+    }
+    if (q) {
+      pool = pool.filter(i => (i.name + ' ' + i.path + ' ' + i.group).toLowerCase().includes(q));
+    }
+    pool.forEach(item => rows.push({ ...item, isCandidate: false }));
+  }
+
+  // 在“本机软件库”标签下，或在“全部/应用”中搜索关键字时，直接展示本机已安装应用
+  if (!state.overflowOnly && (state.filter === 'installed' || (q && (state.filter === 'all' || state.filter === '应用')))) {
+    const existingPaths = new Set(state.items.map(i => i.path.trim().toLowerCase()));
+    const existingNames = new Set(state.items.map(i => i.name.trim().toLowerCase()));
+    for (const app of state.installedApps) {
+      if (existingPaths.has(app.path.trim().toLowerCase()) || existingNames.has(app.name.trim().toLowerCase())) continue;
+      if (q && !(app.name + ' ' + app.path + ' ' + app.category).toLowerCase().includes(q)) continue;
+      rows.push({
+        id: null,
+        name: app.name,
+        path: app.path,
+        group: `本机应用 (${app.category})`,
+        kind: '应用',
+        pinned: false,
+        isCandidate: true
+      });
+    }
+  }
+
+  const missingIconPaths = [];
+  for (const item of rows) {
+    const row = document.createElement('div');
+    row.className = 'entry';
+
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'entry-icon';
+    iconWrap.dataset.iconPath = item.path;
+    const cachedUri = state.icons[item.path];
+    if (cachedUri && item.kind !== '文件夹') {
+      iconWrap.innerHTML = `<img src="${cachedUri}" alt="">`;
+    } else {
+      iconWrap.innerHTML = fallbackSvg(item.kind);
+      if (item.kind !== '文件夹' && cachedUri === undefined && missingIconPaths.length < 40) {
+        missingIconPaths.push(item.path);
+      }
+    }
+
+    const mainBtn = document.createElement('button');
+    mainBtn.className = 'entry-main';
+    const strong = document.createElement('strong');
+    strong.textContent = item.name;
+    const small = document.createElement('small');
+    small.textContent = (item.group || item.kind) + ' · ' + item.path;
+    mainBtn.append(strong, small);
+    mainBtn.onclick = () => send('launch', { path: item.path, id: item.id });
+
+    const actions = document.createElement('div');
+    actions.className = 'entry-actions';
+
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'row-act';
+    revealBtn.textContent = '定位';
+    revealBtn.title = '在资源管理器中显示';
+    revealBtn.onclick = () => send('reveal', { path: item.path });
+    actions.append(revealBtn);
+
+    if (!item.isCandidate) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'row-act';
+      editBtn.textContent = '编辑';
+      editBtn.onclick = () => openEditor(item);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'row-act';
+      delBtn.textContent = '移除';
+      delBtn.onclick = () => send('remove', { id: item.id });
+      actions.append(editBtn, delBtn);
+    }
+
+    const pinBtn = document.createElement('button');
+    pinBtn.className = 'pin';
+    if (item.isCandidate) {
+      pinBtn.textContent = '＋ 固定到 Dock';
+      pinBtn.setAttribute('aria-pressed', 'true');
+      pinBtn.onclick = () => {
+        send('pinInstalled', { name: item.name, path: item.path });
+        notify(`已固定到 Dock：${item.name}`);
+      };
+    } else {
+      pinBtn.textContent = item.pinned ? '★ 已固定' : '☆ 固定';
+      pinBtn.setAttribute('aria-pressed', String(item.pinned));
+      pinBtn.onclick = () => send('togglePin', { id: item.id });
+    }
+    actions.append(pinBtn);
+
+    row.append(iconWrap, mainBtn, actions);
+    list.append(row);
+  }
+
+  if (rows.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.innerHTML = q
+      ? '没有匹配的收藏或本机软件'
+      : '还没有收藏项<br>可点击上方「＋ 添加文件夹」或切换到「本机软件库」一键固定常用软件';
+    list.append(empty);
+  }
+
+  const pinnedCount = state.items.filter(i => i.pinned).length;
+  $('#library-count').textContent = `显示 ${rows.length} 项 · 共 ${state.items.length} 项收藏 · ${pinnedCount} 项固定`;
+
+  if (missingIconPaths.length > 0) {
+    send('requestIcons', { paths: missingIconPaths });
+  }
+}
+
+// 添加 / 编辑弹窗
+function openEditor(item = null) {
+  editingId = item ? item.id : null;
+  $('#editor-title').textContent = item ? '编辑收藏' : '添加收藏';
+  $('#editor-path').value = item ? item.path : '';
+  $('#editor-name').value = item ? item.name : '';
+  $('#editor-group').value = item ? (item.group || '') : '';
+  $('#editor-args').value = item ? (item.arguments || '') : '';
+  $('#editor-workdir').value = item ? (item.workingDirectory || '') : '';
+  $('#editor-pinned').checked = item ? !!item.pinned : true;
+
+  const sel = $('#editor-installed-select');
+  sel.innerHTML = '<option value="">— 选择开始菜单 / 桌面已安装应用 —</option>';
+  state.installedApps.forEach((app, idx) => {
+    const opt = document.createElement('option');
+    opt.value = String(idx);
+    opt.textContent = `${app.name} (${app.category})`;
+    sel.append(opt);
+  });
+
+  const dl = $('#group-datalist');
+  dl.innerHTML = '';
+  state.groups.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g;
+    dl.append(opt);
+  });
+
+  $('#modal-editor').classList.add('open');
+  $('#editor-path').focus();
+}
+
+$('#editor-installed-select').onchange = e => {
+  const idx = parseInt(e.target.value, 10);
+  if (!isNaN(idx) && state.installedApps[idx]) {
+    const app = state.installedApps[idx];
+    $('#editor-name').value = app.name;
+    $('#editor-path').value = app.path;
+  }
+};
+$('#btn-open-add').onclick = () => openEditor(null);
+$('#btn-close-editor').onclick = () => $('#modal-editor').classList.remove('open');
+$('#btn-cancel-editor').onclick = () => $('#modal-editor').classList.remove('open');
+$('#btn-pick-folder').onclick = () => send('pickPathForEditor', { folder: true });
+$('#btn-pick-file').onclick = () => send('pickPathForEditor', { folder: false });
+$('#btn-quick-folder').onclick = () => send('quickAddFolder');
+
+$('#btn-save-editor').onclick = () => {
+  const path = $('#editor-path').value.trim();
+  if (!path) { notify('请选择或输入目标路径'); return; }
+  send('saveBookmark', {
+    id: editingId,
+    name: $('#editor-name').value.trim(),
+    path,
+    group: $('#editor-group').value.trim(),
+    arguments: $('#editor-args').value,
+    workingDirectory: $('#editor-workdir').value.trim(),
+    pinned: $('#editor-pinned').checked
+  });
+  $('#modal-editor').classList.remove('open');
+};
+
+// 新建分组弹窗
+$('#btn-open-group').onclick = () => {
+  $('#group-name-input').value = '';
+  $('#modal-group').classList.add('open');
+  $('#group-name-input').focus();
+};
+$('#btn-close-group').onclick = () => $('#modal-group').classList.remove('open');
+$('#btn-cancel-group').onclick = () => $('#modal-group').classList.remove('open');
+$('#btn-save-group').onclick = () => {
+  const name = $('#group-name-input').value.trim();
+  if (!name) { notify('请输入分组名称'); return; }
+  send('addGroup', { name });
+  $('#modal-group').classList.remove('open');
+  notify(`已添加分组：${name}`);
+};
+
+// 设置页导航与控件
+$$('.nav').forEach(btn => btn.onclick = () => {
+  $$('.nav').forEach(b => b.classList.toggle('active', b === btn));
+  $$('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== btn.dataset.page);
+});
+
+$$('[data-mode]').forEach(btn => btn.onclick = () => {
+  state.settings.displayMode = btn.dataset.mode;
+  applySettingsToUi();
+  send('updateSettings', { settings: state.settings });
+});
+
+$$('[data-palette-choice]').forEach(btn => btn.onclick = () => {
+  state.settings.palette = btn.dataset.paletteChoice;
+  applySettingsToUi();
+  send('updateSettings', { settings: state.settings });
+});
+
+$$('[data-edge-choice]').forEach(btn => btn.onclick = () => {
+  state.settings.dockEdge = btn.dataset.edgeChoice;
+  applySettingsToUi();
+  send('updateSettings', { settings: state.settings });
+});
+
+$('#sel-theme').onchange = e => {
+  state.settings.themeMode = e.target.value;
+  send('updateSettings', { settings: state.settings });
+};
+$('#sel-size').onchange = e => {
+  state.settings.iconSize = e.target.value;
+  send('updateSettings', { settings: state.settings });
+};
+$('#sel-monitor-policy').onchange = e => {
+  state.settings.monitorPolicy = e.target.value;
+  applySettingsToUi();
+  send('updateSettings', { settings: state.settings });
+};
+
+$('#rng-opacity').oninput = e => {
+  const val = parseInt(e.target.value, 10);
+  $('#lbl-opacity').textContent = val + '%';
+  state.settings.opacity = val / 100.0;
+  send('updateOpacity', { opacity: state.settings.opacity });
+};
+
+function bindSwitch(id, prop, cmdName = 'updateSettings') {
+  $(id).onclick = () => {
+    state.settings[prop] = !state.settings[prop];
+    applySettingsToUi();
+    if (cmdName === 'toggleExplorerMenu') {
+      send('toggleExplorerMenu', { enabled: state.settings[prop] });
+    } else {
+      send('updateSettings', { settings: state.settings });
+    }
+  };
+}
+bindSwitch('#sw-collapse', 'collapseAfterLaunch');
+bindSwitch('#sw-topmost', 'topmost');
+bindSwitch('#sw-fullscreen', 'avoidFullscreen');
+bindSwitch('#sw-lock', 'lockPosition');
+bindSwitch('#sw-explorer-menu', 'explorerContextMenu', 'toggleExplorerMenu');
+
+// 快捷键录制与清除
+$('#btn-hotkey-record').onclick = () => {
+  recordingHotkey = !recordingHotkey;
+  renderHotkeyUi();
+};
+$('#btn-hotkey-clear').onclick = () => {
+  recordingHotkey = false;
+  state.settings.hotkeyModifiers = '';
+  state.settings.hotkeyKey = '';
+  renderHotkeyUi();
+  send('updateHotkey', { modifiers: '', key: '' });
+  notify('已清除全局快捷键（设为不使用）');
+};
+$('#btn-hotkey-reset').onclick = () => {
+  recordingHotkey = false;
+  state.settings.hotkeyModifiers = 'Alt+Shift';
+  state.settings.hotkeyKey = 'P';
+  renderHotkeyUi();
+  send('updateHotkey', { modifiers: 'Alt+Shift', key: 'P' });
+  notify('已恢复默认快捷键 Alt + Shift + P');
+};
+
+document.addEventListener('keydown', e => {
+  if (recordingHotkey) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'Escape') {
+      recordingHotkey = false;
+      renderHotkeyUi();
+      return;
+    }
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      $('#btn-hotkey-clear').click();
+      return;
+    }
+    if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) return;
+
+    const mods = [];
+    if (e.ctrlKey) mods.push('Ctrl');
+    if (e.altKey) mods.push('Alt');
+    if (e.shiftKey) mods.push('Shift');
+    if (e.metaKey) mods.push('Win');
+    if (mods.length === 0) {
+      notify('请至少搭配一个修饰键 (Ctrl / Alt / Shift)');
+      return;
+    }
+
+    let keyName = '';
+    if (/^Key[A-Z]$/.test(e.code)) keyName = e.code.slice(3);
+    else if (/^Digit[0-9]$/.test(e.code)) keyName = e.code.slice(5);
+    else if (/^F([1-9]|1[0-2])$/.test(e.code)) keyName = e.code;
+    else if (e.code === 'Space') keyName = 'Space';
+    else if (e.code === 'Backquote') keyName = '`';
+
+    if (!keyName) {
+      notify('支持 A-Z、0-9、F1-F12、Space 或 ` 键');
+      return;
+    }
+
+    recordingHotkey = false;
+    state.settings.hotkeyModifiers = mods.join('+');
+    state.settings.hotkeyKey = keyName;
+    renderHotkeyUi();
+    send('updateHotkey', { modifiers: state.settings.hotkeyModifiers, key: keyName });
+    notify(`快捷键已更新为 ${mods.join(' + ')} + ${keyName}`);
+    return;
+  }
+
+  if (e.key === 'Escape') {
+    if ($('#modal-editor').classList.contains('open')) {
+      $('#modal-editor').classList.remove('open');
+    } else if ($('#modal-group').classList.contains('open')) {
+      $('#modal-group').classList.remove('open');
+    } else {
+      send('closeWindow');
+    }
+  }
+});
+
+$('#btn-import').onclick = () => send('importLibrary');
+$('#btn-export').onclick = () => send('exportLibrary');
+
+function renderHotkeyUi() {
+  const btn = $('#btn-hotkey-record');
+  const mod = state.settings.hotkeyModifiers || '';
+  const key = state.settings.hotkeyKey || '';
+  const has = mod.length > 0 && key.length > 0;
+  btn.classList.toggle('recording', recordingHotkey);
+  btn.textContent = recordingHotkey
+    ? '请按下组合键… (Esc 取消)'
+    : has ? `${mod.replace(/\+/g, ' + ')} + ${key}` : '不使用';
+  $('#btn-hotkey-clear').disabled = !has && !recordingHotkey;
+}
+
+function applySettingsToUi() {
+  const s = state.settings;
+  if (!s) return;
+  document.body.dataset.palette = (s.palette || 'Forest').toLowerCase();
+  document.body.classList.toggle('dark', !!state.isDark);
+
+  $$('[data-mode]').forEach(b => b.classList.toggle('selected', b.dataset.mode === s.displayMode));
+  $$('[data-palette-choice]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.paletteChoice === s.palette)));
+  $$('[data-edge-choice]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.edgeChoice === s.dockEdge)));
+
+  $('#sel-theme').value = s.themeMode || 'Light';
+  $('#sel-size').value = s.iconSize || 'Standard';
+  $('#sel-monitor-policy').value = s.monitorPolicy || 'Primary';
+
+  const op = Math.round((s.opacity || 0.94) * 100);
+  $('#rng-opacity').value = String(op);
+  $('#lbl-opacity').textContent = op + '%';
+
+  $('#sw-collapse').setAttribute('aria-checked', String(!!s.collapseAfterLaunch));
+  $('#sw-topmost').setAttribute('aria-checked', String(!!s.topmost));
+  $('#sw-fullscreen').setAttribute('aria-checked', String(!!s.avoidFullscreen));
+  $('#sw-lock').setAttribute('aria-checked', String(!!s.lockPosition));
+  $('#sw-explorer-menu').setAttribute('aria-checked', String(!!s.explorerContextMenu));
+
+  renderHotkeyUi();
+
+  const monList = $('#monitor-list');
+  monList.replaceChildren();
+  const fixed = s.monitorPolicy === 'Fixed';
+  (state.monitors || []).forEach((m, idx) => {
+    const b = document.createElement('button');
+    b.className = 'monitor';
+    const selected = (s.monitorDeviceName && s.monitorDeviceName.toLowerCase() === m.deviceName.toLowerCase()) || (!s.monitorDeviceName && m.isPrimary);
+    b.setAttribute('aria-pressed', String(!!selected));
+    b.disabled = !fixed;
+    b.innerHTML = `${idx + 1} · ${m.isPrimary ? '主显示器' : '外接显示器'}<br>${m.width} × ${m.height}`;
+    b.onclick = () => {
+      state.settings.monitorDeviceName = m.deviceName;
+      applySettingsToUi();
+      send('updateSettings', { settings: state.settings });
+    };
+    monList.append(b);
+  });
+}
+
+// 接收来自 C# 的消息
+if (window.chrome && window.chrome.webview) {
+  window.chrome.webview.addEventListener('message', event => {
+    const msg = event.data;
+    if (!msg || !msg.type) return;
+
+    if (msg.type === 'state') {
+      state.items = msg.items || [];
+      state.overflowIds = msg.overflowIds || [];
+      state.groups = msg.groups || [];
+      state.installedApps = msg.installedApps || state.installedApps;
+      state.monitors = msg.monitors || state.monitors;
+      state.settings = msg.settings || state.settings;
+      state.isDark = !!msg.isDark;
+      if (msg.icons) Object.assign(state.icons, msg.icons);
+      applySettingsToUi();
+      renderLibrary();
+      if (msg.openView) {
+        switchView(msg.openView, { overflowOnly: !!msg.overflowOnly, filter: msg.filter });
+      }
+      if (msg.openEditorItem !== undefined) {
+        openEditor(msg.openEditorItem);
+      }
+    } else if (msg.type === 'icons') {
+      Object.assign(state.icons, msg.icons || {});
+      $$('[data-icon-path]').forEach(el => {
+        const p = el.dataset.iconPath;
+        if (state.icons[p]) {
+          el.innerHTML = `<img src="${state.icons[p]}" alt="">`;
+        }
+      });
+    } else if (msg.type === 'pickedPath') {
+      $('#editor-path').value = msg.path;
+      if (!$('#editor-name').value.trim() && msg.suggestedName) {
+        $('#editor-name').value = msg.suggestedName;
+      }
+    } else if (msg.type === 'toast') {
+      notify(msg.message);
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => send('ready'));
+</script>
+</body>
+</html>

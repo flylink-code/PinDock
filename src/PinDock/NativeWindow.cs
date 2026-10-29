@@ -43,8 +43,18 @@ public static class NativeWindow
             throw new InvalidOperationException($"SetWindowPos 失败：{window.GetType().Name}");
     }
 
+    public static void EnableHardwareRoundedCorners(Window window)
+    {
+        var handle = new WindowInteropHelper(window).EnsureHandle();
+        int preference = 2; // DWMWCP_ROUND
+        _ = DwmSetWindowAttribute(handle, 33, ref preference, sizeof(int));
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     private struct Rect { public int Left, Top, Right, Bottom; }
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);

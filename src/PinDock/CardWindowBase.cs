@@ -22,6 +22,7 @@ public class CardWindowBase : Window
     public CardWindowBase()
     {
         Style = (Style)Application.Current.FindResource("CardWindow");
+        SourceInitialized += (_, _) => NativeWindow.EnableHardwareRoundedCorners(this);
     }
 
     public override void OnApplyTemplate()

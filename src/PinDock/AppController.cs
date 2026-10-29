@@ -16,8 +16,7 @@ public sealed class AppController : IDisposable
     private readonly AutoHideController autoHide = new();
     private readonly DockWindow dock;
     private readonly EdgeHandleWindow edgeHandle = new();
-    private readonly LibraryWindow library;
-    private readonly SettingsWindow settings;
+    private readonly WebPanelWindow webPanel;
     private DisplayMode appliedMode;
     private bool dialogOpen;
     private bool suppressedByFullscreen;
@@ -40,35 +39,35 @@ public sealed class AppController : IDisposable
 
         theme.Apply(Data.Settings.ThemeMode, Data.Settings.Palette);
         dock = new DockWindow(icons);
-        library = new LibraryWindow(this, icons);
-        settings = new SettingsWindow(this);
+        webPanel = new WebPanelWindow(this, icons);
+        webPanel.Prewarm();
 
         dock.LaunchRequested += bookmark => _ = LaunchAsync(bookmark);
         dock.EditRequested += EditBookmarkInteractive;
         dock.UnpinRequested += TogglePin;
         dock.RemoveRequested += RemoveBookmarkWithConfirm;
-        dock.LibraryRequested += () => library.ShowLibrary();
-        dock.InstalledAppsRequested += () => library.ShowLibrary(focusInstalledApps: true);
-        dock.OverflowRequested += () => library.ShowLibrary(true);
+        dock.LibraryRequested += () => webPanel.ShowLibrary();
+        dock.InstalledAppsRequested += () => webPanel.ShowLibrary(focusInstalledApps: true);
+        dock.OverflowRequested += () => webPanel.ShowLibrary(true);
         dock.AddRequested += AddBookmarkInteractive;
         dock.AddFolderRequested += AddFolderInteractive;
         dock.AddFileRequested += AddFileInteractive;
         dock.FilesDropped += AddPaths;
-        dock.SettingsRequested += () => settings.ShowSettings();
+        dock.SettingsRequested += () => webPanel.ShowSettings();
         dock.DragEnded += Persist;
 
         edgeHandle.Hovered += () => autoHide.Reveal(false);
         autoHide.Configure(
             () => dock.IsGroupOpen,
             () => dock.IsDragging,
-            () => dialogOpen || library.IsVisible || settings.IsVisible,
+            () => dialogOpen || webPanel.IsVisible,
             () => dock.HitArea,
             () => dock.GroupBounds);
         autoHide.StateChanged += _ => SyncVisuals();
 
         tray.ToggleRequested += ToggleVisibility;
-        tray.LibraryRequested += () => library.ShowLibrary();
-        tray.SettingsRequested += () => settings.ShowSettings();
+        tray.LibraryRequested += () => webPanel.ShowLibrary();
+        tray.SettingsRequested += () => webPanel.ShowSettings();
         tray.ExitRequested += () => Application.Current.Shutdown();
 
         hotkeys.Pressed += ToggleVisibility;
@@ -83,6 +82,12 @@ public sealed class AppController : IDisposable
 
         if (!string.IsNullOrWhiteSpace(initialAddPath))
             AddPaths([initialAddPath]);
+    }
+
+    public void UpdateOpacityOnly()
+    {
+        dock.Bind(Data);
+        Persist();
     }
 
     public void UpdateHotkey()
@@ -191,7 +196,7 @@ public sealed class AppController : IDisposable
         var result = LibraryTransfer.Import(Data, path);
         Persist();
         RelayoutDock();
-        library.Refresh();
+        webPanel.RefreshIfVisible();
         return result;
     }
 
@@ -206,35 +211,9 @@ public sealed class AppController : IDisposable
         theme.Dispose();
     }
 
-    private void AddBookmarkInteractive()
-    {
-        dialogOpen = true;
-        try
-        {
-            var editor = new BookmarkEditor(new Bookmark { Pinned = true }, Data.Groups, InstalledApps.GetInstalledApps())
-            {
-                Owner = library.IsVisible ? library : null,
-                Title = "添加收藏"
-            };
-            if (editor.ShowDialog() == true) SaveEdited(editor.Result, null);
-        }
-        finally { dialogOpen = false; }
-    }
+    private void AddBookmarkInteractive() => webPanel.ShowEditor(null);
 
-    private void EditBookmarkInteractive(Bookmark target)
-    {
-        dialogOpen = true;
-        try
-        {
-            var editor = new BookmarkEditor(target, Data.Groups, InstalledApps.GetInstalledApps())
-            {
-                Owner = library.IsVisible ? library : null,
-                Title = "编辑收藏"
-            };
-            if (editor.ShowDialog() == true) SaveEdited(editor.Result, target);
-        }
-        finally { dialogOpen = false; }
-    }
+    private void EditBookmarkInteractive(Bookmark target) => webPanel.ShowEditor(target);
 
     private void AddFolderInteractive()
     {
@@ -284,7 +263,7 @@ public sealed class AppController : IDisposable
         Data.Items = items;
         Persist();
         RelayoutDock();
-        if (library.IsVisible) library.Refresh();
+        webPanel.RefreshIfVisible();
     }
 
     private void RelayoutDock()
