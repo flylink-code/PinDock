@@ -64,6 +64,14 @@ body.dark[data-palette="graphite"] {
 }
 
 * { box-sizing: border-box; user-select: none; -webkit-user-drag: none; }
+[hidden] { display: none !important; }
+.text-badge-icon {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px; border-radius: 5px;
+  border: 1.5px solid var(--accent); color: var(--accent);
+  font: 700 11px/1 'Bahnschrift', 'Segoe UI', sans-serif;
+  letter-spacing: -0.3px;
+}
 html, body {
   margin: 0; width: 100%; height: 100%; overflow: hidden;
   font: 13px/1.45 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
@@ -776,12 +784,21 @@ input[type="range"] {
         <select id="editor-icon-kind" class="field-input">
           <option value="Default">默认图标（自动提取应用图标 / 默认文件夹图标）</option>
           <option value="Preset">内置分类矢量图标（磁盘、代码、芯片、文档等）</option>
+          <option value="TextBadge">字母 / 数字图标（A-Z、0-9 或自定义 1~3 字符）</option>
           <option value="CustomFile">自定义本地图片或程序图标 (.png / .ico / .exe)</option>
         </select>
       </div>
       <div class="field-label" id="editor-preset-wrap" hidden>
         <span>选择内置分类图标</span>
         <div id="editor-preset-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+      <div class="field-label" id="editor-text-badge-wrap" hidden>
+        <span>选择字母 / 数字图标，或在右侧输入 1~3 个自定义字符</span>
+        <div class="field-row" style="margin-bottom:4px">
+          <span class="entry-icon" id="editor-text-badge-preview" style="width:32px;height:32px"><span class="text-badge-icon">A</span></span>
+          <input class="field-input" id="editor-text-badge-input" maxlength="3" placeholder="输入 1~3 字符，如 A、01、STM、E">
+        </div>
+        <div id="editor-text-badge-grid" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
       <div class="field-label" id="editor-custom-file-wrap" hidden>
         <span>自定义图标文件（支持 .png / .ico / .jpg / .exe / .lnk）</span>
@@ -831,6 +848,7 @@ input[type="range"] {
             <option value="DefaultGrid">默认四宫格</option>
             <option value="MemberPreview">组内成员 2×2 缩略图</option>
             <option value="Preset">内置分类矢量图标</option>
+            <option value="TextBadge">字母 / 数字图标 (A-Z / 0-9)</option>
             <option value="CustomFile">自定义图片 / 程序图标</option>
           </select>
         </label>
@@ -838,6 +856,14 @@ input[type="range"] {
       <div class="field-label" id="group-preset-wrap" hidden>
         <span>选择内置分类图标</span>
         <div id="group-preset-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+      <div class="field-label" id="group-text-badge-wrap" hidden>
+        <span>选择字母 / 数字图标，或输入 1~3 个字符</span>
+        <div class="field-row" style="margin-bottom:4px">
+          <span class="entry-icon" id="group-text-badge-preview" style="width:32px;height:32px"><span class="text-badge-icon">A</span></span>
+          <input class="field-input" id="group-text-badge-input" maxlength="3" placeholder="输入 1~3 字符，如 A、01、AI">
+        </div>
+        <div id="group-text-badge-grid" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
       <div class="field-label" id="group-custom-file-wrap" hidden>
         <span>自定义图标文件（支持 .png / .ico / .jpg / .exe / .lnk）</span>
@@ -1051,7 +1077,10 @@ function renderLibrary() {
       ? (state.groupIconPresets || []).find(p => p.key.toLowerCase() === item.iconValue.toLowerCase())
       : null;
 
-    if (presetObj) {
+    if (item.iconKind === 'TextBadge' && item.iconValue) {
+      const badgeTxt = item.iconValue.trim().toUpperCase().slice(0, 3);
+      iconWrap.innerHTML = `<span class="text-badge-icon">${badgeTxt}</span>`;
+    } else if (presetObj) {
       iconWrap.innerHTML = `<svg viewBox="0 0 24 24"><path d="${presetObj.pathData}"/></svg>`;
     } else if (item.iconKind === 'CustomFile' && item.iconValue) {
       iconWrap.dataset.iconPath = item.iconValue;
@@ -1186,6 +1215,36 @@ function renderLibrary() {
 }
 
 let selectedBookmarkPresetKey = 'drive';
+const defaultBadges = ['A','B','C','D','E','F','G','H','M','P','S','T','W','X','Z','1','2','3','4','5','6','7','8','9','0','01','02','03','AI','QT','DB','UI'];
+
+function renderTextBadgeGrid(gridSelector, inputSelector, previewSelector) {
+  const grid = $(gridSelector);
+  const input = $(inputSelector);
+  const preview = $(previewSelector);
+  if (!grid || !input || !preview) return;
+  const list = (state.textBadgePresets && state.textBadgePresets.length > 0) ? state.textBadgePresets : defaultBadges;
+  const cur = (input.value || 'A').trim().toUpperCase().slice(0, 3);
+  preview.innerHTML = `<span class="text-badge-icon">${cur || 'A'}</span>`;
+  grid.replaceChildren();
+  list.forEach(code => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn';
+    btn.style.minWidth = '32px';
+    btn.style.padding = '5px 8px';
+    btn.style.fontWeight = '700';
+    btn.setAttribute('aria-pressed', String(cur === code));
+    btn.textContent = code;
+    btn.onclick = () => {
+      input.value = code;
+      renderTextBadgeGrid(gridSelector, inputSelector, previewSelector);
+    };
+    grid.append(btn);
+  });
+}
+
+$('#editor-text-badge-input').oninput = () => renderTextBadgeGrid('#editor-text-badge-grid', '#editor-text-badge-input', '#editor-text-badge-preview');
+$('#group-text-badge-input').oninput = () => renderTextBadgeGrid('#group-text-badge-grid', '#group-text-badge-input', '#group-text-badge-preview');
 
 function renderEditorPresetGrid() {
   const grid = $('#editor-preset-grid');
@@ -1210,8 +1269,10 @@ function renderEditorPresetGrid() {
 function updateEditorIconKindVisibility() {
   const kind = $('#editor-icon-kind').value;
   $('#editor-preset-wrap').hidden = kind !== 'Preset';
+  $('#editor-text-badge-wrap').hidden = kind !== 'TextBadge';
   $('#editor-custom-file-wrap').hidden = kind !== 'CustomFile';
   if (kind === 'Preset') renderEditorPresetGrid();
+  else if (kind === 'TextBadge') renderTextBadgeGrid('#editor-text-badge-grid', '#editor-text-badge-input', '#editor-text-badge-preview');
 }
 
 function updateEditorCustomIconPreview(path, dataUri) {
@@ -1245,6 +1306,9 @@ function openEditor(item = null) {
   } else if (state.groupIconPresets && state.groupIconPresets.length > 0) {
     selectedBookmarkPresetKey = state.groupIconPresets[0].key;
   }
+  $('#editor-text-badge-input').value = (iconKind === 'TextBadge' && item && item.iconValue)
+    ? item.iconValue
+    : ((item && item.name ? item.name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2).toUpperCase() : '') || 'A');
   $('#editor-custom-icon-path').value = (iconKind === 'CustomFile' && item) ? (item.iconValue || '') : '';
   updateEditorCustomIconPreview($('#editor-custom-icon-path').value);
   updateEditorIconKindVisibility();
@@ -1291,6 +1355,7 @@ $('#btn-save-editor').onclick = () => {
   const iconKind = $('#editor-icon-kind').value;
   let iconValue = '';
   if (iconKind === 'Preset') iconValue = selectedBookmarkPresetKey;
+  else if (iconKind === 'TextBadge') iconValue = ($('#editor-text-badge-input').value.trim().toUpperCase().slice(0, 3) || 'A');
   else if (iconKind === 'CustomFile') iconValue = $('#editor-custom-icon-path').value.trim();
 
   send('saveBookmark', {
@@ -1333,8 +1398,10 @@ function renderGroupPresetGrid() {
 function updateGroupIconKindVisibility() {
   const kind = $('#group-icon-kind').value;
   $('#group-preset-wrap').hidden = kind !== 'Preset';
+  $('#group-text-badge-wrap').hidden = kind !== 'TextBadge';
   $('#group-custom-file-wrap').hidden = kind !== 'CustomFile';
   if (kind === 'Preset') renderGroupPresetGrid();
+  else if (kind === 'TextBadge') renderTextBadgeGrid('#group-text-badge-grid', '#group-text-badge-input', '#group-text-badge-preview');
 }
 
 $('#group-icon-kind').onchange = updateGroupIconKindVisibility;
@@ -1380,6 +1447,7 @@ function populateGroupModalFields(groupName, preselectIds = []) {
   } else if (state.groupIconPresets && state.groupIconPresets.length > 0) {
     selectedPresetKey = state.groupIconPresets[0].key;
   }
+  $('#group-text-badge-input').value = iconCfg.kind === 'TextBadge' && iconCfg.value ? iconCfg.value : 'G1';
   $('#group-custom-icon-path').value = iconCfg.kind === 'CustomFile' ? (iconCfg.value || '') : '';
   updateGroupCustomIconPreview($('#group-custom-icon-path').value);
   updateGroupIconKindVisibility();
@@ -1426,6 +1494,7 @@ $('#btn-save-group').onclick = () => {
   const iconKind = $('#group-icon-kind').value;
   let iconValue = '';
   if (iconKind === 'Preset') iconValue = selectedPresetKey;
+  else if (iconKind === 'TextBadge') iconValue = ($('#group-text-badge-input').value.trim().toUpperCase().slice(0, 3) || 'G');
   else if (iconKind === 'CustomFile') iconValue = $('#group-custom-icon-path').value.trim();
 
   const memberIds = [...$$('#group-member-list input[type="checkbox"]:checked')].map(cb => cb.value);
@@ -1780,6 +1849,7 @@ if (window.chrome && window.chrome.webview) {
       state.groups = msg.groups || [];
       state.groupIcons = msg.groupIcons || state.groupIcons;
       state.groupIconPresets = msg.groupIconPresets || state.groupIconPresets;
+      state.textBadgePresets = msg.textBadgePresets || state.textBadgePresets;
       state.dockOrder = msg.dockOrder || state.dockOrder;
       state.installedApps = msg.installedApps || state.installedApps;
       state.monitors = msg.monitors || state.monitors;

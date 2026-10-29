@@ -6,7 +6,7 @@ namespace PinDock;
 public sealed class AutoHideController : IDisposable
 {
     private readonly DispatcherTimer pollTimer = new() { Interval = TimeSpan.FromMilliseconds(40) };
-    private readonly DispatcherTimer hideTimer = new() { Interval = TimeSpan.FromMilliseconds(380) };
+    private readonly DispatcherTimer hideTimer = new() { Interval = TimeSpan.FromMilliseconds(650) };
     private Func<bool> popupOpen = () => false;
     private Func<bool> dragging = () => false;
     private Func<bool> dialogOpen = () => false;

@@ -48,15 +48,23 @@ public partial class DockWindow : Window
     public event Action<string[], string>? FilesDroppedToGroup;
     public event Action? SettingsRequested;
     public event Action? ToggleThemeRequested;
+    public event Action? DrawerToggled;
     public event Action? ExitRequested;
     public event Action? DragEnded;
 
     public bool IsDragging { get; private set; }
     public bool IsShown { get; private set; }
-    public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible || isContextMenuOpen || folderPopup.IsContextMenuOpen || isExternalDragOver;
+    public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible || isContextMenuOpen || folderPopup.IsContextMenuOpen || isExternalDragOver || IsMouseOver;
     public ScreenRect CurrentBounds => placement.Bounds;
     public ScreenRect EdgeHandleRect => placement.EdgeHandle;
-    public ScreenRect HitArea => placement.Bounds.Union(placement.EdgeHandle);
+    public ScreenRect HitArea
+    {
+        get
+        {
+            var baseRect = IsVisible ? placement.Bounds.Union(NativeWindow.GetPixelBounds(this)) : placement.Bounds;
+            return ExpandRect(baseRect, 14).Union(ExpandRect(placement.EdgeHandle, 8));
+        }
+    }
     public ScreenRect? GroupBounds => groupPopup.IsVisible
         ? NativeWindow.GetPixelBounds(groupPopup)
         : folderPopup.IsVisible
@@ -170,11 +178,18 @@ public partial class DockWindow : Window
         IsShown = true;
         Opacity = data.Settings.Opacity;
         if (!IsVisible) Show();
+        UpdateLayout();
+        Reposition(placement.Capacity);
     }
 
     public void HideDock()
     {
         IsShown = false;
+        dragStartCursor = null;
+        IsDragging = false;
+        isReordering = false;
+        reorderToken = null;
+        reorderElement = null;
         folderOpenTimer.Stop();
         folderCloseTimer.Stop();
         utilityHoverHideTimer.Stop();
@@ -193,10 +208,11 @@ public partial class DockWindow : Window
     private void Reposition(int capacity)
     {
         var settings = data.Settings;
+        UpdateLayout();
         DockChrome.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
-        double width = Math.Ceiling(DockChrome.DesiredSize.Width * scale);
-        double height = Math.Ceiling(DockChrome.DesiredSize.Height * scale);
+        double width = Math.Ceiling(Math.Max(DockChrome.DesiredSize.Width, DockChrome.ActualWidth) * scale);
+        double height = Math.Ceiling(Math.Max(DockChrome.DesiredSize.Height, DockChrome.ActualHeight) * scale);
         var bounds = DockLayout.Fit(workArea, settings.DockEdge, width, height, settings.EdgeOffset, settings.LockPosition);
         placement = new DockPlacement(bounds, capacity, DockLayout.EdgeHandleFor(workArea, settings.DockEdge, bounds));
         NativeWindow.MoveTo(this, bounds.X, bounds.Y);
@@ -204,6 +220,11 @@ public partial class DockWindow : Window
 
     private void Rebuild(IReadOnlySet<Guid> visiblePinnedIds)
     {
+        dragStartCursor = null;
+        IsDragging = false;
+        isReordering = false;
+        reorderToken = null;
+        reorderElement = null;
         ItemsPanel.Children.Clear();
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
         ItemsPanel.Orientation = vertical ? Orientation.Vertical : Orientation.Horizontal;
@@ -298,14 +319,14 @@ public partial class DockWindow : Window
 
         var border = new Border
         {
-            Width = vertical ? icon : Math.Max(20, Math.Round(icon * 0.46)),
-            Height = vertical ? Math.Max(20, Math.Round(icon * 0.46)) : icon,
-            CornerRadius = new CornerRadius(9),
+            Width = vertical ? icon : Math.Max(28, Math.Round(icon * 0.58)),
+            Height = vertical ? Math.Max(28, Math.Round(icon * 0.58)) : icon,
+            CornerRadius = new CornerRadius(10),
             Background = collapsed ? (Brush)FindResource("SoftBrush") : Brushes.Transparent,
             Child = new TextBlock
             {
                 Text = glyph,
-                FontSize = Math.Max(14, icon * 0.38),
+                FontSize = Math.Max(15, icon * 0.4),
                 FontWeight = FontWeights.SemiBold,
                 Foreground = (Brush)FindResource(collapsed ? "AccentBrush" : "MutedBrush"),
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -316,6 +337,7 @@ public partial class DockWindow : Window
         {
             Content = border,
             Style = (Style)FindResource("DockButton"),
+            VerticalAlignment = !vertical && data.Settings.ShowIconLabels ? VerticalAlignment.Top : VerticalAlignment.Center,
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
             ToolTip = tip
         };
@@ -333,6 +355,7 @@ public partial class DockWindow : Window
         {
             data.Settings.UtilityCollapsed = !data.Settings.UtilityCollapsed;
             Relayout();
+            DrawerToggled?.Invoke();
             DragEnded?.Invoke();
         };
         return button;
@@ -406,8 +429,44 @@ public partial class DockWindow : Window
         return button;
     }
 
+    private UIElement BuildTextBadgeVisual(string rawText, double icon)
+    {
+        string text = GroupIconPresets.NormalizeBadgeText(rawText);
+        double fontSize = text.Length switch
+        {
+            1 => icon * 0.44,
+            2 => icon * 0.34,
+            _ => icon * 0.27
+        };
+        return new Border
+        {
+            Width = icon * 0.66,
+            Height = icon * 0.66,
+            CornerRadius = new CornerRadius(icon * 0.16),
+            BorderBrush = (Brush)FindResource("AccentBrush"),
+            BorderThickness = new Thickness(1.5),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = new TextBlock
+            {
+                Text = text,
+                FontFamily = new FontFamily("Bahnschrift, Segoe UI, Microsoft YaHei UI"),
+                FontSize = fontSize,
+                FontWeight = FontWeights.Bold,
+                Foreground = (Brush)FindResource("AccentBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = TextAlignment.Center
+            }
+        };
+    }
+
     private UIElement BuildBookmarkIconVisual(Bookmark item, double icon, bool isFolder)
     {
+        if (item.IconKind == BookmarkIconKind.TextBadge && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            return BuildTextBadgeVisual(item.IconValue, icon);
+        }
         if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue))
         {
             string? pathData = GroupIconPresets.FindPathData(item.IconValue);
@@ -583,6 +642,10 @@ public partial class DockWindow : Window
         var kind = cfg?.Kind ?? GroupIconKind.DefaultGrid;
         string val = cfg?.Value ?? "";
 
+        if (kind == GroupIconKind.TextBadge && !string.IsNullOrWhiteSpace(val))
+        {
+            return BuildTextBadgeVisual(val, icon);
+        }
         if (kind == GroupIconKind.Preset)
         {
             string? pathData = GroupIconPresets.FindPathData(val);
@@ -734,13 +797,17 @@ public partial class DockWindow : Window
     private FrameworkElement CreateSeparator(double icon)
     {
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        double lineH = icon * 0.62;
+        double topPad = (!vertical && data.Settings.ShowIconLabels) ? Math.Round((icon - lineH) / 2) : 0;
         return new Border
         {
-            Width = vertical ? icon * 0.62 : 1,
-            Height = vertical ? 1 : icon * 0.62,
+            Width = vertical ? lineH : 1,
+            Height = vertical ? 1 : lineH,
             Background = (Brush)FindResource("LineBrush"),
-            Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
-            VerticalAlignment = VerticalAlignment.Center,
+            Margin = vertical
+                ? new Thickness(0, 0, 0, 9)
+                : new Thickness(0, topPad, 9, 0),
+            VerticalAlignment = (!vertical && data.Settings.ShowIconLabels) ? VerticalAlignment.Top : VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         };
     }
@@ -763,8 +830,9 @@ public partial class DockWindow : Window
             Height = vertical ? 10 : icon,
             Background = Brushes.Transparent,
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
+            VerticalAlignment = (!vertical && data.Settings.ShowIconLabels) ? VerticalAlignment.Top : VerticalAlignment.Center,
             Cursor = Cursors.Hand,
-            ToolTip = "分隔符（可拖拽调整位置 · 右键删除）",
+            ToolTip = T("分隔符（可拖拽调整位置 · 右键删除）", "Separator (Drag to move · Right-click to remove)"),
             Tag = token,
             Child = line
         };
@@ -783,48 +851,66 @@ public partial class DockWindow : Window
     {
         var scale = new ScaleTransform(1, 1);
         var translate = new TranslateTransform(0, 0);
+        var animGroup = new TransformGroup { Children = { scale, translate } };
+        bool showLabel = data.Settings.ShowIconLabels && !string.IsNullOrWhiteSpace(labelText);
+
         iconBorder = new Border
         {
             Width = icon,
             Height = icon,
-            CornerRadius = new CornerRadius(11),
+            CornerRadius = new CornerRadius(12),
             Background = background,
             BorderThickness = new Thickness(1.5),
             BorderBrush = Brushes.Transparent,
+            HorizontalAlignment = HorizontalAlignment.Center,
             RenderTransformOrigin = new Point(0.5, 0.5),
-            RenderTransform = new TransformGroup { Children = { scale, translate } }
+            RenderTransform = showLabel ? Transform.Identity : animGroup
         };
 
         object contentElement = iconBorder;
-        if (data.Settings.ShowIconLabels && !string.IsNullOrWhiteSpace(labelText))
+        if (showLabel)
         {
+            double cellWidth = icon + 16;
             var stack = new StackPanel
             {
                 Orientation = Orientation.Vertical,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Width = icon + 10
+                VerticalAlignment = VerticalAlignment.Top,
+                Width = cellWidth,
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = animGroup
             };
             stack.Children.Add(iconBorder);
-            stack.Children.Add(new TextBlock
+            stack.Children.Add(new Border
             {
-                Text = labelText,
-                FontSize = 10,
-                Foreground = (Brush)FindResource("InkBrush"),
-                MaxWidth = icon + 10,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                TextAlignment = TextAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 3.5, 0, 0)
+                Height = 16,
+                Margin = new Thickness(0, 4, 0, 0),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Child = new TextBlock
+                {
+                    Text = labelText,
+                    FontSize = 11,
+                    FontWeight = FontWeights.Medium,
+                    Foreground = (Brush)FindResource("InkBrush"),
+                    Opacity = 0.92,
+                    MaxWidth = cellWidth,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    TextAlignment = TextAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                }
             });
             contentElement = stack;
         }
 
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        double gap = showLabel && !vertical ? 10 : 9;
         var button = new Button
         {
             Content = contentElement,
             Style = (Style)FindResource("DockButton"),
-            Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = vertical ? new Thickness(0, 0, 0, gap) : new Thickness(0, 0, gap, 0),
             ToolTip = tip,
             Tag = reorderItemToken
         };
@@ -1181,6 +1267,7 @@ public partial class DockWindow : Window
 
     private void DockChrome_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        if (e.OriginalSource != DockChrome && e.OriginalSource != ItemsPanel) return;
         if (data.Settings.LockPosition || isReordering) return;
         var cursor = PointToScreen(e.GetPosition(this));
         dragStartCursor = new ScreenRect(cursor.X, cursor.Y, 0, 0);
@@ -1215,6 +1302,12 @@ public partial class DockWindow : Window
     {
         element.PreviewMouseLeftButtonDown += (_, e) =>
         {
+            dragStartCursor = null;
+            IsDragging = false;
+            isReordering = false;
+            reorderToken = null;
+            reorderElement = null;
+
             bool altHeld = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
             if (altHeld || string.IsNullOrEmpty(itemToken))
             {
@@ -1227,7 +1320,6 @@ public partial class DockWindow : Window
             reorderToken = itemToken;
             reorderElement = element;
             reorderStartPoint = e.GetPosition(ItemsPanel);
-            isReordering = false;
         };
         element.PreviewMouseMove += (_, e) =>
         {
@@ -1236,7 +1328,7 @@ public partial class DockWindow : Window
                 var cursor = element.PointToScreen(e.GetPosition(element));
                 bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
                 double delta = vertical ? cursor.Y - start.Y : cursor.X - start.X;
-                if (!IsDragging && Math.Abs(delta) < 4) return;
+                if (!IsDragging && Math.Abs(delta) < 10) return;
                 IsDragging = true;
                 double along = vertical ? placement.Bounds.Height : placement.Bounds.Width;
                 data.Settings.EdgeOffset = DockLayout.ClampEdgeOffset(workArea, data.Settings.DockEdge, along, dragOriginOffset + delta);
@@ -1248,7 +1340,7 @@ public partial class DockWindow : Window
             var currentPos = e.GetPosition(ItemsPanel);
             bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
             double moveDelta = isVert ? currentPos.Y - reorderStartPoint.Y : currentPos.X - reorderStartPoint.X;
-            if (!isReordering && Math.Abs(moveDelta) < 6) return;
+            if (!isReordering && Math.Abs(moveDelta) < 14) return;
 
             if (!isReordering)
             {

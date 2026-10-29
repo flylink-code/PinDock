@@ -4,10 +4,11 @@
 
 [Module](app.md) · [Source](../../src/PinDock/GroupIconPresets.cs) · page 1/1
 
-Source SHA-256: c49d694ff1471f6827685e48d5cb920189aa2c9e169cef6c1916428263897615
+Source SHA-256: bbdf5e42fc6b501d349e700e0f53344c50d7f0f9966a169436b55a413df563e0
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [1](../../src/PinDock/GroupIconPresets.cs#L1) |
 | GroupIconPresets | class_declaration | PinDock | [5](../../src/PinDock/GroupIconPresets.cs#L5) |
-| FindPathData | method_declaration | PinDock::GroupIconPresets | [22](../../src/PinDock/GroupIconPresets.cs#L22) |
+| NormalizeBadgeText | method_declaration | PinDock::GroupIconPresets | [29](../../src/PinDock/GroupIconPresets.cs#L29) |
+| FindPathData | method_declaration | PinDock::GroupIconPresets | [36](../../src/PinDock/GroupIconPresets.cs#L36) |

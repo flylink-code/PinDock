@@ -4,10 +4,10 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkLauncher.cs) · page 1/1
 
-Source SHA-256: e807b1708bacb8ef91775220b572a6aeb92936c68ac695ea23c1ba3fcd199b0e
+Source SHA-256: 4309c0f34483b585867d1fc25826ee5a668b1fc35cb8a32c21c96b70784cd1f6
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/BookmarkLauncher.cs#L3) |
-| BookmarkLauncher | class_declaration | PinDock | [5](../../src/PinDock/BookmarkLauncher.cs#L5) |
-| Open | method_declaration | PinDock::BookmarkLauncher | [7](../../src/PinDock/BookmarkLauncher.cs#L7) |
+| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/BookmarkLauncher.cs#L4) |
+| BookmarkLauncher | class_declaration | PinDock | [6](../../src/PinDock/BookmarkLauncher.cs#L6) |
+| Open | method_declaration | PinDock::BookmarkLauncher | [8](../../src/PinDock/BookmarkLauncher.cs#L8) |

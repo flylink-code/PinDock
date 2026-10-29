@@ -792,6 +792,7 @@ public partial class WebPanelWindow : Window
                 label = p.Label,
                 pathData = p.PathData
             }).ToList(),
+            ["textBadgePresets"] = GroupIconPresets.DefaultTextBadges,
             ["dockOrder"] = controller.Data.DockOrder,
             ["installedApps"] = controller.InstalledApps.GetInstalledApps().Select(a => new
             {

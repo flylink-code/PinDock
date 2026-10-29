@@ -217,7 +217,7 @@ try
     {
         Items =
         [
-            new Bookmark { Name = "App1", Path = Environment.ProcessPath!, Group = "开发工具", Pinned = true, IconKind = BookmarkIconKind.Preset, IconValue = "drive" },
+            new Bookmark { Name = "App1", Path = Environment.ProcessPath!, Group = "开发工具", Pinned = true, IconKind = BookmarkIconKind.TextBadge, IconValue = "A1" },
             new Bookmark { Name = "Folder1", Path = directory, Group = "", Pinned = true, IconKind = BookmarkIconKind.CustomFile, IconValue = Environment.ProcessPath! }
         ],
         Groups = ["开发工具"],
@@ -257,7 +257,8 @@ try
     if (!reloadedCustom.GroupIcons.TryGetValue("开发工具", out var loadedIconCfg) ||
         loadedIconCfg.Kind != GroupIconKind.Preset || loadedIconCfg.Value != "code")
         throw new Exception("GroupIcons round trip failed");
-    if (reloadedCustom.Items[0].IconKind != BookmarkIconKind.Preset || reloadedCustom.Items[0].IconValue != "drive" ||
+    if (reloadedCustom.Items[0].IconKind != BookmarkIconKind.TextBadge || reloadedCustom.Items[0].IconValue != "A1" ||
+        GroupIconPresets.NormalizeBadgeText("  stm32 ") != "STM" ||
         reloadedCustom.Items[1].IconKind != BookmarkIconKind.CustomFile)
         throw new Exception("Bookmark custom icon round trip failed");
     if (reloadedCustom.GetFolderSortMode(@"e:") != DirectorySortMode.ModifiedDesc)
@@ -285,11 +286,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.3")
-        throw new Exception($"Expected version 0.1.3, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.3", "v0.1.4") ||
-        !UpdateService.IsNewerVersion("0.1.3", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.3", "v0.1.3"))
+    if (UpdateService.GetCurrentVersion() != "0.1.4")
+        throw new Exception($"Expected version 0.1.4, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.4", "v0.1.5") ||
+        !UpdateService.IsNewerVersion("0.1.4", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.4", "v0.1.4"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";

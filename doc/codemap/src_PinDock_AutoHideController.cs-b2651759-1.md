@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AutoHideController.cs) · page 1/1
 
-Source SHA-256: 861687ed7e4d081ad248d6aff2e2734c95930d83a40fadb2fc02a9977c220293
+Source SHA-256: 70d15b8c2e24a64b41cd575d880b205dcd9a501928b61dde0d1aca14cf01a64f
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

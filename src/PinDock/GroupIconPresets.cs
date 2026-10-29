@@ -19,6 +19,20 @@ public static class GroupIconPresets
         new("star", "精选常用", "M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9L12 2.5z")
     ];
 
+    public static readonly IReadOnlyList<string> DefaultTextBadges =
+    [
+        "A", "B", "C", "D", "E", "F", "G", "H", "M", "P", "S", "T", "W", "X", "Z",
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+        "01", "02", "03", "AI", "QT", "DB", "UI"
+    ];
+
+    public static string NormalizeBadgeText(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return "A";
+        string trimmed = raw.Trim().ToUpperInvariant();
+        return trimmed.Length > 3 ? trimmed[..3] : trimmed;
+    }
+
     public static string? FindPathData(string? key) =>
         All.FirstOrDefault(p => string.Equals(p.Key, key, StringComparison.OrdinalIgnoreCase)).PathData;
 }

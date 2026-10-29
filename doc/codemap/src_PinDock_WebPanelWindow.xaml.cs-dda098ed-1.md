@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/WebPanelWindow.xaml.cs) · page 1/1
 
-Source SHA-256: bea8754a9e01c2303e2744bb735233226c55910b4efc8bb2a81274c790b82ea1
+Source SHA-256: 21964c3a689b9b4fde4c4afa14372e812738e42c0ebe59db7eb9b32e5f28e9df
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -35,10 +35,10 @@ Source SHA-256: bea8754a9e01c2303e2744bb735233226c55910b4efc8bb2a81274c790b82ea1
 | LoadIconsAsync | method_declaration | PinDock::WebPanelWindow | [705](../../src/PinDock/WebPanelWindow.xaml.cs#L705) |
 | TryFindBookmark | method_declaration | PinDock::WebPanelWindow | [719](../../src/PinDock/WebPanelWindow.xaml.cs#L719) |
 | PushState | method_declaration | PinDock::WebPanelWindow | [734](../../src/PinDock/WebPanelWindow.xaml.cs#L734) |
-| PostToast | method_declaration | PinDock::WebPanelWindow | [876](../../src/PinDock/WebPanelWindow.xaml.cs#L876) |
-| PostJson | method_declaration | PinDock::WebPanelWindow | [878](../../src/PinDock/WebPanelWindow.xaml.cs#L878) |
-| BeginNativeDrag | method_declaration | PinDock::WebPanelWindow | [884](../../src/PinDock/WebPanelWindow.xaml.cs#L884) |
-| Window_Drop | method_declaration | PinDock::WebPanelWindow | [891](../../src/PinDock/WebPanelWindow.xaml.cs#L891) |
-| OnClosing | method_declaration | PinDock::WebPanelWindow | [901](../../src/PinDock/WebPanelWindow.xaml.cs#L901) |
-| ReleaseCapture | method_declaration | PinDock::WebPanelWindow | [913](../../src/PinDock/WebPanelWindow.xaml.cs#L913) |
-| SendMessage | method_declaration | PinDock::WebPanelWindow | [916](../../src/PinDock/WebPanelWindow.xaml.cs#L916) |
+| PostToast | method_declaration | PinDock::WebPanelWindow | [877](../../src/PinDock/WebPanelWindow.xaml.cs#L877) |
+| PostJson | method_declaration | PinDock::WebPanelWindow | [879](../../src/PinDock/WebPanelWindow.xaml.cs#L879) |
+| BeginNativeDrag | method_declaration | PinDock::WebPanelWindow | [885](../../src/PinDock/WebPanelWindow.xaml.cs#L885) |
+| Window_Drop | method_declaration | PinDock::WebPanelWindow | [892](../../src/PinDock/WebPanelWindow.xaml.cs#L892) |
+| OnClosing | method_declaration | PinDock::WebPanelWindow | [902](../../src/PinDock/WebPanelWindow.xaml.cs#L902) |
+| ReleaseCapture | method_declaration | PinDock::WebPanelWindow | [914](../../src/PinDock/WebPanelWindow.xaml.cs#L914) |
+| SendMessage | method_declaration | PinDock::WebPanelWindow | [917](../../src/PinDock/WebPanelWindow.xaml.cs#L917) |

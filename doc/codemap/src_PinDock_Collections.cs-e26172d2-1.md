@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Collections.cs) · page 1/1
 
-Source SHA-256: b07593b7a944dc1da7098ac91d7063734c2f5b7e792a143f4607b4b4e449c627
+Source SHA-256: 6c02fc0eb353b3b5a40012cc9741d55cb9439ad3c3777e483cdfb4a95cabd83c
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -13,10 +13,12 @@ Source SHA-256: b07593b7a944dc1da7098ac91d7063734c2f5b7e792a143f4607b4b4e449c627
 | DefaultGrid | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | MemberPreview | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | Preset | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
+| TextBadge | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | CustomFile | enum_member_declaration | PinDock::GroupIconKind | [6](../../src/PinDock/Collections.cs#L6) |
 | BookmarkIconKind | enum_declaration | PinDock | [7](../../src/PinDock/Collections.cs#L7) |
 | Default | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
 | Preset | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
+| TextBadge | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
 | CustomFile | enum_member_declaration | PinDock::BookmarkIconKind | [7](../../src/PinDock/Collections.cs#L7) |
 | DirectorySortMode | enum_declaration | PinDock | [8](../../src/PinDock/Collections.cs#L8) |
 | NameAsc | enum_member_declaration | PinDock::DirectorySortMode | [8](../../src/PinDock/Collections.cs#L8) |

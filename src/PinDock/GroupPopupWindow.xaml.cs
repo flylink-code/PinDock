@@ -131,6 +131,21 @@ public partial class GroupPopupWindow : Window
 
     private void ApplyBookmarkIcon(Border host, Bookmark item)
     {
+        if (item.IconKind == BookmarkIconKind.TextBadge && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            string badge = GroupIconPresets.NormalizeBadgeText(item.IconValue);
+            host.Child = new TextBlock
+            {
+                Text = badge,
+                FontFamily = new FontFamily("Bahnschrift, Segoe UI, Microsoft YaHei UI"),
+                FontSize = badge.Length == 1 ? 15 : 12,
+                FontWeight = FontWeights.Bold,
+                Foreground = (Brush)FindResource("AccentBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            return;
+        }
         if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue))
         {
             string? pathData = GroupIconPresets.FindPathData(item.IconValue);

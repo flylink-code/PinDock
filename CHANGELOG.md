@@ -2,6 +2,20 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.4] - 2026-10-29
+
+### Added
+- **字母与数字徽标图标 (`TextBadge`)**：在收藏项与收藏组图标样式中新增「字母 / 数字图标」，内置 `A–Z`、`0–9`、`01–03`、`AI / QT / DB / UI` 快捷点选，并支持输入任意 1~3 个自定义字符生成几何字标图标。
+- **完善中英文 README 文档**：同步更新 [README.md](README.md) 与英文版 [README_EN.md](README_EN.md)。
+
+### Improved & Fixed
+- **修复切换图标样式时内置分类/自定义文件区未隐藏**：在 `ui.html` 中补充 `[hidden] { display: none !important; }`，解决 `.field-label` 的 `display: flex` 覆盖 HTML `hidden` 属性导致所有图标配置区同时展开的问题。
+- **优化 Dock「图标 + 文字」显示对齐**：固定底部文字区高度为 `16px` 并将按钮内容设为顶部基准对齐，消除中英文混排（如 `百度翻译`、`E:`、`TOOLS`）导致的图标高低错位；同时将分隔符 `|` 与右侧折叠按钮 `>` 对齐至图标行中心。
+- **修复贴边自动隐藏下点击右侧展开按钮 `>` 前被提前隐藏**：在 `ShowDock()` 时强制同步实际像素边界、扩充 `HitArea` 安全热区与展开按钮宽度，并在点击展开/折叠抽屉时保持 Dock 展开状态。
+- **修复左键点击 Dock 应用偶发无法启动问题**：在 `PreviewMouseLeftButtonDown`、`Rebuild` 与 `HideDock` 时彻底重置 `dragStartCursor` 与拖拽重排状态，防止点击功能按钮后残留的拖拽坐标拦截后续应用点击事件；并为无显式工作目录的 `.exe` 自动回填所在目录。
+
+---
+
 ## [0.1.3] - 2026-10-29
 
 ### Added

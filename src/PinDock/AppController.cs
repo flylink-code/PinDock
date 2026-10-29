@@ -61,6 +61,11 @@ public sealed class AppController : IDisposable
         dock.FilesDroppedToGroup += (paths, groupName) => AddPathsToGroup(paths, groupName);
         dock.SettingsRequested += () => webPanel.ShowSettings();
         dock.ToggleThemeRequested += QuickToggleLightDarkTheme;
+        dock.DrawerToggled += () =>
+        {
+            if (appliedMode == DisplayMode.EdgeAutoHide)
+                autoHide.Reveal(true);
+        };
         dock.ExitRequested += RequestExitApplication;
         dock.DragEnded += () =>
         {

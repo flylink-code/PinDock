@@ -3,8 +3,8 @@ using System.Text.Json;
 
 namespace PinDock;
 
-public enum GroupIconKind { DefaultGrid, MemberPreview, Preset, CustomFile }
-public enum BookmarkIconKind { Default, Preset, CustomFile }
+public enum GroupIconKind { DefaultGrid, MemberPreview, Preset, TextBadge, CustomFile }
+public enum BookmarkIconKind { Default, Preset, TextBadge, CustomFile }
 public enum DirectorySortMode { NameAsc, NameDesc, ModifiedDesc, ModifiedAsc, CreatedDesc }
 
 public sealed class GroupIconConfig

@@ -348,7 +348,21 @@ public partial class TrayFlyoutWindow : Window
             Hide();
             _ = controller.LaunchAsync(item);
         };
-        if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue) &&
+        if (item.IconKind == BookmarkIconKind.TextBadge && !string.IsNullOrWhiteSpace(item.IconValue))
+        {
+            string badgeText = GroupIconPresets.NormalizeBadgeText(item.IconValue);
+            iconHost.Child = new TextBlock
+            {
+                Text = badgeText,
+                FontFamily = new FontFamily("Bahnschrift, Segoe UI, Microsoft YaHei UI"),
+                FontSize = badgeText.Length == 1 ? 13 : 10.5,
+                FontWeight = FontWeights.Bold,
+                Foreground = (Brush)FindResource("AccentBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+        }
+        else if (item.IconKind == BookmarkIconKind.Preset && !string.IsNullOrWhiteSpace(item.IconValue) &&
             GroupIconPresets.FindPathData(item.IconValue) is string pathData && !string.IsNullOrWhiteSpace(pathData))
         {
             iconHost.Child = new Viewbox
