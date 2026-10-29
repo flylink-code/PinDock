@@ -1,0 +1,20 @@
+﻿# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: flylink-code.PinDock
+PackageVersion: 0.1.5
+PackageLocale: zh-CN
+Publisher: flylink-code
+PublisherUrl: https://github.com/flylink-code
+PackageName: PinDock
+PackageUrl: https://github.com/flylink-code/PinDock
+License: MIT
+LicenseUrl: https://github.com/flylink-code/PinDock/blob/main/LICENSE
+PrivacyUrl: https://github.com/flylink-code/PinDock/blob/main/PRIVACY.md
+ShortDescription: Windows 鐙珛鎮诞鍚姩鏍忎笌鐩綍澶氱骇棰勮宸ュ叿锛屼笉鏇挎崲鍘熺敓浠诲姟鏍忋€?
+Tags:
+  - dock
+  - launcher
+  - productivity
+  - windows
+ReleaseNotesUrl: https://github.com/flylink-code/PinDock/releases/tag/v0.1.5
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
