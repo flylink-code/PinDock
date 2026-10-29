@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/UpdateService.cs) · page 1/1
 
-Source SHA-256: fa508386097d2c9605daece9673dda9a2de9f29a14335d0c2edeab22e1e243b3
+Source SHA-256: 2768fac671a77a003d1fb016448e810d28a8205b246c55f8f76e2493d15ff865
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

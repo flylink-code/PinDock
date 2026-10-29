@@ -2,6 +2,14 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.5] - 2026-10-29
+
+### Fixed
+- **修复左键点击 Dock 图标启动失效问题**：在 `DockWindow` 的 `PreviewMouseLeftButtonUp` 中仅当实际发生拖拽排序 (`isReordering == true`) 时才释放鼠标捕获 (`ReleaseMouseCapture`)，保留普通单击时 `Button` 原生的 `IsPressed` 状态，确保左键点击应用、文件夹与分组 100% 正常触发。
+- **清理子进程 Electron/Chromium 环境变量污染**：启动时主动清理 `CHROME_CRASHPAD_PIPE_NAME` 与 `ELECTRON_RUN_AS_NODE`，确保从 PinDock 启动 Electron 类桌面应用（如百度翻译等）时正常弹出主窗口。
+
+---
+
 ## [0.1.4] - 2026-10-29
 
 ### Added

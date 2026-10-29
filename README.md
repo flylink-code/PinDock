@@ -4,7 +4,7 @@
 
 Windows 独立快捷启动工具。提供现代化悬浮 Dock、目录多级悬停预览、收藏分组、托盘快捷浮窗与主题定制，与系统原生任务栏共存。
 
-## 核心特性 (v0.1.4)
+## 核心特性 (v0.1.5)
 
 - **混合渲染架构（C# .NET 10 + WebView2 HTML/CSS）**
   - 系统底层（全局热键、48×48 高清系统图标提取、全屏应用避让、资源管理器右键、开机自启、单实例 IPC）采用 C# 原生实现；
@@ -42,7 +42,7 @@ dotnet run --project tests/PinDock.Tests
 # 启动开发版
 dotnet run --project src/PinDock
 
-# 一键编译生成安装包 (输出至 dist\PinDock-Setup-0.1.4.exe)
+# 一键编译生成安装包 (输出至 dist\PinDock-Setup-0.1.5.exe)
 powershell -ExecutionPolicy Bypass -File scripts\build-installer.ps1
 ```
 

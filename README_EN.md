@@ -4,7 +4,7 @@
 
 A standalone floating dock and quick launcher for Windows. Designed to coexist peacefully with the native Windows taskbar—providing fast access to apps, workspace folders, custom groups, and multi-level directory previews.
 
-## Key Features (v0.1.4)
+## Key Features (v0.1.5)
 
 - **Hybrid Architecture (C# .NET 10 + WebView2 HTML/CSS)**
   - Native C# core for global hotkeys, 48×48 high-DPI shell icon extraction, fullscreen app avoidance, Explorer context menu integration, startup management, and single-instance IPC;
@@ -41,7 +41,7 @@ dotnet run --project tests/PinDock.Tests
 # Run PinDock from source
 dotnet run --project src/PinDock
 
-# Build standalone installer (outputs dist\PinDock-Setup-0.1.4.exe)
+# Build standalone installer (outputs dist\PinDock-Setup-0.1.5.exe)
 powershell -ExecutionPolicy Bypass -File scripts\build-installer.ps1
 ```
 
