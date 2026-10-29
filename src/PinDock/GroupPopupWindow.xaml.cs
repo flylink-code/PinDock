@@ -12,6 +12,7 @@ public partial class GroupPopupWindow : Window
 
     private readonly ShellIconService icons;
     private List<Bookmark> items = [];
+    private bool isEn;
 
     public event Action<Bookmark>? LaunchRequested;
 
@@ -22,11 +23,12 @@ public partial class GroupPopupWindow : Window
         NativeWindow.HideFromAltTab(this);
     }
 
-    public void ShowGroup(string groupName, IEnumerable<Bookmark> bookmarks, ScreenRect dock, ScreenRect workArea, DockEdge edge, double opacity)
+    public void ShowGroup(string groupName, IEnumerable<Bookmark> bookmarks, ScreenRect dock, ScreenRect workArea, DockEdge edge, double opacity, bool english = false)
     {
+        isEn = english;
         items = bookmarks.ToList();
         TitleText.Text = groupName;
-        CountText.Text = $"{items.Count} 个收藏";
+        CountText.Text = isEn ? $"{items.Count} items" : $"{items.Count} 个收藏";
         SearchBox.Text = "";
         Opacity = opacity;
         RenderList("");
@@ -78,7 +80,7 @@ public partial class GroupPopupWindow : Window
         {
             ListPanel.Children.Add(new TextBlock
             {
-                Text = "没有匹配的收藏",
+                Text = isEn ? "No matching bookmarks" : "没有匹配的收藏",
                 Foreground = (Brush)FindResource("MutedBrush"),
                 FontSize = 12,
                 Margin = new Thickness(0, 8, 0, 0)

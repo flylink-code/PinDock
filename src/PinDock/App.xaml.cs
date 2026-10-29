@@ -14,14 +14,16 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        string? addPath = ExplorerMenuService.TryExtractAddPath(e.Args);
+        var addPaths = ExplorerMenuService.ExtractAddPaths(e.Args);
+        string? firstAddPath = addPaths.Count > 0 ? addPaths[0] : null;
 
         mutex = new Mutex(true, @"Local\PinDock.SingleInstance", out bool created);
         if (!created)
         {
-            if (!string.IsNullOrWhiteSpace(addPath))
+            if (addPaths.Count > 0)
             {
-                SendToRunningInstance(addPath);
+                foreach (string p in addPaths)
+                    SendToRunningInstance(p);
             }
             else
             {
@@ -32,7 +34,11 @@ public partial class App : Application
         }
 
         base.OnStartup(e);
-        controller = new AppController(addPath);
+        controller = new AppController(firstAddPath);
+        if (addPaths.Count > 1)
+        {
+            controller.AddPaths(addPaths.Skip(1));
+        }
         pipeCts = new CancellationTokenSource();
         _ = ListenForCommandsAsync(pipeCts.Token);
     }

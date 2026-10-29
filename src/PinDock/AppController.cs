@@ -57,7 +57,10 @@ public sealed class AppController : IDisposable
         dock.AddFolderRequested += AddFolderInteractive;
         dock.AddFileRequested += AddFileInteractive;
         dock.FilesDropped += AddPaths;
+        dock.FilesDroppedAt += (paths, targetToken, insertAfter) => AddPathsAt(paths, targetToken, insertAfter);
+        dock.FilesDroppedToGroup += (paths, groupName) => AddPathsToGroup(paths, groupName);
         dock.SettingsRequested += () => webPanel.ShowSettings();
+        dock.ToggleThemeRequested += QuickToggleLightDarkTheme;
         dock.ExitRequested += RequestExitApplication;
         dock.DragEnded += () =>
         {
@@ -89,6 +92,19 @@ public sealed class AppController : IDisposable
             trayFlyout.RefreshIfVisible();
         };
 
+        tray.ApplyLanguage(Data.Settings.IsEnglish);
+        if (Data.Settings.ExplorerContextMenu || ExplorerMenuService.IsRegistered())
+        {
+            try
+            {
+                ExplorerMenuService.SetRegistered(true, null, Data.Settings.IsEnglish);
+                Data.Settings.ExplorerContextMenu = true;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         dock.Bind(Data);
         dock.Relayout();
         ApplyDisplayMode();
@@ -108,6 +124,29 @@ public sealed class AppController : IDisposable
 
     public void OpenSettingsPanel(string? page = null) => webPanel.ShowSettings(page);
 
+    public void QuickToggleLightDarkTheme()
+    {
+        bool currentlyDark = Data.Settings.ThemeMode == ThemeMode.Dark ||
+                             (Data.Settings.ThemeMode == ThemeMode.System && ThemeService.IsSystemDark());
+        Data.Settings.ThemeMode = currentlyDark ? ThemeMode.Light : ThemeMode.Dark;
+        ApplySettings();
+        webPanel.RefreshIfVisible();
+        trayFlyout.RefreshIfVisible();
+    }
+
+    public void ToggleLanguage()
+    {
+        Data.Settings.Language = Data.Settings.IsEnglish ? "zh-CN" : "en-US";
+        if (Data.Settings.ExplorerContextMenu)
+        {
+            try { ExplorerMenuService.SetRegistered(true, null, Data.Settings.IsEnglish); }
+            catch (Exception) { }
+        }
+        ApplySettings();
+        webPanel.RefreshIfVisible();
+        trayFlyout.RefreshIfVisible();
+    }
+
     public void RequestExitApplication()
     {
         if (Data.Settings.ConfirmBeforeExit)
@@ -115,7 +154,9 @@ public sealed class AppController : IDisposable
             dialogOpen = true;
             try
             {
-                if (MessageBox.Show("确定要退出 PinDock 吗？", "退出 PinDock", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                string msg = I18n.T(Data.Settings, "确定要退出 PinDock 吗？", "Are you sure you want to exit PinDock?");
+                string title = I18n.T(Data.Settings, "退出 PinDock", "Exit PinDock");
+                if (MessageBox.Show(msg, title, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                     return;
             }
             finally
@@ -151,6 +192,7 @@ public sealed class AppController : IDisposable
 
     public void ApplySettings()
     {
+        tray.ApplyLanguage(Data.Settings.IsEnglish);
         dock.Bind(Data);
         theme.Apply(Data.Settings.ThemeMode, Data.Settings.Palette);
         edgeHandle.Topmost = Data.Settings.Topmost;
@@ -184,9 +226,12 @@ public sealed class AppController : IDisposable
         }
     }
 
-    public void AddPaths(IEnumerable<string> paths)
+    public void AddPaths(IEnumerable<string> paths) => AddPathsAt(paths, null, insertAfter: true);
+
+    public void AddPathsAt(IEnumerable<string> paths, string? targetToken, bool insertAfter)
     {
         var items = new List<Bookmark>(Data.Items);
+        var addedTokens = new List<string>();
         int duplicates = 0;
         foreach (string rawPath in paths)
         {
@@ -198,11 +243,78 @@ public sealed class AppController : IDisposable
                 Path = path,
                 Pinned = true
             };
-            if (!LibraryStore.IsDuplicate(items, item)) items.Add(item);
-            else duplicates++;
+            if (!LibraryStore.IsDuplicate(items, item))
+            {
+                items.Add(item);
+                addedTokens.Add("bm:" + item.Id.ToString("D"));
+            }
+            else
+            {
+                duplicates++;
+            }
         }
-        if (items.Count != Data.Items.Count) ReplaceItems(items);
-        if (duplicates > 0) MessageBox.Show($"{duplicates} 项已收藏，未重复添加。");
+        if (addedTokens.Count > 0)
+        {
+            Data.Items = items;
+            Data.NormalizeDockOrder();
+            if (!string.IsNullOrEmpty(targetToken))
+            {
+                foreach (string t in addedTokens)
+                    Data.DockOrder.Remove(t);
+                int idx = Data.DockOrder.IndexOf(targetToken);
+                if (idx >= 0)
+                {
+                    int insertPos = insertAfter ? idx + 1 : idx;
+                    for (int i = 0; i < addedTokens.Count; i++)
+                        Data.DockOrder.Insert(Math.Min(insertPos + i, Data.DockOrder.Count), addedTokens[i]);
+                }
+                else
+                {
+                    Data.DockOrder.AddRange(addedTokens);
+                }
+            }
+            Persist();
+            RelayoutDock();
+            webPanel.RefreshIfVisible();
+            trayFlyout.RefreshIfVisible();
+        }
+        if (duplicates > 0)
+            MessageBox.Show(I18n.T(Data.Settings, $"{duplicates} 项已收藏，未重复添加。", $"{duplicates} item(s) already in library."));
+    }
+
+    public void AddPathsToGroup(IEnumerable<string> paths, string groupName)
+    {
+        var items = new List<Bookmark>(Data.Items);
+        int changed = 0;
+        foreach (string rawPath in paths)
+        {
+            string path = rawPath.Trim();
+            if (path.Length == 0) continue;
+            var existing = items.FirstOrDefault(x => string.Equals(x.Path.Trim(), path, StringComparison.OrdinalIgnoreCase));
+            if (existing is not null)
+            {
+                existing.Group = groupName;
+                changed++;
+            }
+            else
+            {
+                items.Add(new Bookmark
+                {
+                    Name = BookmarkEditor.SuggestDisplayName(path),
+                    Path = path,
+                    Group = groupName,
+                    Pinned = false
+                });
+                changed++;
+            }
+        }
+        if (!Data.Groups.Contains(groupName, StringComparer.Ordinal))
+            Data.Groups.Add(groupName);
+        if (changed > 0)
+        {
+            ReplaceItems(items);
+            trayFlyout.RefreshIfVisible();
+        }
     }
 
     public void SaveEdited(Bookmark result, Bookmark? original)

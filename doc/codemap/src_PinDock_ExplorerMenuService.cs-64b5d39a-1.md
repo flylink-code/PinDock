@@ -4,16 +4,25 @@
 
 [Module](app.md) · [Source](../../src/PinDock/ExplorerMenuService.cs) · page 1/1
 
-Source SHA-256: 643a642f9555fca19532acb64b7ed8c031374f38f1cd121a02ed4804e71627dc
+Source SHA-256: 399500329ab80560f72b0da054c4aa2ab7d418337ecbd6e7415b01d0701c746b
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/ExplorerMenuService.cs#L3) |
-| ExplorerMenuService | class_declaration | PinDock | [5](../../src/PinDock/ExplorerMenuService.cs#L5) |
-| IsRegistered | method_declaration | PinDock::ExplorerMenuService | [11](../../src/PinDock/ExplorerMenuService.cs#L11) |
-| SetRegistered | method_declaration | PinDock::ExplorerMenuService | [17](../../src/PinDock/ExplorerMenuService.cs#L17) |
-| Register | method_declaration | PinDock::ExplorerMenuService | [25](../../src/PinDock/ExplorerMenuService.cs#L25) |
-| Unregister | method_declaration | PinDock::ExplorerMenuService | [31](../../src/PinDock/ExplorerMenuService.cs#L31) |
-| BuildCommand | method_declaration | PinDock::ExplorerMenuService | [37](../../src/PinDock/ExplorerMenuService.cs#L37) |
-| TryExtractAddPath | method_declaration | PinDock::ExplorerMenuService | [40](../../src/PinDock/ExplorerMenuService.cs#L40) |
-| WriteVerb | method_declaration | PinDock::ExplorerMenuService | [53](../../src/PinDock/ExplorerMenuService.cs#L53) |
+| PinDock | file_scoped_namespace_declaration |  | [6](../../src/PinDock/ExplorerMenuService.cs#L6) |
+| ExplorerMenuService | class_declaration | PinDock | [8](../../src/PinDock/ExplorerMenuService.cs#L8) |
+| IsRegistered | method_declaration | PinDock::ExplorerMenuService | [19](../../src/PinDock/ExplorerMenuService.cs#L19) |
+| SetRegistered | method_declaration | PinDock::ExplorerMenuService | [25](../../src/PinDock/ExplorerMenuService.cs#L25) |
+| Register | method_declaration | PinDock::ExplorerMenuService | [33](../../src/PinDock/ExplorerMenuService.cs#L33) |
+| Unregister | method_declaration | PinDock::ExplorerMenuService | [44](../../src/PinDock/ExplorerMenuService.cs#L44) |
+| IsWin11ClassicMenuEnabled | method_declaration | PinDock::ExplorerMenuService | [54](../../src/PinDock/ExplorerMenuService.cs#L54) |
+| SetWin11ClassicMenuEnabled | method_declaration | PinDock::ExplorerMenuService | [60](../../src/PinDock/ExplorerMenuService.cs#L60) |
+| BuildCommand | method_declaration | PinDock::ExplorerMenuService | [78](../../src/PinDock/ExplorerMenuService.cs#L78) |
+| TryExtractAddPath | method_declaration | PinDock::ExplorerMenuService | [81](../../src/PinDock/ExplorerMenuService.cs#L81) |
+| ExtractAddPaths | method_declaration | PinDock::ExplorerMenuService | [87](../../src/PinDock/ExplorerMenuService.cs#L87) |
+| CleanPathArg | method_declaration | PinDock::ExplorerMenuService | [111](../../src/PinDock/ExplorerMenuService.cs#L111) |
+| WriteVerb | method_declaration | PinDock::ExplorerMenuService | [121](../../src/PinDock/ExplorerMenuService.cs#L121) |
+| CreateSendToShortcut | method_declaration | PinDock::ExplorerMenuService | [132](../../src/PinDock/ExplorerMenuService.cs#L132) |
+| RemoveSendToShortcut | method_declaration | PinDock::ExplorerMenuService | [154](../../src/PinDock/ExplorerMenuService.cs#L154) |
+| NotifyShellAssociationChanged | method_declaration | PinDock::ExplorerMenuService | [168](../../src/PinDock/ExplorerMenuService.cs#L168) |
+| RestartExplorerProcess | method_declaration | PinDock::ExplorerMenuService | [179](../../src/PinDock/ExplorerMenuService.cs#L179) |
+| SHChangeNotify | method_declaration | PinDock::ExplorerMenuService | [196](../../src/PinDock/ExplorerMenuService.cs#L196) |

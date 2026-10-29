@@ -28,6 +28,8 @@ public partial class DockWindow : Window
     private Point reorderStartPoint;
     private bool isReordering;
     private bool isUtilityHoverRevealed;
+    private bool isContextMenuOpen;
+    private bool isExternalDragOver;
 
     public event Action<Bookmark>? LaunchRequested;
     public event Action<Bookmark>? EditRequested;
@@ -41,13 +43,16 @@ public partial class DockWindow : Window
     public event Action? AddFolderRequested;
     public event Action? AddFileRequested;
     public event Action<string[]>? FilesDropped;
+    public event Action<string[], string?, bool>? FilesDroppedAt;
+    public event Action<string[], string>? FilesDroppedToGroup;
     public event Action? SettingsRequested;
+    public event Action? ToggleThemeRequested;
     public event Action? ExitRequested;
     public event Action? DragEnded;
 
     public bool IsDragging { get; private set; }
     public bool IsShown { get; private set; }
-    public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible;
+    public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible || isContextMenuOpen || folderPopup.IsContextMenuOpen || isExternalDragOver;
     public ScreenRect CurrentBounds => placement.Bounds;
     public ScreenRect EdgeHandleRect => placement.EdgeHandle;
     public ScreenRect HitArea => placement.Bounds.Union(placement.EdgeHandle);
@@ -79,6 +84,7 @@ public partial class DockWindow : Window
         {
             FilesDropped?.Invoke([folderPath]);
         };
+        folderPopup.HiddenFoldersChanged += () => DragEnded?.Invoke();
         folderOpenTimer.Tick += (_, _) =>
         {
             folderOpenTimer.Stop();
@@ -115,9 +121,20 @@ public partial class DockWindow : Window
         };
     }
 
+    private string T(string zh, string en) => I18n.T(data.Settings, zh, en);
+
+    private void OpenContextMenu(ContextMenu menu)
+    {
+        menu.Opened += (_, _) => isContextMenuOpen = true;
+        menu.Closed += (_, _) => isContextMenuOpen = false;
+        isContextMenuOpen = true;
+        menu.IsOpen = true;
+    }
+
     public void Bind(LibraryData library)
     {
         data = library;
+        folderPopup.Bind(library);
         Topmost = library.Settings.Topmost;
         Opacity = library.Settings.Opacity;
     }
@@ -229,43 +246,95 @@ public partial class DockWindow : Window
             }
         }
 
-        bool showUtilitiesNow = !data.Settings.AutoHideUtilityButtons || isUtilityHoverRevealed;
+        bool collapsed = data.Settings.UtilityCollapsed;
         var utilityButtons = new List<FrameworkElement>();
         if (overflow.Count > 0)
-            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", $"更多固定项 · {overflow.Count}", icon, () => OverflowRequested?.Invoke(), isGear: false));
-        if (showUtilitiesNow)
+            utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", T($"更多固定项 · {overflow.Count}", $"More pinned · {overflow.Count}"), icon, () => OverflowRequested?.Invoke(), isGear: false));
+        if (!collapsed)
         {
-            if (data.Settings.ShowLibraryButton)
-                utilityButtons.Add(CreateUtilityButton("▦", "全部收藏", icon, () => LibraryRequested?.Invoke(), isGear: false));
-            if (data.Settings.ShowAddButton)
-                utilityButtons.Add(CreateUtilityButton("＋", "添加收藏（右键可快速选文件夹/本机应用）", icon, () => AddRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏（支持直接拖入文件夹或应用）", "All Bookmarks (Drag & drop folders/apps)"), icon, () => LibraryRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏（右键可快速选文件夹/本机应用）", "Add Bookmark (Right-click for quick options)"), icon, () => AddRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true));
         }
 
-        var gearSection = new List<FrameworkElement>();
-        if (showUtilitiesNow && data.Settings.ShowSettingsButton)
+        // 若主区域为空且功能区被折叠，自动展开功能区防止 Dock 仅剩一个折叠箭头
+        if (mainElements.Count == 0 && utilityButtons.Count == 0)
         {
-            gearSection.Add(CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true));
-        }
-
-        // 若主区域和功能按钮都为空（例如用户隐藏了所有功能按钮且还没有固定项），保底显示“设置”与“添加”按钮防止空壳
-        if (mainElements.Count == 0 && utilityButtons.Count == 0 && gearSection.Count == 0)
-        {
-            utilityButtons.Add(CreateUtilityButton("＋", "添加收藏", icon, () => AddRequested?.Invoke(), isGear: false));
-            gearSection.Add(CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true));
+            utilityButtons.Add(CreateUtilityButton("▦", T("全部收藏", "All Bookmarks"), icon, () => LibraryRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton("＋", T("添加收藏", "Add Bookmark"), icon, () => AddRequested?.Invoke(), isGear: false));
+            utilityButtons.Add(CreateUtilityButton("⚙", T("打开设置", "Settings"), icon, () => SettingsRequested?.Invoke(), isGear: true));
         }
 
         foreach (var element in mainElements)
             ItemsPanel.Children.Add(element);
 
-        foreach (var section in new[] { utilityButtons, gearSection })
+        if (utilityButtons.Count > 0)
         {
-            if (section.Count == 0) continue;
             if (ItemsPanel.Children.Count > 0) ItemsPanel.Children.Add(CreateSeparator(icon));
-            foreach (var element in section) ItemsPanel.Children.Add(element);
+            foreach (var element in utilityButtons) ItemsPanel.Children.Add(element);
+        }
+
+        // 右侧 / 底部末端展开折叠抽屉按钮
+        if (mainElements.Count > 0)
+        {
+            if (collapsed && ItemsPanel.Children.Count > 0)
+                ItemsPanel.Children.Add(CreateSeparator(icon));
+            ItemsPanel.Children.Add(CreateDrawerToggleButton(icon, vertical, collapsed));
         }
 
         if (ItemsPanel.Children.Count > 0)
             ((FrameworkElement)ItemsPanel.Children[^1]).Margin = new Thickness(0);
+    }
+
+    private Button CreateDrawerToggleButton(double icon, bool vertical, bool collapsed)
+    {
+        string glyph = vertical
+            ? (collapsed ? "▾" : "▴")
+            : (collapsed ? "›" : "‹");
+        string tip = collapsed
+            ? T("展开功能按钮（全部收藏 / 添加 / 设置）", "Expand tools (Library / Add / Settings)")
+            : T("折叠右侧功能按钮", "Collapse tool buttons");
+
+        var border = new Border
+        {
+            Width = vertical ? icon : Math.Max(20, Math.Round(icon * 0.46)),
+            Height = vertical ? Math.Max(20, Math.Round(icon * 0.46)) : icon,
+            CornerRadius = new CornerRadius(9),
+            Background = collapsed ? (Brush)FindResource("SoftBrush") : Brushes.Transparent,
+            Child = new TextBlock
+            {
+                Text = glyph,
+                FontSize = Math.Max(14, icon * 0.38),
+                FontWeight = FontWeights.SemiBold,
+                Foreground = (Brush)FindResource(collapsed ? "AccentBrush" : "MutedBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            }
+        };
+        var button = new Button
+        {
+            Content = border,
+            Style = (Style)FindResource("DockButton"),
+            Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
+            ToolTip = tip
+        };
+        ToolTipService.SetInitialShowDelay(button, 120);
+        button.MouseEnter += (_, _) =>
+        {
+            folderOpenTimer.Stop();
+            border.Background = (Brush)FindResource("SoftBrush");
+        };
+        button.MouseLeave += (_, _) =>
+        {
+            border.Background = collapsed ? (Brush)FindResource("SoftBrush") : Brushes.Transparent;
+        };
+        button.Click += (_, _) =>
+        {
+            data.Settings.UtilityCollapsed = !data.Settings.UtilityCollapsed;
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        return button;
     }
 
     private Button CreateBookmarkButton(Bookmark item, double icon, string token)
@@ -363,7 +432,7 @@ public partial class DockWindow : Window
             folderCloseTimer.Stop();
             return;
         }
-        if (folderPopup.IsKeyboardFocusWithin) return;
+        if (folderPopup.IsKeyboardFocusWithin || folderPopup.IsContextMenuOpen) return;
         if (!AutoHideController.TryGetCursorPoint(out var pt)) return;
 
         var dockRect = ExpandRect(placement.Bounds, 16);
@@ -416,7 +485,7 @@ public partial class DockWindow : Window
             folderOpenTimer.Stop();
             folderPopup.Hide();
             var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
-            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity, data.Settings.IsEnglish);
         };
         button.MouseRightButtonUp += (_, e) =>
         {
@@ -686,89 +755,89 @@ public partial class DockWindow : Window
     private void ShowBookmarkContextMenu(Bookmark item, string token)
     {
         var menu = new ContextMenu();
-        var openItem = new MenuItem { Header = $"打开“{item.Name}”" };
+        var openItem = new MenuItem { Header = T($"打开“{item.Name}”", $"Open \"{item.Name}\"") };
         openItem.Click += (_, _) => LaunchRequested?.Invoke(item);
         menu.Items.Add(openItem);
 
-        var revealItem = new MenuItem { Header = "在资源管理器中显示" };
+        var revealItem = new MenuItem { Header = T("在资源管理器中显示", "Show in Explorer") };
         revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
         menu.Items.Add(revealItem);
 
         menu.Items.Add(new Separator());
 
-        var sepBefore = new MenuItem { Header = "｜ 在前面插入分隔符" };
+        var sepBefore = new MenuItem { Header = T("｜ 在前面插入分隔符", "｜ Insert separator before") };
         sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
         menu.Items.Add(sepBefore);
 
-        var sepAfter = new MenuItem { Header = "｜ 在后面插入分隔符" };
+        var sepAfter = new MenuItem { Header = T("｜ 在后面插入分隔符", "｜ Insert separator after") };
         sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
         menu.Items.Add(sepAfter);
 
-        var movePrev = new MenuItem { Header = "← 向前移动一位" };
+        var movePrev = new MenuItem { Header = T("← 向前移动一位", "← Move backward") };
         movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
         menu.Items.Add(movePrev);
 
-        var moveNext = new MenuItem { Header = "→ 向后移动一位" };
+        var moveNext = new MenuItem { Header = T("→ 向后移动一位", "→ Move forward") };
         moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
         menu.Items.Add(moveNext);
 
         menu.Items.Add(new Separator());
 
-        var editItem = new MenuItem { Header = "编辑收藏…" };
+        var editItem = new MenuItem { Header = T("编辑收藏…", "Edit bookmark…") };
         editItem.Click += (_, _) => EditRequested?.Invoke(item);
         menu.Items.Add(editItem);
 
-        var unpinItem = new MenuItem { Header = "从 Dock 取消固定" };
+        var unpinItem = new MenuItem { Header = T("从 Dock 取消固定", "Unpin from Dock") };
         unpinItem.Click += (_, _) => UnpinRequested?.Invoke(item);
         menu.Items.Add(unpinItem);
 
-        var removeItem = new MenuItem { Header = "从收藏中移除" };
+        var removeItem = new MenuItem { Header = T("从收藏中移除", "Remove bookmark") };
         removeItem.Click += (_, _) => RemoveRequested?.Invoke(item);
         menu.Items.Add(removeItem);
 
-        menu.IsOpen = true;
+        OpenContextMenu(menu);
     }
 
     private void ShowGroupContextMenu(string group, string token)
     {
         var menu = new ContextMenu();
-        var openGrp = new MenuItem { Header = $"打开分组“{group}”" };
+        var openGrp = new MenuItem { Header = T($"打开分组“{group}”", $"Open group \"{group}\"") };
         openGrp.Click += (_, _) =>
         {
             var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
-            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity, data.Settings.IsEnglish);
         };
         menu.Items.Add(openGrp);
 
-        var configGrp = new MenuItem { Header = "配置分组与自定义图标…" };
+        var configGrp = new MenuItem { Header = T("配置分组与自定义图标…", "Configure group & icon…") };
         configGrp.Click += (_, _) => ConfigureGroupRequested?.Invoke(group);
         menu.Items.Add(configGrp);
 
         menu.Items.Add(new Separator());
 
-        var sepBefore = new MenuItem { Header = "｜ 在前面插入分隔符" };
+        var sepBefore = new MenuItem { Header = T("｜ 在前面插入分隔符", "｜ Insert separator before") };
         sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
         menu.Items.Add(sepBefore);
 
-        var sepAfter = new MenuItem { Header = "｜ 在后面插入分隔符" };
+        var sepAfter = new MenuItem { Header = T("｜ 在后面插入分隔符", "｜ Insert separator after") };
         sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
         menu.Items.Add(sepAfter);
 
-        var movePrev = new MenuItem { Header = "← 向前移动一位" };
+        var movePrev = new MenuItem { Header = T("← 向前移动一位", "← Move backward") };
         movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
         menu.Items.Add(movePrev);
 
-        var moveNext = new MenuItem { Header = "→ 向后移动一位" };
+        var moveNext = new MenuItem { Header = T("→ 向后移动一位", "→ Move forward") };
         moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
         menu.Items.Add(moveNext);
 
-        menu.IsOpen = true;
+        OpenContextMenu(menu);
     }
 
     private void ShowSeparatorContextMenu(string sepToken)
     {
         var menu = new ContextMenu();
-        var removeSep = new MenuItem { Header = "删除此分隔符" };
+        var removeSep = new MenuItem { Header = T("删除此分隔符", "Remove separator") };
         removeSep.Click += (_, _) =>
         {
             data.DockOrder.Remove(sepToken);
@@ -776,7 +845,7 @@ public partial class DockWindow : Window
             DragEnded?.Invoke();
         };
         menu.Items.Add(removeSep);
-        menu.IsOpen = true;
+        OpenContextMenu(menu);
     }
 
     private void InsertSeparatorAround(string anchorToken, bool before)
@@ -827,25 +896,25 @@ public partial class DockWindow : Window
     {
         var menu = new ContextMenu();
 
-        var addFolder = new MenuItem { Header = "＋ 添加文件夹到 Dock…" };
+        var addFolder = new MenuItem { Header = T("＋ 添加文件夹到 Dock…", "＋ Add folder to Dock…") };
         addFolder.Click += (_, _) => AddFolderRequested?.Invoke();
         menu.Items.Add(addFolder);
 
-        var addApps = new MenuItem { Header = "⌕ 检索本机已安装应用…" };
+        var addApps = new MenuItem { Header = T("⌕ 检索本机已安装应用…", "⌕ Browse installed apps…") };
         addApps.Click += (_, _) => InstalledAppsRequested?.Invoke();
         menu.Items.Add(addApps);
 
-        var addFile = new MenuItem { Header = "＋ 添加应用 / 文件…" };
+        var addFile = new MenuItem { Header = T("＋ 添加应用 / 文件…", "＋ Add app / file…") };
         addFile.Click += (_, _) => AddFileRequested?.Invoke();
         menu.Items.Add(addFile);
 
-        var addCustom = new MenuItem { Header = "自定义添加收藏…" };
+        var addCustom = new MenuItem { Header = T("自定义添加收藏…", "Custom bookmark…") };
         addCustom.Click += (_, _) => AddRequested?.Invoke();
         menu.Items.Add(addCustom);
 
         menu.Items.Add(new Separator());
 
-        var autoSep = new MenuItem { Header = "｜ 按类型自动分隔（应用 / 文件夹 / 分组）" };
+        var autoSep = new MenuItem { Header = T("｜ 按类型自动分隔（应用 / 文件夹 / 分组）", "｜ Auto-separate by type (Apps / Folders / Groups)") };
         autoSep.Click += (_, _) =>
         {
             data.AutoSeparateByKind();
@@ -855,7 +924,7 @@ public partial class DockWindow : Window
         };
         menu.Items.Add(autoSep);
 
-        var addSepEnd = new MenuItem { Header = "｜ 插入分隔符" };
+        var addSepEnd = new MenuItem { Header = T("｜ 插入分隔符", "｜ Insert separator") };
         addSepEnd.Click += (_, _) =>
         {
             data.NormalizeDockOrder();
@@ -867,7 +936,7 @@ public partial class DockWindow : Window
 
         if (data.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase)))
         {
-            var clearSeps = new MenuItem { Header = "✕ 清除所有自定义分隔符" };
+            var clearSeps = new MenuItem { Header = T("✕ 清除所有自定义分隔符", "✕ Clear custom separators") };
             clearSeps.Click += (_, _) =>
             {
                 data.DockOrder.RemoveAll(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase));
@@ -877,30 +946,107 @@ public partial class DockWindow : Window
             menu.Items.Add(clearSeps);
         }
 
+        var toggleDrawer = new MenuItem
+        {
+            Header = data.Settings.UtilityCollapsed
+                ? T("› 展开右侧功能按钮", "› Expand tool buttons")
+                : T("‹ 折叠右侧功能按钮", "‹ Collapse tool buttons")
+        };
+        toggleDrawer.Click += (_, _) =>
+        {
+            data.Settings.UtilityCollapsed = !data.Settings.UtilityCollapsed;
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        menu.Items.Add(toggleDrawer);
+
         menu.Items.Add(new Separator());
 
-        var allLibrary = new MenuItem { Header = "▦ 打开全部收藏" };
+        var toggleTheme = new MenuItem { Header = T("☀ / 🌙 快速切换浅色/深色主题", "☀ / 🌙 Toggle Light / Dark theme") };
+        toggleTheme.Click += (_, _) => ToggleThemeRequested?.Invoke();
+        menu.Items.Add(toggleTheme);
+
+        var allLibrary = new MenuItem { Header = T("▦ 打开全部收藏", "▦ All Bookmarks") };
         allLibrary.Click += (_, _) => LibraryRequested?.Invoke();
         menu.Items.Add(allLibrary);
 
-        var openSettings = new MenuItem { Header = "⚙ PinDock 设置" };
+        var openSettings = new MenuItem { Header = T("⚙ PinDock 设置", "⚙ PinDock Settings") };
         openSettings.Click += (_, _) => SettingsRequested?.Invoke();
         menu.Items.Add(openSettings);
 
         menu.Items.Add(new Separator());
 
-        var exitItem = new MenuItem { Header = "⏻ 退出 PinDock" };
+        var exitItem = new MenuItem { Header = T("⏻ 退出 PinDock", "⏻ Exit PinDock") };
         exitItem.Click += (_, _) => ExitRequested?.Invoke();
         menu.Items.Add(exitItem);
 
-        menu.IsOpen = true;
+        OpenContextMenu(menu);
         e.Handled = true;
+    }
+
+    private void Window_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            isExternalDragOver = true;
+            e.Effects = DragDropEffects.Copy | DragDropEffects.Link;
+            e.Handled = true;
+        }
+    }
+
+    private void Window_DragOver(object sender, DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+        isExternalDragOver = true;
+        e.Effects = DragDropEffects.Copy | DragDropEffects.Link;
+        bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        HighlightDropTarget(e.GetPosition(ItemsPanel), isVert);
+        e.Handled = true;
+    }
+
+    private void Window_DragLeave(object sender, DragEventArgs e)
+    {
+        isExternalDragOver = false;
+        ClearDropHighlights();
     }
 
     private void Window_Drop(object sender, DragEventArgs e)
     {
-        if (e.Data.GetData(DataFormats.FileDrop) is string[] { Length: > 0 } files)
+        isExternalDragOver = false;
+        ClearDropHighlights();
+        if (e.Data.GetData(DataFormats.FileDrop) is not string[] { Length: > 0 } files)
+            return;
+
+        bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        var posInPanel = e.GetPosition(ItemsPanel);
+
+        // 检查是否直接拖到了某个收藏组按钮上
+        foreach (UIElement child in ItemsPanel.Children)
+        {
+            if (child is FrameworkElement fe && fe.Tag is string token && token.StartsWith("grp:", StringComparison.Ordinal))
+            {
+                var pt = e.GetPosition(fe);
+                if (pt.X >= 0 && pt.Y >= 0 && pt.X <= fe.ActualWidth && pt.Y <= fe.ActualHeight)
+                {
+                    string grpName = token[4..];
+                    FilesDroppedToGroup?.Invoke(files, grpName);
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+
+        var targetFe = FindTargetElementAt(posInPanel, isVert, out bool insertAfter);
+        string? targetToken = targetFe?.Tag as string;
+        if (FilesDroppedAt is not null)
+            FilesDroppedAt.Invoke(files, targetToken, insertAfter);
+        else
             FilesDropped?.Invoke(files);
+        e.Handled = true;
     }
 
     private void DockChrome_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

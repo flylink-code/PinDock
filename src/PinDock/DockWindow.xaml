@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PinDock" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" Topmost="True" SizeToContent="WidthAndHeight"
-        AllowDrop="True" Drop="Window_Drop" MouseRightButtonUp="Window_MouseRightButtonUp"
+        AllowDrop="True" DragEnter="Window_DragEnter" DragOver="Window_DragOver" DragLeave="Window_DragLeave" Drop="Window_Drop"
+        MouseRightButtonUp="Window_MouseRightButtonUp"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <Style x:Key="DockButton" TargetType="Button">

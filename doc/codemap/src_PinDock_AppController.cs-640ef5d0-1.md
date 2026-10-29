@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppController.cs) · page 1/1
 
-Source SHA-256: 845b601e31a6431ae96c97f0cde7d8c8665083fe23473898f80113193b24868f
+Source SHA-256: 1c210b3f4546ef778d82ae51508956e1492682562e3a1cc1cdfada889d5484b6
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -15,38 +15,42 @@ Source SHA-256: 845b601e31a6431ae96c97f0cde7d8c8665083fe23473898f80113193b24868f
 | OverflowItems | property_declaration | PinDock::AppController | [29](../../src/PinDock/AppController.cs#L29) |
 | IsDockVisible | property_declaration | PinDock::AppController | [30](../../src/PinDock/AppController.cs#L30) |
 | AppController | constructor_declaration | PinDock::AppController | [32](../../src/PinDock/AppController.cs#L32) |
-| ToggleDockFromFlyout | method_declaration | PinDock::AppController | [103](../../src/PinDock/AppController.cs#L103) |
-| OpenEditorForNew | method_declaration | PinDock::AppController | [105](../../src/PinDock/AppController.cs#L105) |
-| OpenLibraryPanel | method_declaration | PinDock::AppController | [107](../../src/PinDock/AppController.cs#L107) |
-| OpenSettingsPanel | method_declaration | PinDock::AppController | [109](../../src/PinDock/AppController.cs#L109) |
-| RequestExitApplication | method_declaration | PinDock::AppController | [111](../../src/PinDock/AppController.cs#L111) |
-| UpdateOpacityOnly | method_declaration | PinDock::AppController | [129](../../src/PinDock/AppController.cs#L129) |
-| UpdateHotkey | method_declaration | PinDock::AppController | [135](../../src/PinDock/AppController.cs#L135) |
-| RevealDock | method_declaration | PinDock::AppController | [141](../../src/PinDock/AppController.cs#L141) |
-| ApplySettings | method_declaration | PinDock::AppController | [152](../../src/PinDock/AppController.cs#L152) |
-| LaunchAsync | method_declaration | PinDock::AppController | [164](../../src/PinDock/AppController.cs#L164) |
-| AddPaths | method_declaration | PinDock::AppController | [187](../../src/PinDock/AppController.cs#L187) |
-| SaveEdited | method_declaration | PinDock::AppController | [208](../../src/PinDock/AppController.cs#L208) |
-| Remove | method_declaration | PinDock::AppController | [220](../../src/PinDock/AppController.cs#L220) |
-| TogglePin | method_declaration | PinDock::AppController | [227](../../src/PinDock/AppController.cs#L227) |
-| AddGroup | method_declaration | PinDock::AppController | [234](../../src/PinDock/AppController.cs#L234) |
-| SetBookmarkGroup | method_declaration | PinDock::AppController | [242](../../src/PinDock/AppController.cs#L242) |
-| SaveGroupConfig | method_declaration | PinDock::AppController | [252](../../src/PinDock/AppController.cs#L252) |
-| AutoSeparateDockItems | method_declaration | PinDock::AppController | [297](../../src/PinDock/AppController.cs#L297) |
-| DeleteGroup | method_declaration | PinDock::AppController | [305](../../src/PinDock/AppController.cs#L305) |
-| Import | method_declaration | PinDock::AppController | [313](../../src/PinDock/AppController.cs#L313) |
-| Export | method_declaration | PinDock::AppController | [322](../../src/PinDock/AppController.cs#L322) |
-| Dispose | method_declaration | PinDock::AppController | [324](../../src/PinDock/AppController.cs#L324) |
-| AddBookmarkInteractive | method_declaration | PinDock::AppController | [333](../../src/PinDock/AppController.cs#L333) |
-| EditBookmarkInteractive | method_declaration | PinDock::AppController | [335](../../src/PinDock/AppController.cs#L335) |
-| AddFolderInteractive | method_declaration | PinDock::AppController | [337](../../src/PinDock/AppController.cs#L337) |
-| AddFileInteractive | method_declaration | PinDock::AppController | [352](../../src/PinDock/AppController.cs#L352) |
-| RemoveBookmarkWithConfirm | method_declaration | PinDock::AppController | [369](../../src/PinDock/AppController.cs#L369) |
-| ReplaceItems | method_declaration | PinDock::AppController | [380](../../src/PinDock/AppController.cs#L380) |
-| RelayoutDock | method_declaration | PinDock::AppController | [388](../../src/PinDock/AppController.cs#L388) |
-| Persist | method_declaration | PinDock::AppController | [394](../../src/PinDock/AppController.cs#L394) |
-| ApplyDisplayMode | method_declaration | PinDock::AppController | [403](../../src/PinDock/AppController.cs#L403) |
-| SyncVisuals | method_declaration | PinDock::AppController | [411](../../src/PinDock/AppController.cs#L411) |
-| ToggleVisibility | method_declaration | PinDock::AppController | [448](../../src/PinDock/AppController.cs#L448) |
-| OnFullscreenChanged | method_declaration | PinDock::AppController | [463](../../src/PinDock/AppController.cs#L463) |
-| RegisterHotkey | method_declaration | PinDock::AppController | [469](../../src/PinDock/AppController.cs#L469) |
+| ToggleDockFromFlyout | method_declaration | PinDock::AppController | [119](../../src/PinDock/AppController.cs#L119) |
+| OpenEditorForNew | method_declaration | PinDock::AppController | [121](../../src/PinDock/AppController.cs#L121) |
+| OpenLibraryPanel | method_declaration | PinDock::AppController | [123](../../src/PinDock/AppController.cs#L123) |
+| OpenSettingsPanel | method_declaration | PinDock::AppController | [125](../../src/PinDock/AppController.cs#L125) |
+| QuickToggleLightDarkTheme | method_declaration | PinDock::AppController | [127](../../src/PinDock/AppController.cs#L127) |
+| ToggleLanguage | method_declaration | PinDock::AppController | [137](../../src/PinDock/AppController.cs#L137) |
+| RequestExitApplication | method_declaration | PinDock::AppController | [150](../../src/PinDock/AppController.cs#L150) |
+| UpdateOpacityOnly | method_declaration | PinDock::AppController | [170](../../src/PinDock/AppController.cs#L170) |
+| UpdateHotkey | method_declaration | PinDock::AppController | [176](../../src/PinDock/AppController.cs#L176) |
+| RevealDock | method_declaration | PinDock::AppController | [182](../../src/PinDock/AppController.cs#L182) |
+| ApplySettings | method_declaration | PinDock::AppController | [193](../../src/PinDock/AppController.cs#L193) |
+| LaunchAsync | method_declaration | PinDock::AppController | [206](../../src/PinDock/AppController.cs#L206) |
+| AddPaths | method_declaration | PinDock::AppController | [229](../../src/PinDock/AppController.cs#L229) |
+| AddPathsAt | method_declaration | PinDock::AppController | [231](../../src/PinDock/AppController.cs#L231) |
+| AddPathsToGroup | method_declaration | PinDock::AppController | [285](../../src/PinDock/AppController.cs#L285) |
+| SaveEdited | method_declaration | PinDock::AppController | [320](../../src/PinDock/AppController.cs#L320) |
+| Remove | method_declaration | PinDock::AppController | [332](../../src/PinDock/AppController.cs#L332) |
+| TogglePin | method_declaration | PinDock::AppController | [339](../../src/PinDock/AppController.cs#L339) |
+| AddGroup | method_declaration | PinDock::AppController | [346](../../src/PinDock/AppController.cs#L346) |
+| SetBookmarkGroup | method_declaration | PinDock::AppController | [354](../../src/PinDock/AppController.cs#L354) |
+| SaveGroupConfig | method_declaration | PinDock::AppController | [364](../../src/PinDock/AppController.cs#L364) |
+| AutoSeparateDockItems | method_declaration | PinDock::AppController | [409](../../src/PinDock/AppController.cs#L409) |
+| DeleteGroup | method_declaration | PinDock::AppController | [417](../../src/PinDock/AppController.cs#L417) |
+| Import | method_declaration | PinDock::AppController | [425](../../src/PinDock/AppController.cs#L425) |
+| Export | method_declaration | PinDock::AppController | [434](../../src/PinDock/AppController.cs#L434) |
+| Dispose | method_declaration | PinDock::AppController | [436](../../src/PinDock/AppController.cs#L436) |
+| AddBookmarkInteractive | method_declaration | PinDock::AppController | [445](../../src/PinDock/AppController.cs#L445) |
+| EditBookmarkInteractive | method_declaration | PinDock::AppController | [447](../../src/PinDock/AppController.cs#L447) |
+| AddFolderInteractive | method_declaration | PinDock::AppController | [449](../../src/PinDock/AppController.cs#L449) |
+| AddFileInteractive | method_declaration | PinDock::AppController | [464](../../src/PinDock/AppController.cs#L464) |
+| RemoveBookmarkWithConfirm | method_declaration | PinDock::AppController | [481](../../src/PinDock/AppController.cs#L481) |
+| ReplaceItems | method_declaration | PinDock::AppController | [492](../../src/PinDock/AppController.cs#L492) |
+| RelayoutDock | method_declaration | PinDock::AppController | [500](../../src/PinDock/AppController.cs#L500) |
+| Persist | method_declaration | PinDock::AppController | [506](../../src/PinDock/AppController.cs#L506) |
+| ApplyDisplayMode | method_declaration | PinDock::AppController | [515](../../src/PinDock/AppController.cs#L515) |
+| SyncVisuals | method_declaration | PinDock::AppController | [523](../../src/PinDock/AppController.cs#L523) |
+| ToggleVisibility | method_declaration | PinDock::AppController | [560](../../src/PinDock/AppController.cs#L560) |
+| OnFullscreenChanged | method_declaration | PinDock::AppController | [575](../../src/PinDock/AppController.cs#L575) |
+| RegisterHotkey | method_declaration | PinDock::AppController | [581](../../src/PinDock/AppController.cs#L581) |

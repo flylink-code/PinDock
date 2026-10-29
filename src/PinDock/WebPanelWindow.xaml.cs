@@ -339,16 +339,45 @@ public partial class WebPanelWindow : Window
                 bool enabled = root.TryGetProperty("enabled", out var enEl) && enEl.GetBoolean();
                 try
                 {
-                    ExplorerMenuService.SetRegistered(enabled);
+                    ExplorerMenuService.SetRegistered(enabled, null, controller.Data.Settings.IsEnglish);
                     controller.Data.Settings.ExplorerContextMenu = enabled;
                     controller.ApplySettings();
-                    PostToast(enabled ? "已开启资源管理器右键“添加到 PinDock”" : "已关闭资源管理器右键菜单");
+                    PostToast(enabled
+                        ? I18n.T(controller.Data.Settings, "已开启右键菜单与“发送到 PinDock”", "Explorer context menu & SendTo enabled")
+                        : I18n.T(controller.Data.Settings, "已关闭资源管理器右键菜单", "Explorer context menu disabled"));
                 }
                 catch (Exception ex) when (ex is UnauthorizedAccessException or InvalidOperationException or System.Security.SecurityException)
                 {
                     PostToast($"设置失败：{ex.Message}");
                     PushState(null, false, null);
                 }
+                break;
+
+            case "toggleWin11Menu":
+                bool win11Enabled = root.TryGetProperty("enabled", out var w11El) && w11El.GetBoolean();
+                bool restartExp = root.TryGetProperty("restartExplorer", out var reEl) && reEl.GetBoolean();
+                try
+                {
+                    ExplorerMenuService.SetWin11ClassicMenuEnabled(win11Enabled, restartExp);
+                    controller.Data.Settings.Win11ClassicMenu = win11Enabled;
+                    controller.ApplySettings();
+                    PostToast(win11Enabled
+                        ? I18n.T(controller.Data.Settings, "已开启 Win11 一级右键菜单直显", "Win11 direct context menu enabled")
+                        : I18n.T(controller.Data.Settings, "已恢复 Win11 默认折叠右键菜单", "Restored Win11 default context menu"));
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException or InvalidOperationException or System.Security.SecurityException)
+                {
+                    PostToast($"设置失败：{ex.Message}");
+                    PushState(null, false, null);
+                }
+                break;
+
+            case "quickToggleTheme":
+                controller.QuickToggleLightDarkTheme();
+                break;
+
+            case "toggleLanguage":
+                controller.ToggleLanguage();
                 break;
 
             case "toggleStartup":
@@ -573,6 +602,17 @@ public partial class WebPanelWindow : Window
             s.AvoidFullscreen = af.GetBoolean();
         if (sEl.TryGetProperty("lockPosition", out var lp))
             s.LockPosition = lp.GetBoolean();
+        if (sEl.TryGetProperty("language", out var langEl) && langEl.GetString() is string langStr && !string.IsNullOrWhiteSpace(langStr))
+        {
+            s.Language = langStr;
+            if (s.ExplorerContextMenu)
+            {
+                try { ExplorerMenuService.SetRegistered(true, null, s.IsEnglish); }
+                catch (Exception) { }
+            }
+        }
+        if (sEl.TryGetProperty("utilityCollapsed", out var ucEl))
+            s.UtilityCollapsed = ucEl.GetBoolean();
         if (sEl.TryGetProperty("showLibraryButton", out var slb))
             s.ShowLibraryButton = slb.GetBoolean();
         if (sEl.TryGetProperty("showAddButton", out var sab))
@@ -738,8 +778,11 @@ public partial class WebPanelWindow : Window
                 collapseAfterLaunch = s.CollapseAfterLaunch,
                 monitorDeviceName = s.MonitorDeviceName,
                 explorerContextMenu = s.ExplorerContextMenu || ExplorerMenuService.IsRegistered(),
+                win11ClassicMenu = s.Win11ClassicMenu || ExplorerMenuService.IsWin11ClassicMenuEnabled(),
                 hotkeyModifiers = s.HotkeyModifiers,
                 hotkeyKey = s.HotkeyKey,
+                language = s.Language,
+                utilityCollapsed = s.UtilityCollapsed,
                 showLibraryButton = s.ShowLibraryButton,
                 showAddButton = s.ShowAddButton,
                 showSettingsButton = s.ShowSettingsButton,

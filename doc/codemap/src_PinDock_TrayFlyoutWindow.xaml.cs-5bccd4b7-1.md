@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/TrayFlyoutWindow.xaml.cs) · page 1/1
 
-Source SHA-256: e58e04020f864073cf1d3b6d950e545a0d42c8c91df8693f8e57f2212ca286ba
+Source SHA-256: fc615b60685e55bad15f20d63b8bfed133d44dd7a097e7f110ebecbad9ab5989
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -15,20 +15,24 @@ Source SHA-256: e58e04020f864073cf1d3b6d950e545a0d42c8c91df8693f8e57f2212ca286ba
 | ShowFlyout | method_declaration | PinDock::TrayFlyoutWindow | [38](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L38) |
 | RefreshIfVisible | method_declaration | PinDock::TrayFlyoutWindow | [51](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L51) |
 | PositionNearTray | method_declaration | PinDock::TrayFlyoutWindow | [57](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L57) |
-| RefreshContent | method_declaration | PinDock::TrayFlyoutWindow | [86](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L86) |
-| RenderRecentSection | method_declaration | PinDock::TrayFlyoutWindow | [105](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L105) |
-| RenderTabs | method_declaration | PinDock::TrayFlyoutWindow | [146](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L146) |
-| RenderList | method_declaration | PinDock::TrayFlyoutWindow | [185](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L185) |
-| CreateRowButton | method_declaration | PinDock::TrayFlyoutWindow | [251](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L251) |
-| LoadMiniIconAsync | method_declaration | PinDock::TrayFlyoutWindow | [330](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L330) |
-| SearchBox_TextChanged | method_declaration | PinDock::TrayFlyoutWindow | [348](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L348) |
-| BtnToggleDock_Click | method_declaration | PinDock::TrayFlyoutWindow | [355](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L355) |
-| BtnCycleMode_Click | method_declaration | PinDock::TrayFlyoutWindow | [361](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L361) |
-| BtnToggleLock_Click | method_declaration | PinDock::TrayFlyoutWindow | [374](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L374) |
-| BtnAdd_Click | method_declaration | PinDock::TrayFlyoutWindow | [381](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L381) |
-| BtnLibrary_Click | method_declaration | PinDock::TrayFlyoutWindow | [387](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L387) |
-| BtnSettings_Click | method_declaration | PinDock::TrayFlyoutWindow | [393](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L393) |
-| BtnUpdate_Click | method_declaration | PinDock::TrayFlyoutWindow | [399](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L399) |
-| BtnExit_Click | method_declaration | PinDock::TrayFlyoutWindow | [405](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L405) |
-| Window_Deactivated | method_declaration | PinDock::TrayFlyoutWindow | [411](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L411) |
-| Window_PreviewKeyDown | method_declaration | PinDock::TrayFlyoutWindow | [417](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L417) |
+| T | method_declaration | PinDock::TrayFlyoutWindow | [86](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L86) |
+| RefreshContent | method_declaration | PinDock::TrayFlyoutWindow | [88](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L88) |
+| RenderRecentSection | method_declaration | PinDock::TrayFlyoutWindow | [128](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L128) |
+| RenderTabs | method_declaration | PinDock::TrayFlyoutWindow | [169](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L169) |
+| RenderList | method_declaration | PinDock::TrayFlyoutWindow | [208](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L208) |
+| CreateRowButton | method_declaration | PinDock::TrayFlyoutWindow | [276](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L276) |
+| LoadMiniIconAsync | method_declaration | PinDock::TrayFlyoutWindow | [355](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L355) |
+| SearchBox_TextChanged | method_declaration | PinDock::TrayFlyoutWindow | [373](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L373) |
+| BtnQuickTheme_Click | method_declaration | PinDock::TrayFlyoutWindow | [380](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L380) |
+| BtnQuickLang_Click | method_declaration | PinDock::TrayFlyoutWindow | [386](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L386) |
+| Window_Drop | method_declaration | PinDock::TrayFlyoutWindow | [392](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L392) |
+| BtnToggleDock_Click | method_declaration | PinDock::TrayFlyoutWindow | [401](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L401) |
+| BtnCycleMode_Click | method_declaration | PinDock::TrayFlyoutWindow | [407](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L407) |
+| BtnToggleLock_Click | method_declaration | PinDock::TrayFlyoutWindow | [420](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L420) |
+| BtnAdd_Click | method_declaration | PinDock::TrayFlyoutWindow | [427](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L427) |
+| BtnLibrary_Click | method_declaration | PinDock::TrayFlyoutWindow | [433](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L433) |
+| BtnSettings_Click | method_declaration | PinDock::TrayFlyoutWindow | [439](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L439) |
+| BtnUpdate_Click | method_declaration | PinDock::TrayFlyoutWindow | [445](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L445) |
+| BtnExit_Click | method_declaration | PinDock::TrayFlyoutWindow | [451](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L451) |
+| Window_Deactivated | method_declaration | PinDock::TrayFlyoutWindow | [457](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L457) |
+| Window_PreviewKeyDown | method_declaration | PinDock::TrayFlyoutWindow | [463](../../src/PinDock/TrayFlyoutWindow.xaml.cs#L463) |

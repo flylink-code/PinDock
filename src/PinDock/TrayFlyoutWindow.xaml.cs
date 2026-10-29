@@ -83,19 +83,42 @@ public partial class TrayFlyoutWindow : Window
         NativeWindow.MoveTo(this, x, y);
     }
 
+    private string T(string zh, string en) => I18n.T(controller.Data.Settings, zh, en);
+
     private void RefreshContent()
     {
         var s = controller.Data.Settings;
-        HotkeyHintText.Text = HotkeyService.FormatDisplay(s.HotkeyModifiers, s.HotkeyKey);
-        TxtToggleDock.Text = controller.IsDockVisible ? "Dock: 显示中" : "Dock: 已隐藏";
+        bool isDark = s.ThemeMode == PinDock.ThemeMode.Dark || (s.ThemeMode == PinDock.ThemeMode.System && ThemeService.IsSystemDark());
+        FlyoutTitleText.Text = T("PinDock 快捷中心", "PinDock Hub");
+        SearchPlaceholder.Text = T("搜索收藏、文件夹或本机应用 (回车直接打开)…", "Search bookmarks, folders or apps (Enter to open)…");
+        RecentHeaderText.Text = T("最近使用", "Recent");
+        TxtQuickTheme.Text = isDark ? "☀" : "🌙";
+        BtnQuickTheme.ToolTip = T(isDark ? "切换为浅色主题" : "切换为深色主题", isDark ? "Switch to Light theme" : "Switch to Dark theme");
+        TxtQuickLang.Text = s.IsEnglish ? "中" : "EN";
+        BtnQuickLang.ToolTip = T("Switch to English", "切换为简体中文");
+
+        TxtFooterAdd.Text = T("＋ 添加", "＋ Add");
+        TxtFooterLib.Text = T("▦ 收藏库", "▦ Library");
+        TxtFooterSettings.Text = T("⚙ 设置", "⚙ Settings");
+        TxtFooterUpdate.Text = T("↑ 更新", "↑ Update");
+        TxtFooterExit.Text = T("⏻ 退出", "⏻ Exit");
+
+        HotkeyHintText.Text = s.HasHotkey
+            ? HotkeyService.FormatDisplay(s.HotkeyModifiers, s.HotkeyKey)
+            : T("无热键", "No Hotkey");
+        TxtToggleDock.Text = controller.IsDockVisible
+            ? T("Dock: 显示中", "Dock: Shown")
+            : T("Dock: 已隐藏", "Dock: Hidden");
         TxtCycleMode.Text = s.DisplayMode switch
         {
-            DisplayMode.Persistent => "模式: 常驻",
-            DisplayMode.EdgeAutoHide => "模式: 贴边",
-            DisplayMode.Hotkey => "模式: 热键",
-            _ => "模式: 常驻"
+            DisplayMode.Persistent => T("模式: 常驻", "Mode: Always"),
+            DisplayMode.EdgeAutoHide => T("模式: 贴边", "Mode: Edge"),
+            DisplayMode.Hotkey => T("模式: 热键", "Mode: Hotkey"),
+            _ => T("模式: 常驻", "Mode: Always")
         };
-        TxtToggleLock.Text = s.LockPosition ? "位置: 已锁定" : "位置: 可拖动";
+        TxtToggleLock.Text = s.LockPosition
+            ? T("位置: 已锁定", "Pos: Locked")
+            : T("位置: 可拖动", "Pos: Free");
 
         RenderRecentSection();
         RenderTabs();
@@ -148,8 +171,8 @@ public partial class TrayFlyoutWindow : Window
         TabPanel.Children.Clear();
         var tabs = new List<(string Key, string Title)>
         {
-            ("pinned", $"固定项 ({controller.Data.Items.Count(i => i.Pinned)})"),
-            ("all", $"全部 ({controller.Data.Items.Count})")
+            ("pinned", T($"固定项 ({controller.Data.Items.Count(i => i.Pinned)})", $"Pinned ({controller.Data.Items.Count(i => i.Pinned)})")),
+            ("all", T($"全部 ({controller.Data.Items.Count})", $"All ({controller.Data.Items.Count})"))
         };
         foreach (string g in controller.Data.Groups)
         {
@@ -232,7 +255,9 @@ public partial class TrayFlyoutWindow : Window
         {
             ItemsListPanel.Children.Add(new TextBlock
             {
-                Text = string.IsNullOrEmpty(q) ? "当前分类暂无收藏项" : "没有找到匹配的收藏或本机应用",
+                Text = string.IsNullOrEmpty(q)
+                    ? T("当前分类暂无收藏项（可直接拖入文件或文件夹）", "No items in this view (Drag & drop files/folders here)")
+                    : T("没有找到匹配的收藏或本机应用", "No matching bookmarks or installed apps"),
                 Foreground = (Brush)FindResource("MutedBrush"),
                 FontSize = 11.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -350,6 +375,27 @@ public partial class TrayFlyoutWindow : Window
         SearchPlaceholder.Visibility = string.IsNullOrEmpty(SearchBox.Text) ? Visibility.Visible : Visibility.Collapsed;
         RenderRecentSection();
         RenderList();
+    }
+
+    private void BtnQuickTheme_Click(object sender, RoutedEventArgs e)
+    {
+        controller.QuickToggleLightDarkTheme();
+        RefreshContent();
+    }
+
+    private void BtnQuickLang_Click(object sender, RoutedEventArgs e)
+    {
+        controller.ToggleLanguage();
+        RefreshContent();
+    }
+
+    private void Window_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(DataFormats.FileDrop) is string[] { Length: > 0 } files)
+        {
+            controller.AddPaths(files);
+            RefreshContent();
+        }
     }
 
     private void BtnToggleDock_Click(object sender, RoutedEventArgs e)

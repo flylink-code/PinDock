@@ -16,6 +16,7 @@ public static class LibraryTransfer
             Groups = [.. data.Groups],
             GroupIcons = data.GroupIcons.ToDictionary(k => k.Key, v => new GroupIconConfig { Kind = v.Value.Kind, Value = v.Value.Value }, StringComparer.Ordinal),
             DockOrder = [.. data.DockOrder],
+            HiddenFolderPaths = [.. data.HiddenFolderPaths],
             Settings = CloneSettings(data.Settings)
         };
         File.WriteAllText(filePath, JsonSerializer.Serialize(copy, Options));
@@ -126,10 +127,13 @@ public static class LibraryTransfer
         ExplorerContextMenu = s.ExplorerContextMenu,
         HotkeyModifiers = s.HotkeyModifiers,
         HotkeyKey = s.HotkeyKey,
+        Language = s.Language,
+        UtilityCollapsed = s.UtilityCollapsed,
         ShowLibraryButton = s.ShowLibraryButton,
         ShowAddButton = s.ShowAddButton,
         ShowSettingsButton = s.ShowSettingsButton,
         AutoHideUtilityButtons = s.AutoHideUtilityButtons,
+        Win11ClassicMenu = s.Win11ClassicMenu,
         LaunchAtStartup = s.LaunchAtStartup,
         ClosePanelBehavior = s.ClosePanelBehavior,
         ConfirmBeforeExit = s.ConfirmBeforeExit,

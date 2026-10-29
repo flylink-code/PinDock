@@ -20,4 +20,6 @@ public partial class EdgeHandleWindow : Window
     }
 
     private void Window_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) => Hovered?.Invoke();
+
+    private void Window_DragEnter(object sender, DragEventArgs e) => Hovered?.Invoke();
 }

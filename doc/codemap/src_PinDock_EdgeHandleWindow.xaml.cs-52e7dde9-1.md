@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/EdgeHandleWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 8b1b1635c2a6b39084dc4725fdc5891ce92c98b808ef7b94d149835cd26f1f33
+Source SHA-256: f59cc953f0d918df58648330127ea36a1b0a9a871447d0d17bfec5b787fad4d5
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -13,3 +13,4 @@ Source SHA-256: 8b1b1635c2a6b39084dc4725fdc5891ce92c98b808ef7b94d149835cd26f1f33
 | EdgeHandleWindow | constructor_declaration | PinDock::EdgeHandleWindow | [9](../../src/PinDock/EdgeHandleWindow.xaml.cs#L9) |
 | ShowAt | method_declaration | PinDock::EdgeHandleWindow | [15](../../src/PinDock/EdgeHandleWindow.xaml.cs#L15) |
 | Window_MouseEnter | method_declaration | PinDock::EdgeHandleWindow | [22](../../src/PinDock/EdgeHandleWindow.xaml.cs#L22) |
+| Window_DragEnter | method_declaration | PinDock::EdgeHandleWindow | [24](../../src/PinDock/EdgeHandleWindow.xaml.cs#L24) |

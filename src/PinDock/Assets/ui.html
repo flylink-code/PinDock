@@ -416,6 +416,8 @@ input[type="range"] {
         <small id="library-subtitle">收藏留在这里，常用的固定到 Dock · 支持直接拖入文件或文件夹</small>
       </div>
       <div class="titlebar-actions">
+        <button class="switch-view-btn quick-theme-btn" title="快速切换浅色 / 深色主题 (Toggle Theme)">🌙</button>
+        <button class="switch-view-btn quick-lang-btn" title="切换中英文 (Switch Language)">EN</button>
         <button class="switch-view-btn" id="btn-to-settings">⚙ 设置</button>
         <button class="close-btn" data-close="true" aria-label="关闭">×</button>
       </div>
@@ -439,7 +441,7 @@ input[type="range"] {
     <div class="library-list" id="library-list"></div>
     <footer class="footer">
       <span id="library-count">显示 0 项</span>
-      <span>单击条目直接打开 · 右侧一键固定到 Dock</span>
+      <span id="library-footer-tip">单击条目直接打开 · 右侧一键固定到 Dock</span>
     </footer>
   </section>
 
@@ -447,10 +449,12 @@ input[type="range"] {
   <section class="view" id="view-settings" aria-label="PinDock 设置">
     <header class="titlebar" data-drag="true">
       <div class="titlebar-left">
-        <strong>PinDock 设置</strong>
-        <span>让它适合你的习惯</span>
+        <strong id="settings-header-title">PinDock 设置</strong>
+        <span id="settings-header-sub">让它适合你的习惯</span>
       </div>
       <div class="titlebar-actions">
+        <button class="switch-view-btn quick-theme-btn" title="快速切换浅色 / 深色主题 (Toggle Theme)">🌙</button>
+        <button class="switch-view-btn quick-lang-btn" title="切换中英文 (Switch Language)">EN</button>
         <button class="switch-view-btn" id="btn-to-library">▦ 全部收藏</button>
         <button class="close-btn" data-close="true" aria-label="关闭设置">×</button>
       </div>
@@ -502,6 +506,16 @@ input[type="range"] {
             </span>
             <button class="switch" id="sw-collapse" role="switch" aria-checked="true"></button>
           </div>
+          <div class="row">
+            <span>
+              界面语言 / Language
+              <small>支持简体中文与 English 实时切换（顶部栏也可一键切换）</small>
+            </span>
+            <select id="sel-language" aria-label="语言">
+              <option value="zh-CN">简体中文 (zh-CN)</option>
+              <option value="en-US">English (en-US)</option>
+            </select>
+          </div>
         </section>
 
         <!-- 外观 -->
@@ -543,37 +557,11 @@ input[type="range"] {
             </div>
           </div>
           <div class="row">
-            <span>悬停名称提示</span>
-            <span class="badge">默认开启</span>
-          </div>
-          <div class="section-label" style="margin-top:18px">Dock 功能按钮精简与隐藏</div>
-          <div class="row">
             <span>
-              仅鼠标悬停 Dock 时展开功能按钮
-              <small>平时仅展示你的应用、文件夹与分组，鼠标移入 Dock 时自动渐显功能区</small>
+              折叠 Dock 右侧功能按钮（全部收藏 / 添加 / 设置）
+              <small>可以直接在 Dock 右侧末端点击「‹ / ›」展开或折叠按钮区</small>
             </span>
-            <button class="switch" id="sw-autohide-utility" role="switch" aria-checked="false"></button>
-          </div>
-          <div class="row">
-            <span>
-              显示「▦ 全部收藏」按钮
-              <small>隐藏后仍可通过 Dock 右键菜单或右下角托盘浮窗进入</small>
-            </span>
-            <button class="switch" id="sw-show-library-btn" role="switch" aria-checked="true"></button>
-          </div>
-          <div class="row">
-            <span>
-              显示「＋ 添加收藏」按钮
-              <small>隐藏后仍可直接拖入文件或右键添加</small>
-            </span>
-            <button class="switch" id="sw-show-add-btn" role="switch" aria-checked="true"></button>
-          </div>
-          <div class="row">
-            <span>
-              显示「⚙ 设置」按钮
-              <small>隐藏后仍可通过 Dock 右键菜单或右下角托盘进入设置</small>
-            </span>
-            <button class="switch" id="sw-show-settings-btn" role="switch" aria-checked="true"></button>
+            <button class="switch" id="sw-utility-collapsed" role="switch" aria-checked="false"></button>
           </div>
           <p class="notice">自动提取应用与快捷方式 48×48 高清系统图标，文件夹使用原型定制双层矢量图标。</p>
         </section>
@@ -613,10 +601,17 @@ input[type="range"] {
           </div>
           <div class="row">
             <span>
-              资源管理器右键添加文件夹
-              <small>在 Windows 文件夹上右键可直接选择“添加到 PinDock”</small>
+              资源管理器右键添加（支持文件夹、应用、文件、磁盘与“发送到”）
+              <small>右键任意文件夹、应用或磁盘即可直接选择“添加到 PinDock”</small>
             </span>
             <button class="switch" id="sw-explorer-menu" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              Windows 11 一级右键菜单直显
+              <small>开启后在 Windows 11 右键无需点击“显示更多选项”即可直接看到“添加到 PinDock”</small>
+            </span>
+            <button class="switch" id="sw-win11-menu" role="switch" aria-checked="false"></button>
           </div>
           <div class="section-label" style="margin-top:18px">系统启动与退出行为</div>
           <div class="row">
@@ -889,6 +884,15 @@ document.addEventListener('mousedown', e => {
 $$('[data-close="true"]').forEach(b => b.onclick = () => send('closeWindow'));
 $('#btn-to-settings').onclick = () => switchView('settings');
 $('#btn-to-library').onclick = () => switchView('library');
+$$('.quick-theme-btn').forEach(b => b.onclick = () => send('quickToggleTheme'));
+$$('.quick-lang-btn').forEach(b => b.onclick = () => send('toggleLanguage'));
+
+function isEn() {
+  return (state.settings && state.settings.language === 'en-US');
+}
+function tr(zh, en) {
+  return isEn() ? en : zh;
+}
 
 function switchView(viewName, options = {}) {
   state.view = viewName;
@@ -896,7 +900,7 @@ function switchView(viewName, options = {}) {
   if (options.filter) setFilter(options.filter);
   $('#view-library').classList.toggle('active', viewName === 'library');
   $('#view-settings').classList.toggle('active', viewName === 'settings');
-  $('#library-title').textContent = state.overflowOnly ? '更多固定收藏' : '全部收藏';
+  $('#library-title').textContent = state.overflowOnly ? tr('更多固定收藏', 'Overflow Pinned Items') : tr('全部收藏', 'All Bookmarks');
   if (viewName === 'library') {
     renderLibrary();
     $('#library-search').focus();
@@ -923,7 +927,7 @@ function renderGroupFilterBar() {
 
   const lbl = document.createElement('span');
   lbl.className = 'group-chips-label';
-  lbl.textContent = '收藏组：';
+  lbl.textContent = tr('收藏组：', 'Groups:');
   bar.append(lbl);
 
   state.groups.forEach(g => {
@@ -945,7 +949,7 @@ function renderGroupFilterBar() {
     const cfgBtn = document.createElement('button');
     cfgBtn.className = 'chip-btn';
     cfgBtn.style.marginLeft = 'auto';
-    cfgBtn.textContent = `⚙ 配置「${activeGroup}」成员`;
+    cfgBtn.textContent = tr(`⚙ 配置「${activeGroup}」成员`, `⚙ Configure "${activeGroup}"`);
     cfgBtn.onclick = () => openGroupModal(activeGroup);
     bar.append(cfgBtn);
   }
@@ -1032,30 +1036,30 @@ function renderLibrary() {
 
     const revealBtn = document.createElement('button');
     revealBtn.className = 'row-act';
-    revealBtn.textContent = '定位';
-    revealBtn.title = '在资源管理器中显示';
+    revealBtn.textContent = tr('定位', 'Reveal');
+    revealBtn.title = tr('在资源管理器中显示', 'Show in Explorer');
     revealBtn.onclick = () => send('reveal', { path: item.path });
     actions.append(revealBtn);
 
     if (!item.isCandidate) {
       const editBtn = document.createElement('button');
       editBtn.className = 'row-act';
-      editBtn.textContent = '编辑';
+      editBtn.textContent = tr('编辑', 'Edit');
       editBtn.onclick = () => openEditor(item);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'row-act';
-      delBtn.textContent = '移除';
+      delBtn.textContent = tr('移除', 'Remove');
       delBtn.onclick = () => send('remove', { id: item.id });
       actions.append(editBtn, delBtn);
 
       // 行内快速分组下拉框：一键把收藏项归入任意分组
       const groupSel = document.createElement('select');
       groupSel.className = 'row-group-select' + (item.group ? ' has-group' : '');
-      groupSel.title = '点击快速修改所属收藏组';
+      groupSel.title = tr('点击快速修改所属收藏组', 'Change group');
       const noneOpt = document.createElement('option');
       noneOpt.value = '';
-      noneOpt.textContent = '未分组';
+      noneOpt.textContent = tr('未分组', 'Ungrouped');
       groupSel.append(noneOpt);
       state.groups.forEach(g => {
         const opt = document.createElement('option');
@@ -1065,7 +1069,7 @@ function renderLibrary() {
       });
       const newOpt = document.createElement('option');
       newOpt.value = '__new__';
-      newOpt.textContent = '＋ 新建分组…';
+      newOpt.textContent = tr('＋ 新建分组…', '＋ New group…');
       groupSel.append(newOpt);
       groupSel.value = item.group || '';
       groupSel.onchange = () => {
@@ -1075,7 +1079,7 @@ function renderLibrary() {
           return;
         }
         send('setBookmarkGroup', { id: item.id, group: groupSel.value });
-        notify(groupSel.value ? `已归入分组「${groupSel.value}」` : '已移出分组');
+        notify(groupSel.value ? tr(`已归入分组「${groupSel.value}」`, `Moved to group "${groupSel.value}"`) : tr('已移出分组', 'Removed from group'));
       };
       actions.append(groupSel);
     }
@@ -1083,14 +1087,14 @@ function renderLibrary() {
     const pinBtn = document.createElement('button');
     pinBtn.className = 'pin';
     if (item.isCandidate) {
-      pinBtn.textContent = '＋ 固定到 Dock';
+      pinBtn.textContent = tr('＋ 固定到 Dock', '＋ Pin to Dock');
       pinBtn.setAttribute('aria-pressed', 'true');
       pinBtn.onclick = () => {
         send('pinInstalled', { name: item.name, path: item.path });
-        notify(`已固定到 Dock：${item.name}`);
+        notify(tr(`已固定到 Dock：${item.name}`, `Pinned to Dock: ${item.name}`));
       };
     } else {
-      pinBtn.textContent = item.pinned ? '★ 已固定' : '☆ 固定';
+      pinBtn.textContent = item.pinned ? tr('★ 已固定', '★ Pinned') : tr('☆ 固定', '☆ Pin');
       pinBtn.setAttribute('aria-pressed', String(item.pinned));
       pinBtn.onclick = () => send('togglePin', { id: item.id });
     }
@@ -1105,19 +1109,23 @@ function renderLibrary() {
     empty.className = 'empty-state';
     if (state.filter.startsWith('group:')) {
       const gName = state.filter.slice(6);
-      empty.innerHTML = `分组「${gName}」暂无成员<br><button class="chip-btn" style="margin-top:10px" id="btn-empty-cfg-group">＋ 点击批量勾选收藏项加入此分组</button>`;
+      empty.innerHTML = tr(
+        `分组「${gName}」暂无成员<br><button class="chip-btn" style="margin-top:10px" id="btn-empty-cfg-group">＋ 点击批量勾选收藏项加入此分组</button>`,
+        `Group "${gName}" has no items<br><button class="chip-btn" style="margin-top:10px" id="btn-empty-cfg-group">＋ Select items for this group</button>`);
       list.append(empty);
       $('#btn-empty-cfg-group').onclick = () => openGroupModal(gName);
     } else {
       empty.innerHTML = q
-        ? '没有匹配的收藏或本机软件'
-        : '还没有收藏项<br>可点击上方「＋ 添加文件夹」或切换到「本机软件库」一键固定常用软件';
+        ? tr('没有匹配的收藏或本机软件', 'No matching bookmarks or installed apps')
+        : tr('还没有收藏项<br>可点击上方「＋ 添加文件夹」或切换到「本机软件库」一键固定常用软件', 'No bookmarks yet<br>Click "＋ Add Folder" or switch to "Installed Apps" to pin apps');
       list.append(empty);
     }
   }
 
   const pinnedCount = state.items.filter(i => i.pinned).length;
-  $('#library-count').textContent = `显示 ${rows.length} 项 · 共 ${state.items.length} 项收藏 · ${pinnedCount} 项固定`;
+  $('#library-count').textContent = tr(
+    `显示 ${rows.length} 项 · 共 ${state.items.length} 项收藏 · ${pinnedCount} 项固定`,
+    `Showing ${rows.length} · Total ${state.items.length} · ${pinnedCount} Pinned`);
 
   if (missingIconPaths.length > 0) {
     send('requestIcons', { paths: missingIconPaths });
@@ -1366,6 +1374,12 @@ $('#sel-close-behavior').onchange = e => {
   state.settings.closePanelBehavior = e.target.value;
   send('updateSettings', { settings: state.settings });
 };
+$('#sel-language').onchange = e => {
+  state.settings.language = e.target.value;
+  applySettingsToUi();
+  renderLibrary();
+  send('updateSettings', { settings: state.settings });
+};
 
 $('#sel-mirror-preset').onchange = e => {
   if (e.target.value !== 'custom') {
@@ -1399,11 +1413,15 @@ $('#rng-opacity').oninput = e => {
 };
 
 function bindSwitch(id, prop, cmdName = 'updateSettings') {
-  $(id).onclick = () => {
+  const el = $(id);
+  if (!el) return;
+  el.onclick = () => {
     state.settings[prop] = !state.settings[prop];
     applySettingsToUi();
     if (cmdName === 'toggleExplorerMenu') {
       send('toggleExplorerMenu', { enabled: state.settings[prop] });
+    } else if (cmdName === 'toggleWin11Menu') {
+      send('toggleWin11Menu', { enabled: state.settings[prop], restartExplorer: true });
     } else if (cmdName === 'toggleStartup') {
       send('toggleStartup', { enabled: state.settings[prop] });
     } else {
@@ -1416,12 +1434,10 @@ bindSwitch('#sw-topmost', 'topmost');
 bindSwitch('#sw-fullscreen', 'avoidFullscreen');
 bindSwitch('#sw-lock', 'lockPosition');
 bindSwitch('#sw-explorer-menu', 'explorerContextMenu', 'toggleExplorerMenu');
+bindSwitch('#sw-win11-menu', 'win11ClassicMenu', 'toggleWin11Menu');
 bindSwitch('#sw-startup', 'launchAtStartup', 'toggleStartup');
 bindSwitch('#sw-confirm-exit', 'confirmBeforeExit');
-bindSwitch('#sw-autohide-utility', 'autoHideUtilityButtons');
-bindSwitch('#sw-show-library-btn', 'showLibraryButton');
-bindSwitch('#sw-show-add-btn', 'showAddButton');
-bindSwitch('#sw-show-settings-btn', 'showSettingsButton');
+bindSwitch('#sw-utility-collapsed', 'utilityCollapsed');
 bindSwitch('#sw-github-mirror', 'useGithubMirror');
 
 // 快捷键录制与清除
@@ -1513,9 +1529,53 @@ function renderHotkeyUi() {
   const has = mod.length > 0 && key.length > 0;
   btn.classList.toggle('recording', recordingHotkey);
   btn.textContent = recordingHotkey
-    ? '请按下组合键… (Esc 取消)'
-    : has ? `${mod.replace(/\+/g, ' + ')} + ${key}` : '不使用';
+    ? tr('请按下组合键… (Esc 取消)', 'Press shortcut… (Esc to cancel)')
+    : has ? `${mod.replace(/\+/g, ' + ')} + ${key}` : tr('不使用', 'Disabled');
   $('#btn-hotkey-clear').disabled = !has && !recordingHotkey;
+}
+
+function applyI18n() {
+  $('#library-title').textContent = state.overflowOnly ? tr('更多固定收藏', 'Overflow Pinned Items') : tr('全部收藏', 'All Bookmarks');
+  $('#library-subtitle').textContent = tr(
+    '收藏留在这里，常用的固定到 Dock · 支持直接拖入文件或文件夹',
+    'Store all bookmarks here, pin favorites to Dock · Drag & drop files or folders');
+  $('#library-search').placeholder = tr(
+    '搜索名称、路径、收藏组，或直接搜索本机已安装应用…',
+    'Search name, path, group, or installed applications…');
+  $('#btn-to-settings').textContent = tr('⚙ 设置', '⚙ Settings');
+  $('#btn-to-library').textContent = tr('▦ 全部收藏', '▦ Library');
+  $('#settings-header-title').textContent = tr('PinDock 设置', 'PinDock Settings');
+  $('#settings-header-sub').textContent = tr('让它适合你的习惯', 'Tailor it to your workflow');
+  $('#library-footer-tip').textContent = tr('单击条目直接打开 · 右侧一键固定到 Dock', 'Click item to launch · Pin to Dock on the right');
+
+  const filterMap = {
+    'all': tr('全部', 'All'),
+    '应用': tr('应用', 'Apps'),
+    '文件夹': tr('文件夹', 'Folders'),
+    '文件': tr('文件', 'Files'),
+    'installed': tr('本机软件库', 'Installed Apps')
+  };
+  $$('[data-filter]').forEach(b => {
+    if (filterMap[b.dataset.filter]) b.textContent = filterMap[b.dataset.filter];
+  });
+  $('#btn-auto-separate').textContent = tr('｜ 按类型分隔', '｜ Separate by Type');
+  $('#btn-quick-folder').textContent = tr('＋ 添加文件夹', '＋ Add Folder');
+  $('#btn-open-add').textContent = tr('＋ 添加收藏', '＋ Add Bookmark');
+  $('#btn-open-group').textContent = tr('▦ 管理分组', '▦ Manage Groups');
+
+  const navMap = {
+    'general': tr('常规', 'General'),
+    'appearance': tr('外观', 'Appearance'),
+    'behavior': tr('位置与行为', 'Behavior'),
+    'about': tr('数据与关于', 'Data & About')
+  };
+  $$('.nav').forEach(b => {
+    if (navMap[b.dataset.page]) b.textContent = navMap[b.dataset.page];
+  });
+  $('#btn-check-update').textContent = tr('检查更新', 'Check Update');
+  $('#btn-import').textContent = tr('导入 JSON…', 'Import JSON…');
+  $('#btn-export').textContent = tr('导出 JSON…', 'Export JSON…');
+  $('#btn-exit-app').textContent = tr('⏻ 退出 PinDock', '⏻ Exit PinDock');
 }
 
 function applySettingsToUi() {
@@ -1541,16 +1601,25 @@ function applySettingsToUi() {
   $('#sw-fullscreen').setAttribute('aria-checked', String(!!s.avoidFullscreen));
   $('#sw-lock').setAttribute('aria-checked', String(!!s.lockPosition));
   $('#sw-explorer-menu').setAttribute('aria-checked', String(!!s.explorerContextMenu));
+  if ($('#sw-win11-menu')) $('#sw-win11-menu').setAttribute('aria-checked', String(!!s.win11ClassicMenu));
   $('#sw-startup').setAttribute('aria-checked', String(!!s.launchAtStartup));
   $('#sw-confirm-exit').setAttribute('aria-checked', String(!!s.confirmBeforeExit));
-  $('#sw-autohide-utility').setAttribute('aria-checked', String(!!s.autoHideUtilityButtons));
-  $('#sw-show-library-btn').setAttribute('aria-checked', String(s.showLibraryButton !== false));
-  $('#sw-show-add-btn').setAttribute('aria-checked', String(s.showAddButton !== false));
-  $('#sw-show-settings-btn').setAttribute('aria-checked', String(s.showSettingsButton !== false));
+  if ($('#sw-utility-collapsed')) $('#sw-utility-collapsed').setAttribute('aria-checked', String(!!s.utilityCollapsed));
   $('#sw-github-mirror').setAttribute('aria-checked', String(s.useGithubMirror !== false));
 
   $('#sel-close-behavior').value = s.closePanelBehavior || 'MinimizeToTray';
-  $('#lbl-current-version').textContent = 'v' + (state.version || '0.1.0');
+  if ($('#sel-language')) $('#sel-language').value = s.language || 'zh-CN';
+  $('#lbl-current-version').textContent = 'v' + (state.version || '0.1.1');
+
+  $$('.quick-theme-btn').forEach(b => {
+    b.textContent = state.isDark ? '☀' : '🌙';
+    b.title = tr(state.isDark ? '切换为浅色主题' : '切换为深色主题', state.isDark ? 'Switch to Light theme' : 'Switch to Dark theme');
+  });
+  $$('.quick-lang-btn').forEach(b => {
+    b.textContent = isEn() ? '中' : 'EN';
+    b.title = isEn() ? '切换为简体中文' : 'Switch to English';
+  });
+  applyI18n();
 
   const mirrorUrl = s.githubMirrorUrl || 'https://ghfast.top/';
   $('#inp-github-mirror').value = mirrorUrl;

@@ -172,7 +172,7 @@ public static class UpdateService
     private static HttpClient CreateHttpClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("PinDock-Updater/0.1.0");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("PinDock-Updater/0.1.1");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return client;
     }

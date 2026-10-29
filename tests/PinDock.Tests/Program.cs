@@ -185,7 +185,11 @@ try
     // 资源管理器右键命令与参数提取测试
     if (ExplorerMenuService.TryExtractAddPath(["--add", @"D:\Work\ProjectA"]) != @"D:\Work\ProjectA")
         throw new Exception("Explorer --add argument parse failed");
-    if (!ExplorerMenuService.BuildCommand(@"C:\App\PinDock.exe").Contains("--add \"%1\""))
+    if (ExplorerMenuService.TryExtractAddPath(["--add", "E:\\ "]) != @"E:\")
+        throw new Exception("Explorer root drive trailing space argument parse failed");
+    if (ExplorerMenuService.TryExtractAddPath(["--add", "E:\""]) != @"E:\")
+        throw new Exception("Explorer root drive escaped quote argument parse failed");
+    if (!ExplorerMenuService.BuildCommand(@"C:\App\PinDock.exe").Contains("--add \"%1 \""))
         throw new Exception("Explorer command build failed");
 
     // 名称推断与全色板解析测试
@@ -218,6 +222,8 @@ try
         },
         Settings = new AppSettings
         {
+            Language = "en-US",
+            UtilityCollapsed = true,
             ShowLibraryButton = false,
             ShowAddButton = true,
             ShowSettingsButton = false,
@@ -229,6 +235,10 @@ try
             GithubMirrorUrl = "https://gh-proxy.com/"
         }
     };
+    customGroupData.SetFolderHidden(@"E:\W-STM32IDE\", true);
+    if (!customGroupData.IsFolderHidden(@"e:\w-stm32ide"))
+        throw new Exception("HiddenFolderPaths case-insensitive check failed");
+
     // 2. Dock 排序与自动按类型分隔测试
     customGroupData.AutoSeparateByKind();
     if (!customGroupData.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.Ordinal)) ||
@@ -240,7 +250,16 @@ try
     if (!reloadedCustom.GroupIcons.TryGetValue("开发工具", out var loadedIconCfg) ||
         loadedIconCfg.Kind != GroupIconKind.Preset || loadedIconCfg.Value != "code")
         throw new Exception("GroupIcons round trip failed");
+    if (!reloadedCustom.IsFolderHidden(@"E:\W-STM32IDE"))
+        throw new Exception("HiddenFolderPaths round trip failed");
+    reloadedCustom.SetFolderHidden(@"E:\W-STM32IDE", false);
+    if (reloadedCustom.IsFolderHidden(@"E:\W-STM32IDE"))
+        throw new Exception("Unhide folder failed");
+
     if (reloadedCustom.Settings.ShowLibraryButton ||
+        !reloadedCustom.Settings.UtilityCollapsed ||
+        !reloadedCustom.Settings.IsEnglish ||
+        I18n.T(reloadedCustom.Settings, "中文", "English") != "English" ||
         !reloadedCustom.Settings.AutoHideUtilityButtons ||
         reloadedCustom.Settings.ClosePanelBehavior != CloseAction.ExitApplication ||
         !reloadedCustom.Settings.ConfirmBeforeExit ||
@@ -253,11 +272,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.0")
-        throw new Exception($"Expected version 0.1.0, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.0", "v0.1.1") ||
-        !UpdateService.IsNewerVersion("0.1.0", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.0", "v0.1.0"))
+    if (UpdateService.GetCurrentVersion() != "0.1.1")
+        throw new Exception($"Expected version 0.1.1, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.1", "v0.1.2") ||
+        !UpdateService.IsNewerVersion("0.1.1", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.1", "v0.1.1"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";

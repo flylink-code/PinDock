@@ -32,11 +32,18 @@ public sealed class AppSettings
     public string HotkeyModifiers { get; set; } = "Alt+Shift";
     public string HotkeyKey { get; set; } = "P";
 
-    // Dock 功能按钮显隐与悬停展开
+    // 语言设置 (zh-CN / en-US)
+    public string Language { get; set; } = "zh-CN";
+
+    // Dock 功能按钮折叠开关（右侧/底部展开折叠抽屉）
+    public bool UtilityCollapsed { get; set; }
     public bool ShowLibraryButton { get; set; } = true;
     public bool ShowAddButton { get; set; } = true;
     public bool ShowSettingsButton { get; set; } = true;
     public bool AutoHideUtilityButtons { get; set; }
+
+    // Windows 11 一级右键菜单直显
+    public bool Win11ClassicMenu { get; set; }
 
     // 开机自启与关闭/退出策略
     public bool LaunchAtStartup { get; set; }
@@ -48,6 +55,7 @@ public sealed class AppSettings
     public string GithubMirrorUrl { get; set; } = DefaultGithubMirror;
 
     public bool HasHotkey => !string.IsNullOrWhiteSpace(HotkeyModifiers) && !string.IsNullOrWhiteSpace(HotkeyKey);
+    public bool IsEnglish => string.Equals(Language, "en-US", StringComparison.OrdinalIgnoreCase);
 }
 
 public enum BookmarkKind { Application, Folder, File }

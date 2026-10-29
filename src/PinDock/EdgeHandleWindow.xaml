@@ -3,6 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PinDock Handle" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ResizeMode="NoResize" Topmost="True" ShowActivated="False" Width="3" Height="3"
-        MouseEnter="Window_MouseEnter">
+        AllowDrop="True" MouseEnter="Window_MouseEnter" PreviewDragEnter="Window_DragEnter" PreviewDragOver="Window_DragEnter">
     <Border Background="{DynamicResource AccentBrush}" CornerRadius="1"/>
 </Window>

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Collections.cs) · page 1/1
 
-Source SHA-256: 3c9028dfc6241d0cc361b887fe232c06ac334b64b23b41dc45316e6587665afd
+Source SHA-256: d89cc2d75e3180878d5d9075effac6ad792fefd34a8adbc81da700b876190237
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -33,17 +33,21 @@ Source SHA-256: 3c9028dfc6241d0cc361b887fe232c06ac334b64b23b41dc45316e6587665afd
 | Groups | property_declaration | PinDock::LibraryData | [31](../../src/PinDock/Collections.cs#L31) |
 | GroupIcons | property_declaration | PinDock::LibraryData | [32](../../src/PinDock/Collections.cs#L32) |
 | DockOrder | property_declaration | PinDock::LibraryData | [33](../../src/PinDock/Collections.cs#L33) |
-| Settings | property_declaration | PinDock::LibraryData | [34](../../src/PinDock/Collections.cs#L34) |
-| NormalizeDockOrder | method_declaration | PinDock::LibraryData | [36](../../src/PinDock/Collections.cs#L36) |
-| AutoSeparateByKind | method_declaration | PinDock::LibraryData | [89](../../src/PinDock/Collections.cs#L89) |
-| UnsupportedLibraryVersionException | class_declaration | PinDock | [116](../../src/PinDock/Collections.cs#L116) |
-| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [118](../../src/PinDock/Collections.cs#L118) |
-| LibraryStore | class_declaration | PinDock | [121](../../src/PinDock/Collections.cs#L121) |
-| Load | method_declaration | PinDock::LibraryStore | [127](../../src/PinDock/Collections.cs#L127) |
-| Read | method_declaration | PinDock::LibraryStore | [140](../../src/PinDock/Collections.cs#L140) |
-| ValidateSettings | method_declaration | PinDock::LibraryStore | [161](../../src/PinDock/Collections.cs#L161) |
-| Save | method_declaration | PinDock::LibraryStore | [174](../../src/PinDock/Collections.cs#L174) |
-| IsDuplicate | method_declaration | PinDock::LibraryStore | [186](../../src/PinDock/Collections.cs#L186) |
+| HiddenFolderPaths | property_declaration | PinDock::LibraryData | [34](../../src/PinDock/Collections.cs#L34) |
+| Settings | property_declaration | PinDock::LibraryData | [35](../../src/PinDock/Collections.cs#L35) |
+| IsFolderHidden | method_declaration | PinDock::LibraryData | [37](../../src/PinDock/Collections.cs#L37) |
+| SetFolderHidden | method_declaration | PinDock::LibraryData | [44](../../src/PinDock/Collections.cs#L44) |
+| NormalizePathKey | method_declaration | PinDock::LibraryData | [54](../../src/PinDock/Collections.cs#L54) |
+| NormalizeDockOrder | method_declaration | PinDock::LibraryData | [57](../../src/PinDock/Collections.cs#L57) |
+| AutoSeparateByKind | method_declaration | PinDock::LibraryData | [111](../../src/PinDock/Collections.cs#L111) |
+| UnsupportedLibraryVersionException | class_declaration | PinDock | [138](../../src/PinDock/Collections.cs#L138) |
+| UnsupportedLibraryVersionException | constructor_declaration | PinDock::UnsupportedLibraryVersionException | [140](../../src/PinDock/Collections.cs#L140) |
+| LibraryStore | class_declaration | PinDock | [143](../../src/PinDock/Collections.cs#L143) |
+| Load | method_declaration | PinDock::LibraryStore | [149](../../src/PinDock/Collections.cs#L149) |
+| Read | method_declaration | PinDock::LibraryStore | [162](../../src/PinDock/Collections.cs#L162) |
+| ValidateSettings | method_declaration | PinDock::LibraryStore | [184](../../src/PinDock/Collections.cs#L184) |
+| Save | method_declaration | PinDock::LibraryStore | [198](../../src/PinDock/Collections.cs#L198) |
+| IsDuplicate | method_declaration | PinDock::LibraryStore | [210](../../src/PinDock/Collections.cs#L210) |
 
 Parser recovery: 1 diagnostic(s). Inspect source; extraction may be incomplete.
-- line 121: ERROR
+- line 143: ERROR

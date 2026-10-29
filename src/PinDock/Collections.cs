@@ -31,12 +31,34 @@ public sealed class LibraryData
     public List<string> Groups { get; set; } = [];
     public Dictionary<string, GroupIconConfig> GroupIcons { get; set; } = new(StringComparer.Ordinal);
     public List<string> DockOrder { get; set; } = [];
+    public List<string> HiddenFolderPaths { get; set; } = [];
     public AppSettings Settings { get; set; } = new();
+
+    public bool IsFolderHidden(string fullPath)
+    {
+        if (string.IsNullOrWhiteSpace(fullPath) || HiddenFolderPaths is null) return false;
+        string normalized = NormalizePathKey(fullPath);
+        return HiddenFolderPaths.Any(p => string.Equals(NormalizePathKey(p), normalized, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public void SetFolderHidden(string fullPath, bool hidden)
+    {
+        if (string.IsNullOrWhiteSpace(fullPath)) return;
+        HiddenFolderPaths ??= [];
+        string normalized = NormalizePathKey(fullPath);
+        HiddenFolderPaths.RemoveAll(p => string.Equals(NormalizePathKey(p), normalized, StringComparison.OrdinalIgnoreCase));
+        if (hidden)
+            HiddenFolderPaths.Add(normalized);
+    }
+
+    private static string NormalizePathKey(string path) =>
+        path.Trim().TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
     public void NormalizeDockOrder()
     {
         DockOrder ??= [];
         GroupIcons ??= new(StringComparer.Ordinal);
+        HiddenFolderPaths ??= [];
 
         var pinnedIds = Items.Where(i => i.Pinned).Select(i => "bm:" + i.Id.ToString("D")).ToList();
         var pinnedSet = new HashSet<string>(pinnedIds, StringComparer.OrdinalIgnoreCase);
@@ -146,6 +168,7 @@ public sealed class LibraryStore(string directory)
         data.Groups ??= [];
         data.GroupIcons ??= new(StringComparer.Ordinal);
         data.DockOrder ??= [];
+        data.HiddenFolderPaths ??= [];
         data.Settings ??= new();
         ValidateSettings(data.Settings);
         if (data.Version == 1)
@@ -169,6 +192,7 @@ public sealed class LibraryStore(string directory)
         if (settings.HotkeyModifiers is null || settings.HotkeyKey is null)
             throw new InvalidDataException("Hotkey settings missing");
         settings.GithubMirrorUrl ??= AppSettings.DefaultGithubMirror;
+        settings.Language = string.IsNullOrWhiteSpace(settings.Language) ? "zh-CN" : settings.Language;
     }
 
     public void Save(LibraryData data)
