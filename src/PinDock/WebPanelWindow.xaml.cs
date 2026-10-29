@@ -200,6 +200,39 @@ public partial class WebPanelWindow : Window
                 }
                 break;
 
+            case "setBookmarkGroup":
+                if (TryFindBookmark(root, out var grpTarget))
+                {
+                    string grp = root.TryGetProperty("group", out var grpEl) ? (grpEl.GetString() ?? "").Trim() : "";
+                    controller.SetBookmarkGroup(grpTarget, grp);
+                }
+                break;
+
+            case "saveGroupConfig":
+                string origName = root.TryGetProperty("originalName", out var onEl) ? (onEl.GetString() ?? "").Trim() : "";
+                string targetName = root.TryGetProperty("name", out var tnEl) ? (tnEl.GetString() ?? "").Trim() : "";
+                if (targetName.Length > 0)
+                {
+                    var ids = new HashSet<Guid>();
+                    if (root.TryGetProperty("memberIds", out var mIds) && mIds.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var el in mIds.EnumerateArray())
+                        {
+                            if (el.ValueKind == JsonValueKind.String && Guid.TryParse(el.GetString(), out var g))
+                                ids.Add(g);
+                        }
+                    }
+                    controller.SaveGroupConfig(origName, targetName, ids);
+                }
+                break;
+
+            case "deleteGroup":
+                if (root.TryGetProperty("name", out var delGrpEl) && delGrpEl.GetString() is string delGrp && !string.IsNullOrWhiteSpace(delGrp))
+                {
+                    controller.DeleteGroup(delGrp.Trim());
+                }
+                break;
+
             case "pickPathForEditor":
                 bool isFolder = root.TryGetProperty("folder", out var fEl) && fEl.GetBoolean();
                 HandlePickPathForEditor(isFolder);

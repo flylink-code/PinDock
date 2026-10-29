@@ -5,8 +5,8 @@ namespace PinDock;
 
 public sealed class AutoHideController : IDisposable
 {
-    private readonly DispatcherTimer pollTimer = new() { Interval = TimeSpan.FromMilliseconds(120) };
-    private readonly DispatcherTimer hideTimer = new() { Interval = TimeSpan.FromMilliseconds(600) };
+    private readonly DispatcherTimer pollTimer = new() { Interval = TimeSpan.FromMilliseconds(40) };
+    private readonly DispatcherTimer hideTimer = new() { Interval = TimeSpan.FromMilliseconds(380) };
     private Func<bool> popupOpen = () => false;
     private Func<bool> dragging = () => false;
     private Func<bool> dialogOpen = () => false;
@@ -109,6 +109,17 @@ public sealed class AutoHideController : IDisposable
         if (!GetCursorPos(out var point))
             throw new InvalidOperationException("GetCursorPos 失败");
         return dock.Contains(point.X, point.Y) || (popup is ScreenRect p && p.Contains(point.X, point.Y));
+    }
+
+    public static bool TryGetCursorPoint(out (int X, int Y) point)
+    {
+        if (GetCursorPos(out var p))
+        {
+            point = (p.X, p.Y);
+            return true;
+        }
+        point = default;
+        return false;
     }
 
     [StructLayout(LayoutKind.Sequential)]

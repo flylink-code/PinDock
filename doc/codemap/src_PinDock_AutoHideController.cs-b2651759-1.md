@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AutoHideController.cs) · page 1/1
 
-Source SHA-256: 2110e40c8f469109cf4518aad3eca1737cf29d972cb6fa6b8acdd3d88f0ffd4b
+Source SHA-256: 861687ed7e4d081ad248d6aff2e2734c95930d83a40fadb2fc02a9977c220293
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -20,5 +20,6 @@ Source SHA-256: 2110e40c8f469109cf4518aad3eca1737cf29d972cb6fa6b8acdd3d88f0ffd4b
 | Evaluate | method_declaration | PinDock::AutoHideController | [84](../../src/PinDock/AutoHideController.cs#L84) |
 | SetState | method_declaration | PinDock::AutoHideController | [100](../../src/PinDock/AutoHideController.cs#L100) |
 | IsCursorOver | method_declaration | PinDock::AutoHideController | [107](../../src/PinDock/AutoHideController.cs#L107) |
-| Point32 | struct_declaration | PinDock::AutoHideController | [114](../../src/PinDock/AutoHideController.cs#L114) |
-| GetCursorPos | method_declaration | PinDock::AutoHideController | [117](../../src/PinDock/AutoHideController.cs#L117) |
+| TryGetCursorPoint | method_declaration | PinDock::AutoHideController | [114](../../src/PinDock/AutoHideController.cs#L114) |
+| Point32 | struct_declaration | PinDock::AutoHideController | [125](../../src/PinDock/AutoHideController.cs#L125) |
+| GetCursorPos | method_declaration | PinDock::AutoHideController | [128](../../src/PinDock/AutoHideController.cs#L128) |

@@ -258,9 +258,15 @@ input[type="range"] {
   box-shadow: 0 0 0 1px var(--focus-ring);
 }
 .filters { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.group-chips {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line);
+}
+.group-chips:empty { display: none; }
+.group-chips-label { font-size: 11px; color: var(--muted); margin-right: 2px; }
 .chip-btn {
-  padding: 7px 11px; border-radius: 6px; background: var(--soft);
-  color: var(--ink); font-size: 12px;
+  padding: 6px 11px; border-radius: 6px; background: var(--soft);
+  color: var(--ink); font-size: 12px; white-space: nowrap;
 }
 .chip-btn[aria-pressed="true"] {
   background: var(--accent); color: var(--paper); font-weight: 600;
@@ -268,13 +274,14 @@ input[type="range"] {
 .filters-spacer { flex: 1; }
 
 .library-list {
-  flex: 1; overflow-y: auto; padding: 4px 24px; min-height: 0;
+  flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 20px 14px; min-height: 0;
 }
 .entry {
   display: flex; align-items: center; gap: 12px;
-  border-bottom: 1px solid var(--line); padding: 11px 2px;
+  border-bottom: 1px solid var(--line); padding: 10px 6px;
+  border-radius: 8px;
 }
-.entry:hover { background: color-mix(in srgb, var(--selected) 60%, transparent); border-radius: 8px; padding-left: 6px; padding-right: 6px; margin: 0 -4px; }
+.entry:hover { background: color-mix(in srgb, var(--selected) 65%, transparent); }
 .entry-icon {
   width: 34px; height: 34px; border-radius: 8px; background: var(--soft);
   display: grid; place-items: center; color: var(--accent); flex-shrink: 0; overflow: hidden;
@@ -289,7 +296,14 @@ input[type="range"] {
   display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font: 11px Consolas, 'Microsoft YaHei UI', monospace; color: var(--muted); margin-top: 4px;
 }
-.entry-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.entry-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.row-group-select {
+  padding: 4px 8px; font-size: 11px; border-radius: 6px;
+  background: var(--soft); border: 1px solid transparent; color: var(--muted);
+  max-width: 115px;
+}
+.row-group-select:hover { border-color: var(--line); color: var(--ink); }
+.row-group-select.has-group { color: var(--accent); font-weight: 500; }
 .row-act {
   padding: 6px 8px; border-radius: 6px; font-size: 11px; color: var(--muted);
   opacity: 0; transition: opacity .12s;
@@ -297,8 +311,8 @@ input[type="range"] {
 .entry:hover .row-act { opacity: 1; }
 .row-act:hover { background: var(--soft); color: var(--ink); }
 .pin {
-  background: transparent; color: var(--muted); padding: 7px 11px;
-  border-radius: 6px; font-size: 11px; font-weight: 500;
+  background: transparent; color: var(--muted); padding: 6px 11px;
+  border-radius: 6px; font-size: 11px; font-weight: 500; white-space: nowrap;
 }
 .pin:hover { background: var(--soft); color: var(--ink); }
 .pin[aria-pressed="true"] {
@@ -308,31 +322,57 @@ input[type="range"] {
   padding: 56px 20px; text-align: center; color: var(--muted); font-size: 12px; line-height: 1.9;
 }
 
-/* 弹窗遮罩层（添加/编辑收藏、新建分组） */
+/* 弹窗遮罩层（添加/编辑收藏、新建/配置分组） */
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(15, 23, 20, .38);
+  position: fixed; inset: 0; background: rgba(12, 18, 22, .45);
   backdrop-filter: blur(4px); display: none; place-items: center; z-index: 30;
 }
 .modal-backdrop.open { display: grid; }
 .modal-card {
-  width: min(520px, calc(100vw - 40px)); max-height: calc(100vh - 40px);
+  width: min(540px, calc(100vw - 44px)); max-height: calc(100vh - 36px);
   background: var(--paper); border: 1px solid var(--line); border-radius: 15px;
-  box-shadow: 0 22px 60px rgba(0, 0, 0, .28); display: flex; flex-direction: column;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .32); display: flex; flex-direction: column;
   overflow: hidden;
 }
 .modal-header {
-  padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--line);
+  padding: 16px 22px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line); flex-shrink: 0;
 }
-.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.modal-header h3 { margin: 0; font-size: 17px; font-weight: 700; }
 .modal-header small { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
-.modal-body { padding: 18px 22px; overflow-y: auto; display: grid; gap: 12px; }
-.field-label { display: grid; gap: 6px; font-size: 12px; font-weight: 500; }
-.field-row { display: flex; gap: 6px; }
-.field-row input { flex: 1; }
+.modal-body {
+  padding: 16px 22px; overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; gap: 11px; min-width: 0;
+}
+.field-label {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: 12px; font-weight: 500; min-width: 0; width: 100%;
+}
+.field-label select { width: 100%; max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.field-row { display: flex; gap: 6px; width: 100%; min-width: 0; align-items: center; }
+.field-row input { flex: 1; min-width: 0; }
+.field-row button { flex-shrink: 0; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; width: 100%; }
 .field-input {
-  padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px;
+  width: 100%; min-width: 0; padding: 8px 11px; border: 1px solid var(--line); border-radius: 7px;
   background: var(--input-bg); color: var(--ink); font-size: 12px; user-select: text;
+}
+.member-checklist {
+  max-height: 220px; overflow-y: auto; overflow-x: hidden;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--input-bg);
+  padding: 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.member-item {
+  display: flex; align-items: center; gap: 9px; padding: 7px 8px;
+  border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+.member-item:hover { background: var(--soft); }
+.member-item input { accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
+.member-item span { font-weight: 500; white-space: nowrap; }
+.member-item small { color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.danger-btn {
+  padding: 8px 13px; border-radius: 7px; background: rgba(210, 65, 55, .14);
+  color: #e05a4f; font-size: 12px; font-weight: 500; margin-right: auto;
 }
 .primary-btn {
   padding: 8px 16px; border-radius: 7px; background: var(--accent);
@@ -340,7 +380,7 @@ input[type="range"] {
 }
 .modal-footer {
   padding: 12px 22px; border-top: 1px solid var(--line);
-  display: flex; justify-content: flex-end; gap: 8px;
+  display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-shrink: 0;
 }
 
 .toast {
@@ -391,8 +431,9 @@ input[type="range"] {
         <span class="filters-spacer"></span>
         <button class="chip-btn" id="btn-quick-folder">＋ 添加文件夹</button>
         <button class="chip-btn" id="btn-open-add">＋ 添加收藏</button>
-        <button class="chip-btn" id="btn-open-group">＋ 新建分组</button>
+        <button class="chip-btn" id="btn-open-group">▦ 管理分组</button>
       </div>
+      <div class="group-chips" id="group-filter-bar"></div>
     </div>
     <div class="library-list" id="library-list"></div>
     <footer class="footer">
@@ -589,36 +630,40 @@ input[type="range"] {
     <div class="modal-body">
       <label class="field-label" id="quick-app-wrap">
         <span>从本机已安装软件快速填充</span>
-        <select id="editor-installed-select">
+        <select id="editor-installed-select" class="field-input">
           <option value="">— 选择开始菜单 / 桌面已安装应用 —</option>
         </select>
       </label>
       <label class="field-label">
         <span>目标路径</span>
         <div class="field-row">
-          <input class="field-input" id="editor-path" placeholder="例如：E:\Projects\Client-A 或 C:\App\Tool.exe">
+          <input class="field-input" id="editor-path" placeholder="例如：E:\ 或 C:\App\Tool.exe">
           <button class="chip-btn" type="button" id="btn-pick-folder">选文件夹…</button>
           <button class="chip-btn" type="button" id="btn-pick-file">选文件…</button>
         </div>
       </label>
-      <label class="field-label">
-        <span>显示名称</span>
-        <input class="field-input" id="editor-name" placeholder="留空将根据路径自动生成名称" maxlength="80">
-      </label>
-      <label class="field-label">
-        <span>收藏组（可直接输入新分组名）</span>
-        <input class="field-input" id="editor-group" list="group-datalist" placeholder="未分组">
-        <datalist id="group-datalist"></datalist>
-      </label>
-      <label class="field-label">
-        <span>启动参数（仅 EXE 可选）</span>
-        <input class="field-input" id="editor-args" placeholder="可选启动参数">
-      </label>
-      <label class="field-label">
-        <span>工作目录（仅 EXE 可选）</span>
-        <input class="field-input" id="editor-workdir" placeholder="可选工作目录">
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+      <div class="grid-2">
+        <label class="field-label">
+          <span>显示名称</span>
+          <input class="field-input" id="editor-name" placeholder="留空自动生成名称" maxlength="80">
+        </label>
+        <label class="field-label">
+          <span>所属收藏组（可选或直接输入新组名）</span>
+          <input class="field-input" id="editor-group" list="group-datalist" placeholder="未分组">
+          <datalist id="group-datalist"></datalist>
+        </label>
+      </div>
+      <div class="grid-2">
+        <label class="field-label">
+          <span>启动参数（仅 EXE 可选）</span>
+          <input class="field-input" id="editor-args" placeholder="可选启动参数">
+        </label>
+        <label class="field-label">
+          <span>工作目录（仅 EXE 可选）</span>
+          <input class="field-input" id="editor-workdir" placeholder="可选工作目录">
+        </label>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-top:2px">
         <input type="checkbox" id="editor-pinned" checked style="accent-color:var(--accent);width:15px;height:15px">
         <span>同时固定到 Dock</span>
       </label>
@@ -630,25 +675,36 @@ input[type="range"] {
   </div>
 </div>
 
-<!-- 弹窗 2：新建分组 -->
+<!-- 弹窗 2：新建 / 配置分组及成员 -->
 <div class="modal-backdrop" id="modal-group">
-  <div class="modal-card" style="width:min(400px,calc(100vw - 40px))">
+  <div class="modal-card" style="width:min(500px,calc(100vw - 44px))">
     <div class="modal-header">
       <div>
-        <h3>新建收藏组</h3>
-        <small>有成员的收藏组会自动显示在 Dock 栏上</small>
+        <h3 id="group-modal-title">新建 / 配置收藏组</h3>
+        <small>设置分组名称，并直接勾选要归入该分组的收藏项（有成员的分组将显示在 Dock 上）</small>
       </div>
       <button class="close-btn" id="btn-close-group">×</button>
     </div>
     <div class="modal-body">
+      <div class="field-label" id="existing-group-picker-wrap">
+        <span>选择现有分组或新建</span>
+        <select id="group-select-existing" class="field-input">
+          <option value="">＋ 新建收藏组</option>
+        </select>
+      </div>
       <label class="field-label">
         <span>分组名称</span>
         <input class="field-input" id="group-name-input" placeholder="例如：开发项目、常用工具、客户资料" maxlength="40">
       </label>
+      <div class="field-label">
+        <span>勾选属于该分组的收藏项（可多选）</span>
+        <div class="member-checklist" id="group-member-list"></div>
+      </div>
     </div>
     <div class="modal-footer">
+      <button class="danger-btn" type="button" id="btn-delete-group" hidden>删除此分组</button>
       <button class="chip-btn" type="button" id="btn-cancel-group">取消</button>
-      <button class="primary-btn" type="button" id="btn-save-group">创建分组</button>
+      <button class="primary-btn" type="button" id="btn-save-group">保存分组配置</button>
     </div>
   </div>
 </div>
@@ -718,6 +774,7 @@ function switchView(viewName, options = {}) {
 function setFilter(f) {
   state.filter = f;
   $$('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+  $$('[data-group-filter]').forEach(b => b.setAttribute('aria-pressed', String('group:' + b.dataset.groupFilter === f)));
 }
 
 $$('[data-filter]').forEach(b => b.onclick = () => {
@@ -726,12 +783,48 @@ $$('[data-filter]').forEach(b => b.onclick = () => {
 });
 $('#library-search').oninput = () => renderLibrary();
 
+function renderGroupFilterBar() {
+  const bar = $('#group-filter-bar');
+  bar.replaceChildren();
+  if (!state.groups || state.groups.length === 0) return;
+
+  const lbl = document.createElement('span');
+  lbl.className = 'group-chips-label';
+  lbl.textContent = '收藏组：';
+  bar.append(lbl);
+
+  state.groups.forEach(g => {
+    const count = state.items.filter(i => i.group === g).length;
+    const btn = document.createElement('button');
+    btn.className = 'chip-btn';
+    btn.dataset.groupFilter = g;
+    btn.setAttribute('aria-pressed', String(state.filter === 'group:' + g));
+    btn.textContent = `${g} (${count})`;
+    btn.onclick = () => {
+      setFilter(state.filter === 'group:' + g ? 'all' : 'group:' + g);
+      renderLibrary();
+    };
+    bar.append(btn);
+  });
+
+  if (state.filter.startsWith('group:')) {
+    const activeGroup = state.filter.slice(6);
+    const cfgBtn = document.createElement('button');
+    cfgBtn.className = 'chip-btn';
+    cfgBtn.style.marginLeft = 'auto';
+    cfgBtn.textContent = `⚙ 配置「${activeGroup}」成员`;
+    cfgBtn.onclick = () => openGroupModal(activeGroup);
+    bar.append(cfgBtn);
+  }
+}
+
 function fallbackSvg(kind) {
   const id = kind === '文件夹' ? 'ico-folder' : kind === '应用' ? 'ico-app' : 'ico-file';
   return `<svg><use href="#${id}"/></svg>`;
 }
 
 function renderLibrary() {
+  renderGroupFilterBar();
   const q = $('#library-search').value.trim().toLowerCase();
   const list = $('#library-list');
   list.replaceChildren();
@@ -743,7 +836,10 @@ function renderLibrary() {
       const set = new Set(state.overflowIds);
       pool = pool.filter(i => set.has(i.id));
     }
-    if (state.filter !== 'all') {
+    if (state.filter.startsWith('group:')) {
+      const targetGroup = state.filter.slice(6);
+      pool = pool.filter(i => i.group === targetGroup);
+    } else if (state.filter !== 'all') {
       pool = pool.filter(i => i.kind === state.filter);
     }
     if (q) {
@@ -819,6 +915,36 @@ function renderLibrary() {
       delBtn.textContent = '移除';
       delBtn.onclick = () => send('remove', { id: item.id });
       actions.append(editBtn, delBtn);
+
+      // 行内快速分组下拉框：一键把收藏项归入任意分组
+      const groupSel = document.createElement('select');
+      groupSel.className = 'row-group-select' + (item.group ? ' has-group' : '');
+      groupSel.title = '点击快速修改所属收藏组';
+      const noneOpt = document.createElement('option');
+      noneOpt.value = '';
+      noneOpt.textContent = '未分组';
+      groupSel.append(noneOpt);
+      state.groups.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = '▦ ' + g;
+        groupSel.append(opt);
+      });
+      const newOpt = document.createElement('option');
+      newOpt.value = '__new__';
+      newOpt.textContent = '＋ 新建分组…';
+      groupSel.append(newOpt);
+      groupSel.value = item.group || '';
+      groupSel.onchange = () => {
+        if (groupSel.value === '__new__') {
+          groupSel.value = item.group || '';
+          openGroupModal('', [item.id]);
+          return;
+        }
+        send('setBookmarkGroup', { id: item.id, group: groupSel.value });
+        notify(groupSel.value ? `已归入分组「${groupSel.value}」` : '已移出分组');
+      };
+      actions.append(groupSel);
     }
 
     const pinBtn = document.createElement('button');
@@ -844,10 +970,17 @@ function renderLibrary() {
   if (rows.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
-    empty.innerHTML = q
-      ? '没有匹配的收藏或本机软件'
-      : '还没有收藏项<br>可点击上方「＋ 添加文件夹」或切换到「本机软件库」一键固定常用软件';
-    list.append(empty);
+    if (state.filter.startsWith('group:')) {
+      const gName = state.filter.slice(6);
+      empty.innerHTML = `分组「${gName}」暂无成员<br><button class="chip-btn" style="margin-top:10px" id="btn-empty-cfg-group">＋ 点击批量勾选收藏项加入此分组</button>`;
+      list.append(empty);
+      $('#btn-empty-cfg-group').onclick = () => openGroupModal(gName);
+    } else {
+      empty.innerHTML = q
+        ? '没有匹配的收藏或本机软件'
+        : '还没有收藏项<br>可点击上方「＋ 添加文件夹」或切换到「本机软件库」一键固定常用软件';
+      list.append(empty);
+    }
   }
 
   const pinnedCount = state.items.filter(i => i.pinned).length;
@@ -920,20 +1053,79 @@ $('#btn-save-editor').onclick = () => {
   $('#modal-editor').classList.remove('open');
 };
 
-// 新建分组弹窗
-$('#btn-open-group').onclick = () => {
-  $('#group-name-input').value = '';
+// 新建 / 配置分组及成员弹窗
+let editingGroupOriginalName = '';
+
+function openGroupModal(groupName = '', preselectIds = []) {
+  editingGroupOriginalName = groupName || '';
+  const sel = $('#group-select-existing');
+  sel.innerHTML = '<option value="">＋ 新建收藏组</option>';
+  state.groups.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g;
+    opt.textContent = `编辑现有分组：${g}`;
+    sel.append(opt);
+  });
+  sel.value = editingGroupOriginalName;
+  $('#existing-group-picker-wrap').hidden = state.groups.length === 0;
+  populateGroupModalFields(editingGroupOriginalName, preselectIds);
   $('#modal-group').classList.add('open');
   $('#group-name-input').focus();
+}
+
+function populateGroupModalFields(groupName, preselectIds = []) {
+  editingGroupOriginalName = groupName || '';
+  $('#group-name-input').value = editingGroupOriginalName;
+  $('#btn-delete-group').hidden = !editingGroupOriginalName;
+  const preSet = new Set(preselectIds);
+
+  const list = $('#group-member-list');
+  list.replaceChildren();
+  if (state.items.length === 0) {
+    list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:12px;text-align:center">暂无已收藏项，可先添加文件夹或本机应用</div>';
+    return;
+  }
+  state.items.forEach(item => {
+    const lbl = document.createElement('label');
+    lbl.className = 'member-item';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = item.id;
+    cb.checked = (editingGroupOriginalName && item.group === editingGroupOriginalName) || preSet.has(item.id);
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = item.name;
+    const pathSmall = document.createElement('small');
+    pathSmall.textContent = (item.group && item.group !== editingGroupOriginalName ? `[当前: ${item.group}] ` : '') + item.path;
+    lbl.append(cb, nameSpan, pathSmall);
+    list.append(lbl);
+  });
+}
+
+$('#group-select-existing').onchange = e => populateGroupModalFields(e.target.value);
+$('#btn-open-group').onclick = () => {
+  const activeGroup = state.filter.startsWith('group:') ? state.filter.slice(6) : (state.groups[0] || '');
+  openGroupModal(activeGroup);
 };
 $('#btn-close-group').onclick = () => $('#modal-group').classList.remove('open');
 $('#btn-cancel-group').onclick = () => $('#modal-group').classList.remove('open');
+$('#btn-delete-group').onclick = () => {
+  if (!editingGroupOriginalName) return;
+  if (state.filter === 'group:' + editingGroupOriginalName) setFilter('all');
+  send('deleteGroup', { name: editingGroupOriginalName });
+  $('#modal-group').classList.remove('open');
+  notify(`已删除分组：${editingGroupOriginalName}`);
+};
 $('#btn-save-group').onclick = () => {
   const name = $('#group-name-input').value.trim();
   if (!name) { notify('请输入分组名称'); return; }
-  send('addGroup', { name });
+  const memberIds = [...$$('#group-member-list input[type="checkbox"]:checked')].map(cb => cb.value);
+  send('saveGroupConfig', {
+    originalName: editingGroupOriginalName,
+    name,
+    memberIds
+  });
   $('#modal-group').classList.remove('open');
-  notify(`已添加分组：${name}`);
+  notify(`已保存分组「${name}」（共 ${memberIds.length} 个成员）`);
 };
 
 // 设置页导航与控件

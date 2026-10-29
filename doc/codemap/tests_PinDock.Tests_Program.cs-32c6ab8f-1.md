@@ -4,7 +4,7 @@
 
 [Module](tests.md) · [Source](../../tests/PinDock.Tests/Program.cs) · page 1/1
 
-Source SHA-256: eedfd4ed1e9aae24270507a581bc15f3730e66cd7e38ced169705db43f14db66
+Source SHA-256: 8d2f88404667439457794f9177c3f8327d9200faeb268b37a14108513743372a
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

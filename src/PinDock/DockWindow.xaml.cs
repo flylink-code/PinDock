@@ -3,22 +3,25 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace PinDock;
 
 public partial class DockWindow : Window
 {
-    private const int FadeMilliseconds = 150;
-
     private readonly ShellIconService icons;
     private readonly GroupPopupWindow groupPopup;
+    private readonly FolderPopupWindow folderPopup;
+    private readonly DispatcherTimer folderOpenTimer = new() { Interval = TimeSpan.FromMilliseconds(180) };
+    private readonly DispatcherTimer folderCloseTimer = new() { Interval = TimeSpan.FromMilliseconds(220) };
+    private Bookmark? pendingHoverFolder;
+    private Button? pendingHoverButton;
     private LibraryData data = new();
     private DockPlacement placement;
     private ScreenRect workArea;
     private List<Bookmark> overflow = [];
     private ScreenRect? dragStartCursor;
     private double dragOriginOffset;
-    private int fadeVersion;
 
     public event Action<Bookmark>? LaunchRequested;
     public event Action<Bookmark>? EditRequested;
@@ -36,11 +39,15 @@ public partial class DockWindow : Window
 
     public bool IsDragging { get; private set; }
     public bool IsShown { get; private set; }
-    public bool IsGroupOpen => groupPopup.IsVisible;
+    public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible;
     public ScreenRect CurrentBounds => placement.Bounds;
     public ScreenRect EdgeHandleRect => placement.EdgeHandle;
     public ScreenRect HitArea => placement.Bounds.Union(placement.EdgeHandle);
-    public ScreenRect? GroupBounds => groupPopup.IsVisible ? NativeWindow.GetPixelBounds(groupPopup) : null;
+    public ScreenRect? GroupBounds => groupPopup.IsVisible
+        ? NativeWindow.GetPixelBounds(groupPopup)
+        : folderPopup.IsVisible
+            ? NativeWindow.GetPixelBounds(folderPopup)
+            : null;
     public IReadOnlyList<Bookmark> OverflowItems => overflow;
 
     public DockWindow(ShellIconService icons)
@@ -54,14 +61,30 @@ public partial class DockWindow : Window
             groupPopup.Hide();
             LaunchRequested?.Invoke(bookmark);
         };
+        folderPopup = new FolderPopupWindow(icons);
+        folderPopup.OpenRequested += bookmark =>
+        {
+            folderPopup.Hide();
+            LaunchRequested?.Invoke(bookmark);
+        };
+        folderPopup.PinFolderRequested += folderPath =>
+        {
+            FilesDropped?.Invoke([folderPath]);
+        };
+        folderOpenTimer.Tick += (_, _) =>
+        {
+            folderOpenTimer.Stop();
+            if (pendingHoverFolder is not null && pendingHoverButton is not null && IsShown && !IsDragging)
+                OpenFolderPopupFor(pendingHoverFolder, pendingHoverButton);
+        };
+        folderCloseTimer.Tick += (_, _) => CheckFolderPopupLeave();
     }
 
     public void Bind(LibraryData library)
     {
         data = library;
         Topmost = library.Settings.Topmost;
-        if (IsShown) BeginAnimation(OpacityProperty, null);
-        if (IsShown || !IsVisible) Opacity = library.Settings.Opacity;
+        Opacity = library.Settings.Opacity;
     }
 
     public void Relayout()
@@ -81,42 +104,26 @@ public partial class DockWindow : Window
     public void ShowDock()
     {
         if (IsShown && IsVisible) return;
-        int version = ++fadeVersion;
         IsShown = true;
-        double target = data.Settings.Opacity;
-        if (!IsVisible)
-        {
-            Opacity = 0;
-            Show();
-        }
-        var fade = new DoubleAnimation(target, TimeSpan.FromMilliseconds(FadeMilliseconds));
-        fade.Completed += (_, _) =>
-        {
-            if (version != fadeVersion) return;
-            BeginAnimation(OpacityProperty, null);
-            Opacity = target;
-        };
-        BeginAnimation(OpacityProperty, fade);
+        Opacity = data.Settings.Opacity;
+        if (!IsVisible) Show();
     }
 
     public void HideDock()
     {
-        int version = ++fadeVersion;
         IsShown = false;
+        folderOpenTimer.Stop();
+        folderCloseTimer.Stop();
         groupPopup.Hide();
-        if (!IsVisible) return;
-        var fade = new DoubleAnimation(0, TimeSpan.FromMilliseconds(FadeMilliseconds));
-        fade.Completed += (_, _) =>
-        {
-            if (version != fadeVersion) return;
-            BeginAnimation(OpacityProperty, null);
-            Hide();
-            Opacity = data.Settings.Opacity;
-        };
-        BeginAnimation(OpacityProperty, fade);
+        folderPopup.Hide();
+        if (IsVisible) Hide();
     }
 
-    public void CloseGroup() => groupPopup.Hide();
+    public void CloseGroup()
+    {
+        groupPopup.Hide();
+        folderPopup.Hide();
+    }
 
     private void Reposition(int capacity)
     {
@@ -170,9 +177,29 @@ public partial class DockWindow : Window
         if (isFolder)
         {
             ((Border)button.Content).Child = CreatePrototypeFolderIcon(icon * 0.62);
+            button.ToolTip = null; // 文件夹悬停直接弹出子目录面板，不叠加文字 ToolTip 遮挡
+            button.MouseEnter += (_, _) =>
+            {
+                pendingHoverFolder = item;
+                pendingHoverButton = button;
+                if (folderPopup.IsVisible)
+                {
+                    OpenFolderPopupFor(item, button);
+                }
+                else
+                {
+                    folderOpenTimer.Stop();
+                    folderOpenTimer.Start();
+                }
+            };
+            button.MouseLeave += (_, _) =>
+            {
+                folderOpenTimer.Stop();
+            };
         }
         else
         {
+            button.MouseEnter += (_, _) => folderOpenTimer.Stop();
             var host = new Grid();
             var fallback = new TextBlock
             {
@@ -196,14 +223,61 @@ public partial class DockWindow : Window
             ((Border)button.Content).Child = host;
             _ = LoadIcon(image, fallback, item.Path);
         }
-        button.Click += (_, _) => LaunchRequested?.Invoke(item);
+        button.Click += (_, _) =>
+        {
+            folderOpenTimer.Stop();
+            folderPopup.Hide();
+            LaunchRequested?.Invoke(item);
+        };
         button.MouseRightButtonUp += (_, e) =>
         {
+            folderOpenTimer.Stop();
+            folderPopup.Hide();
             ShowBookmarkContextMenu(item);
             e.Handled = true;
         };
         return button;
     }
+
+    private void OpenFolderPopupFor(Bookmark folderItem, Button anchorButton)
+    {
+        if (groupPopup.IsVisible) groupPopup.Hide();
+        var topLeft = anchorButton.PointToScreen(new Point(0, 0));
+        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        var buttonRect = new ScreenRect(
+            topLeft.X,
+            topLeft.Y,
+            anchorButton.ActualWidth * scale,
+            anchorButton.ActualHeight * scale);
+        var anchor = data.Settings.DockEdge is DockEdge.Bottom or DockEdge.Top
+            ? new ScreenRect(buttonRect.X, placement.Bounds.Y, buttonRect.Width, placement.Bounds.Height)
+            : new ScreenRect(placement.Bounds.X, buttonRect.Y, placement.Bounds.Width, buttonRect.Height);
+
+        folderPopup.ShowFolder(folderItem.Path, folderItem.Name, anchor, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+        if (!folderCloseTimer.IsEnabled) folderCloseTimer.Start();
+    }
+
+    private void CheckFolderPopupLeave()
+    {
+        if (!folderPopup.IsVisible)
+        {
+            folderCloseTimer.Stop();
+            return;
+        }
+        if (folderPopup.IsKeyboardFocusWithin) return;
+        if (!AutoHideController.TryGetCursorPoint(out var pt)) return;
+
+        var dockRect = ExpandRect(placement.Bounds, 16);
+        var popRect = ExpandRect(NativeWindow.GetPixelBounds(folderPopup), 18);
+        if (!dockRect.Contains(pt.X, pt.Y) && !popRect.Contains(pt.X, pt.Y))
+        {
+            folderPopup.Hide();
+            folderCloseTimer.Stop();
+        }
+    }
+
+    private static ScreenRect ExpandRect(ScreenRect r, double pad) =>
+        new(r.X - pad, r.Y - pad, r.Width + pad * 2, r.Height + pad * 2);
 
     private UIElement CreatePrototypeFolderIcon(double size)
     {
@@ -235,6 +309,7 @@ public partial class DockWindow : Window
     private Button CreateGroupButton(string group, double icon)
     {
         var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"));
+        button.MouseEnter += (_, _) => folderOpenTimer.Stop();
         var grid = new Grid { Width = icon * 0.44, Height = icon * 0.44, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         grid.RowDefinitions.Add(new RowDefinition());
         grid.RowDefinitions.Add(new RowDefinition());
@@ -250,6 +325,8 @@ public partial class DockWindow : Window
         ((Border)button.Content).Child = grid;
         button.Click += (_, _) =>
         {
+            folderOpenTimer.Stop();
+            folderPopup.Hide();
             var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
             groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
         };
@@ -259,6 +336,7 @@ public partial class DockWindow : Window
     private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear)
     {
         var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"));
+        button.MouseEnter += (_, _) => folderOpenTimer.Stop();
         ((Border)button.Content).Child = new TextBlock
         {
             Text = glyph,

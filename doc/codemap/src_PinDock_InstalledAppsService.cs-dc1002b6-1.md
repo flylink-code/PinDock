@@ -4,15 +4,15 @@
 
 [Module](app.md) · [Source](../../src/PinDock/InstalledAppsService.cs) · page 1/1
 
-Source SHA-256: 52b5914fc26e9ed461f27ed0c9fdc2282525e508b5a5f08a54fc297ed9971e40
+Source SHA-256: 50b271cc92639c5201850bed7d1ecab0de4c4c660316bab27ef6adc49436429d
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/InstalledAppsService.cs#L3) |
 | InstalledAppsService | class_declaration | PinDock | [7](../../src/PinDock/InstalledAppsService.cs#L7) |
-| InstalledAppsService | constructor_declaration | PinDock::InstalledAppsService | [15](../../src/PinDock/InstalledAppsService.cs#L15) |
-| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [20](../../src/PinDock/InstalledAppsService.cs#L20) |
-| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [37](../../src/PinDock/InstalledAppsService.cs#L37) |
-| ScanRoots | method_declaration | PinDock::InstalledAppsService | [43](../../src/PinDock/InstalledAppsService.cs#L43) |
-| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [65](../../src/PinDock/InstalledAppsService.cs#L65) |
-| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [96](../../src/PinDock/InstalledAppsService.cs#L96) |
+| InstalledAppsService | constructor_declaration | PinDock::InstalledAppsService | [20](../../src/PinDock/InstalledAppsService.cs#L20) |
+| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [25](../../src/PinDock/InstalledAppsService.cs#L25) |
+| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [42](../../src/PinDock/InstalledAppsService.cs#L42) |
+| ScanRoots | method_declaration | PinDock::InstalledAppsService | [48](../../src/PinDock/InstalledAppsService.cs#L48) |
+| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [70](../../src/PinDock/InstalledAppsService.cs#L70) |
+| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [101](../../src/PinDock/InstalledAppsService.cs#L101) |

@@ -7,7 +7,12 @@ public readonly record struct InstalledApp(string Name, string Path, string Cate
 public sealed class InstalledAppsService
 {
     private static readonly string[] IgnoredKeywords =
-        ["uninstall", "卸载", "remove", "readme", "说明", "帮助", "help", "website", "官网", "manual"];
+    [
+        "uninstall", "卸载", "remove", "readme", "说明", "帮助", "help", "website", "官网", "manual",
+        "add design tools", "command prompt", "developer command", "native tools", "license",
+        "release notes", "documentation", "migration", "updater", "update", "setup", "installer",
+        "repair", "diagnostic", "telemetry", "feedback", "welcome"
+    ];
 
     private readonly object sync = new();
     private IReadOnlyList<InstalledApp>? cached;

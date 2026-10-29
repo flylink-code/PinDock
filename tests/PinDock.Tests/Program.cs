@@ -158,11 +158,29 @@ try
     Directory.CreateDirectory(appDir);
     File.WriteAllText(Path.Combine(appDir, "Visual Studio Code.lnk"), "");
     File.WriteAllText(Path.Combine(appDir, "Uninstall Tool.lnk"), "");
+    File.WriteAllText(Path.Combine(appDir, "Add Design Tools or Devices 2023.lnk"), "");
     File.WriteAllText(Path.Combine(appDir, "卸载程序.exe"), "");
     File.WriteAllText(Path.Combine(appDir, "Everything.exe"), "");
     var discovered = InstalledAppsService.DiscoverFromDirectories([appDir]);
     if (discovered.Count != 2 || discovered[0].Name != "Everything" || discovered[1].Name != "Visual Studio Code")
         throw new Exception("InstalledAppsService discovery or filtering failed");
+
+    // 文件夹悬停目录浏览与系统目录过滤测试
+    string browseRoot = Path.Combine(directory, "DriveRoot");
+    Directory.CreateDirectory(Path.Combine(browseRoot, "ProjectB"));
+    Directory.CreateDirectory(Path.Combine(browseRoot, "ProjectA"));
+    Directory.CreateDirectory(Path.Combine(browseRoot, "$RECYCLE.BIN"));
+    Directory.CreateDirectory(Path.Combine(browseRoot, "System Volume Information"));
+    File.WriteAllText(Path.Combine(browseRoot, "readme.md"), "ok");
+    File.WriteAllText(Path.Combine(browseRoot, "pagefile.sys"), "sys");
+    var browseEntries = DirectoryBrowserService.ListEntries(browseRoot);
+    if (browseEntries.Count != 3 ||
+        !browseEntries[0].IsDirectory || browseEntries[0].Name != "ProjectA" ||
+        !browseEntries[1].IsDirectory || browseEntries[1].Name != "ProjectB" ||
+        browseEntries[2].IsDirectory || browseEntries[2].Name != "readme.md")
+    {
+        throw new Exception("DirectoryBrowserService listing or sorting failed");
+    }
 
     // 资源管理器右键命令与参数提取测试
     if (ExplorerMenuService.TryExtractAddPath(["--add", @"D:\Work\ProjectA"]) != @"D:\Work\ProjectA")

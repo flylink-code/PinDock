@@ -191,6 +191,54 @@ public sealed class AppController : IDisposable
         RelayoutDock();
     }
 
+    public void SetBookmarkGroup(Bookmark item, string group)
+    {
+        item.Group = group;
+        if (group.Length > 0 && !Data.Groups.Contains(group, StringComparer.Ordinal))
+            Data.Groups.Add(group);
+        Persist();
+        RelayoutDock();
+        webPanel.RefreshIfVisible();
+    }
+
+    public void SaveGroupConfig(string originalName, string newName, IReadOnlySet<Guid> memberIds)
+    {
+        if (!string.IsNullOrEmpty(originalName) && !string.Equals(originalName, newName, StringComparison.Ordinal))
+        {
+            int idx = Data.Groups.IndexOf(originalName);
+            if (idx >= 0) Data.Groups[idx] = newName;
+            else if (!Data.Groups.Contains(newName, StringComparer.Ordinal)) Data.Groups.Add(newName);
+        }
+        else if (!Data.Groups.Contains(newName, StringComparer.Ordinal))
+        {
+            Data.Groups.Add(newName);
+        }
+
+        foreach (var item in Data.Items)
+        {
+            if (memberIds.Contains(item.Id))
+            {
+                item.Group = newName;
+            }
+            else if ((!string.IsNullOrEmpty(originalName) && item.Group == originalName) || item.Group == newName)
+            {
+                item.Group = "";
+            }
+        }
+
+        Persist();
+        RelayoutDock();
+        webPanel.RefreshIfVisible();
+    }
+
+    public void DeleteGroup(string groupName)
+    {
+        LibraryTransfer.RemoveGroup(Data, groupName);
+        Persist();
+        RelayoutDock();
+        webPanel.RefreshIfVisible();
+    }
+
     public (int Added, int Skipped) Import(string path)
     {
         var result = LibraryTransfer.Import(Data, path);
