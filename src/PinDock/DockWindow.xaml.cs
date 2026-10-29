@@ -1375,11 +1375,11 @@ public partial class DockWindow : Window
                 reorderElement = null;
                 element.Opacity = 1.0;
                 ClearDropHighlights();
-                if (element.IsMouseCaptured) element.ReleaseMouseCapture();
 
                 if (isReordering)
                 {
                     isReordering = false;
+                    if (element.IsMouseCaptured) element.ReleaseMouseCapture();
                     e.Handled = true;
                     var dropPos = e.GetPosition(ItemsPanel);
                     bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;

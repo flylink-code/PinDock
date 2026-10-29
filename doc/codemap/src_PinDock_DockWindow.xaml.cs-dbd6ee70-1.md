@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DockWindow.xaml.cs) · page 1/1
 
-Source SHA-256: a19c2f80f63d7190669da3d05c496324b6ebe2a212188c912b6d94b80a0d3b2e
+Source SHA-256: 57560797860b784eabf2a8fa80072b83a796d5939859a995867a596f6300c333
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

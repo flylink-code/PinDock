@@ -14,6 +14,9 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        Environment.SetEnvironmentVariable("CHROME_CRASHPAD_PIPE_NAME", null);
+        Environment.SetEnvironmentVariable("ELECTRON_RUN_AS_NODE", null);
+
         var addPaths = ExplorerMenuService.ExtractAddPaths(e.Args);
         string? firstAddPath = addPaths.Count > 0 ? addPaths[0] : null;
 
