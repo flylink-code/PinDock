@@ -3,6 +3,14 @@ using System.Text.Json;
 
 namespace PinDock;
 
+public enum GroupIconKind { DefaultGrid, MemberPreview, Preset, CustomFile }
+
+public sealed class GroupIconConfig
+{
+    public GroupIconKind Kind { get; set; } = GroupIconKind.DefaultGrid;
+    public string Value { get; set; } = "";
+}
+
 public sealed class Bookmark
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -12,6 +20,8 @@ public sealed class Bookmark
     public string WorkingDirectory { get; set; } = "";
     public string Group { get; set; } = "";
     public bool Pinned { get; set; }
+    public long LastLaunchedTicks { get; set; }
+    public int LaunchCount { get; set; }
 }
 
 public sealed class LibraryData
@@ -19,7 +29,88 @@ public sealed class LibraryData
     public int Version { get; set; } = 2;
     public List<Bookmark> Items { get; set; } = [];
     public List<string> Groups { get; set; } = [];
+    public Dictionary<string, GroupIconConfig> GroupIcons { get; set; } = new(StringComparer.Ordinal);
+    public List<string> DockOrder { get; set; } = [];
     public AppSettings Settings { get; set; } = new();
+
+    public void NormalizeDockOrder()
+    {
+        DockOrder ??= [];
+        GroupIcons ??= new(StringComparer.Ordinal);
+
+        var pinnedIds = Items.Where(i => i.Pinned).Select(i => "bm:" + i.Id.ToString("D")).ToList();
+        var pinnedSet = new HashSet<string>(pinnedIds, StringComparer.OrdinalIgnoreCase);
+
+        var activeGroups = Groups
+            .Where(g => Items.Any(i => string.Equals(i.Group, g, StringComparison.Ordinal)))
+            .Select(g => "grp:" + g)
+            .ToList();
+        var groupSet = new HashSet<string>(activeGroups, StringComparer.Ordinal);
+
+        var normalized = new List<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (string raw in DockOrder)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) continue;
+            if (raw.StartsWith("bm:", StringComparison.OrdinalIgnoreCase))
+            {
+                string key = "bm:" + raw[3..].ToLowerInvariant();
+                if (pinnedSet.Contains(key) && seen.Add(key))
+                    normalized.Add(key);
+            }
+            else if (raw.StartsWith("grp:", StringComparison.Ordinal))
+            {
+                if (groupSet.Contains(raw) && seen.Add(raw))
+                    normalized.Add(raw);
+            }
+            else if (raw.StartsWith("sep:", StringComparison.OrdinalIgnoreCase))
+            {
+                if (seen.Add(raw))
+                    normalized.Add(raw);
+            }
+        }
+
+        // 若此前还没有分组但现在有了分组，且在固定项与分组之间没有自定义分隔符，则在首次追加分组前可保持连贯顺序
+        foreach (string pid in pinnedIds)
+        {
+            if (seen.Add(pid))
+                normalized.Add(pid);
+        }
+        foreach (string gid in activeGroups)
+        {
+            if (seen.Add(gid))
+                normalized.Add(gid);
+        }
+
+        DockOrder = normalized;
+    }
+
+    public void AutoSeparateByKind()
+    {
+        NormalizeDockOrder();
+        var pinned = Items.Where(i => i.Pinned).ToList();
+        var apps = pinned.Where(i => BookmarkKindHelper.FromPath(i.Path) == BookmarkKind.Application).ToList();
+        var folders = pinned.Where(i => BookmarkKindHelper.FromPath(i.Path) == BookmarkKind.Folder).ToList();
+        var files = pinned.Where(i => BookmarkKindHelper.FromPath(i.Path) == BookmarkKind.File).ToList();
+        var activeGroups = Groups.Where(g => Items.Any(i => string.Equals(i.Group, g, StringComparison.Ordinal))).ToList();
+
+        var order = new List<string>();
+        void AppendSection(IEnumerable<string> tokens)
+        {
+            var list = tokens.ToList();
+            if (list.Count == 0) return;
+            if (order.Count > 0) order.Add("sep:" + Guid.NewGuid().ToString("N")[..8]);
+            order.AddRange(list);
+        }
+
+        AppendSection(apps.Select(i => "bm:" + i.Id.ToString("D")));
+        AppendSection(folders.Select(i => "bm:" + i.Id.ToString("D")));
+        AppendSection(files.Select(i => "bm:" + i.Id.ToString("D")));
+        AppendSection(activeGroups.Select(g => "grp:" + g));
+
+        DockOrder = order;
+    }
 }
 
 public sealed class UnsupportedLibraryVersionException : Exception
@@ -53,6 +144,8 @@ public sealed class LibraryStore(string directory)
         if (data.Items is null || data.Items.Any(item => item is null || string.IsNullOrWhiteSpace(item.Path) || item.Name is null || item.Arguments is null || item.WorkingDirectory is null || item.Group is null))
             throw new InvalidDataException("Invalid library items");
         data.Groups ??= [];
+        data.GroupIcons ??= new(StringComparer.Ordinal);
+        data.DockOrder ??= [];
         data.Settings ??= new();
         ValidateSettings(data.Settings);
         if (data.Version == 1)
@@ -61,6 +154,7 @@ public sealed class LibraryStore(string directory)
             foreach (var item in data.Items)
                 item.Group ??= "";
         }
+        data.NormalizeDockOrder();
         return data;
     }
 
@@ -69,10 +163,12 @@ public sealed class LibraryStore(string directory)
         if (settings.Opacity < AppSettings.MinOpacity || settings.Opacity > AppSettings.MaxOpacity)
             throw new InvalidDataException($"Opacity out of range: {settings.Opacity}");
         if (!Enum.IsDefined(settings.DisplayMode) || !Enum.IsDefined(settings.DockEdge) || !Enum.IsDefined(settings.ThemeMode) ||
-            !Enum.IsDefined(settings.Palette) || !Enum.IsDefined(settings.MonitorPolicy) || !Enum.IsDefined(settings.IconSize))
+            !Enum.IsDefined(settings.Palette) || !Enum.IsDefined(settings.MonitorPolicy) || !Enum.IsDefined(settings.IconSize) ||
+            !Enum.IsDefined(settings.ClosePanelBehavior))
             throw new InvalidDataException("Invalid settings enum value");
         if (settings.HotkeyModifiers is null || settings.HotkeyKey is null)
             throw new InvalidDataException("Hotkey settings missing");
+        settings.GithubMirrorUrl ??= AppSettings.DefaultGithubMirror;
     }
 
     public void Save(LibraryData data)

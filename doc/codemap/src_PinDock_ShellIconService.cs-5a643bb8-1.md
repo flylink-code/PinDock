@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/ShellIconService.cs) · page 1/1
 
-Source SHA-256: cc7ce47440460193a0861f93e111ffba2e5ce8a1d68c5b6e6a7b8f3782799bd7
+Source SHA-256: 834134ed3e5aea99c496e44535cae2abbdedc7cb5a12fca7d488ef6e68668836
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -16,8 +16,8 @@ Source SHA-256: cc7ce47440460193a0861f93e111ffba2e5ce8a1d68c5b6e6a7b8f3782799bd7
 | GetDataUriAsync | method_declaration | PinDock::ShellIconService | [47](../../src/PinDock/ShellIconService.cs#L47) |
 | Run | method_declaration | PinDock::ShellIconService | [71](../../src/PinDock/ShellIconService.cs#L71) |
 | Extract | method_declaration | PinDock::ShellIconService | [82](../../src/PinDock/ShellIconService.cs#L82) |
-| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [115](../../src/PinDock/ShellIconService.cs#L115) |
-| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [125](../../src/PinDock/ShellIconService.cs#L125) |
-| SHGetImageList | method_declaration | PinDock::ShellIconService | [128](../../src/PinDock/ShellIconService.cs#L128) |
-| ImageList_GetIcon | method_declaration | PinDock::ShellIconService | [131](../../src/PinDock/ShellIconService.cs#L131) |
-| DestroyIcon | method_declaration | PinDock::ShellIconService | [134](../../src/PinDock/ShellIconService.cs#L134) |
+| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [140](../../src/PinDock/ShellIconService.cs#L140) |
+| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [150](../../src/PinDock/ShellIconService.cs#L150) |
+| SHGetImageList | method_declaration | PinDock::ShellIconService | [153](../../src/PinDock/ShellIconService.cs#L153) |
+| ImageList_GetIcon | method_declaration | PinDock::ShellIconService | [156](../../src/PinDock/ShellIconService.cs#L156) |
+| DestroyIcon | method_declaration | PinDock::ShellIconService | [159](../../src/PinDock/ShellIconService.cs#L159) |

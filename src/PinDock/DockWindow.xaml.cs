@@ -14,6 +14,7 @@ public partial class DockWindow : Window
     private readonly FolderPopupWindow folderPopup;
     private readonly DispatcherTimer folderOpenTimer = new() { Interval = TimeSpan.FromMilliseconds(180) };
     private readonly DispatcherTimer folderCloseTimer = new() { Interval = TimeSpan.FromMilliseconds(220) };
+    private readonly DispatcherTimer utilityHoverHideTimer = new() { Interval = TimeSpan.FromMilliseconds(260) };
     private Bookmark? pendingHoverFolder;
     private Button? pendingHoverButton;
     private LibraryData data = new();
@@ -22,11 +23,17 @@ public partial class DockWindow : Window
     private List<Bookmark> overflow = [];
     private ScreenRect? dragStartCursor;
     private double dragOriginOffset;
+    private string? reorderToken;
+    private FrameworkElement? reorderElement;
+    private Point reorderStartPoint;
+    private bool isReordering;
+    private bool isUtilityHoverRevealed;
 
     public event Action<Bookmark>? LaunchRequested;
     public event Action<Bookmark>? EditRequested;
     public event Action<Bookmark>? UnpinRequested;
     public event Action<Bookmark>? RemoveRequested;
+    public event Action<string>? ConfigureGroupRequested;
     public event Action? LibraryRequested;
     public event Action? InstalledAppsRequested;
     public event Action? OverflowRequested;
@@ -35,6 +42,7 @@ public partial class DockWindow : Window
     public event Action? AddFileRequested;
     public event Action<string[]>? FilesDropped;
     public event Action? SettingsRequested;
+    public event Action? ExitRequested;
     public event Action? DragEnded;
 
     public bool IsDragging { get; private set; }
@@ -78,6 +86,33 @@ public partial class DockWindow : Window
                 OpenFolderPopupFor(pendingHoverFolder, pendingHoverButton);
         };
         folderCloseTimer.Tick += (_, _) => CheckFolderPopupLeave();
+        utilityHoverHideTimer.Tick += (_, _) =>
+        {
+            utilityHoverHideTimer.Stop();
+            if (!IsMouseOver && isUtilityHoverRevealed)
+            {
+                isUtilityHoverRevealed = false;
+                if (data.Settings.AutoHideUtilityButtons)
+                    Relayout();
+            }
+        };
+        MouseEnter += (_, _) =>
+        {
+            utilityHoverHideTimer.Stop();
+            if (data.Settings.AutoHideUtilityButtons && !isUtilityHoverRevealed && !IsDragging)
+            {
+                isUtilityHoverRevealed = true;
+                Relayout();
+            }
+        };
+        MouseLeave += (_, _) =>
+        {
+            if (data.Settings.AutoHideUtilityButtons && isUtilityHoverRevealed && !IsDragging)
+            {
+                utilityHoverHideTimer.Stop();
+                utilityHoverHideTimer.Start();
+            }
+        };
     }
 
     public void Bind(LibraryData library)
@@ -90,14 +125,24 @@ public partial class DockWindow : Window
     public void Relayout()
     {
         var settings = data.Settings;
+        data.NormalizeDockOrder();
         var monitor = MonitorQuery.Resolve(settings);
         workArea = monitor.WorkingArea;
         bool vertical = settings.DockEdge is DockEdge.Left or DockEdge.Right;
         double available = vertical ? workArea.Height : workArea.Width;
         int capacity = DockLayout.ComputeCapacity(available, DockLayout.IconPixels(settings.IconSize));
-        var pinned = data.Items.Where(i => i.Pinned).ToList();
-        overflow = pinned.Skip(capacity).ToList();
-        Rebuild(pinned.Take(capacity).ToList());
+
+        var pinnedById = data.Items.Where(i => i.Pinned).ToDictionary(i => "bm:" + i.Id.ToString("D"), StringComparer.OrdinalIgnoreCase);
+        var orderedPinned = new List<Bookmark>();
+        foreach (string token in data.DockOrder)
+        {
+            if (pinnedById.TryGetValue(token, out var bm))
+                orderedPinned.Add(bm);
+        }
+        overflow = orderedPinned.Skip(capacity).ToList();
+        var visiblePinnedSet = new HashSet<Guid>(orderedPinned.Take(capacity).Select(i => i.Id));
+
+        Rebuild(visiblePinnedSet);
         Reposition(capacity);
     }
 
@@ -114,6 +159,8 @@ public partial class DockWindow : Window
         IsShown = false;
         folderOpenTimer.Stop();
         folderCloseTimer.Stop();
+        utilityHoverHideTimer.Stop();
+        isUtilityHoverRevealed = false;
         groupPopup.Hide();
         folderPopup.Hide();
         if (IsVisible) Hide();
@@ -137,7 +184,7 @@ public partial class DockWindow : Window
         NativeWindow.MoveTo(this, bounds.X, bounds.Y);
     }
 
-    private void Rebuild(IReadOnlyList<Bookmark> pinned)
+    private void Rebuild(IReadOnlySet<Guid> visiblePinnedIds)
     {
         ItemsPanel.Children.Clear();
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
@@ -145,35 +192,86 @@ public partial class DockWindow : Window
         DockChrome.Padding = vertical ? new Thickness(10, 12, 10, 12) : new Thickness(12, 10, 12, 10);
         double icon = DockLayout.IconPixels(data.Settings.IconSize);
 
-        var pinnedButtons = pinned.Select(item => (FrameworkElement)CreateBookmarkButton(item, icon)).ToList();
-        var groupButtons = data.Groups
-            .Where(group => data.Items.Any(i => string.Equals(i.Group, group, StringComparison.Ordinal)))
-            .Select(group => (FrameworkElement)CreateGroupButton(group, icon))
-            .ToList();
+        var pinnedLookup = data.Items
+            .Where(i => i.Pinned && visiblePinnedIds.Contains(i.Id))
+            .ToDictionary(i => "bm:" + i.Id.ToString("D"), StringComparer.OrdinalIgnoreCase);
+        var activeGroupSet = new HashSet<string>(
+            data.Groups.Where(g => data.Items.Any(i => string.Equals(i.Group, g, StringComparison.Ordinal))),
+            StringComparer.Ordinal);
+
+        bool hasCustomSeparators = data.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase));
+        var mainElements = new List<FrameworkElement>();
+        string? prevTokenKind = null;
+
+        foreach (string token in data.DockOrder)
+        {
+            if (pinnedLookup.TryGetValue(token, out var bm))
+            {
+                var btn = CreateBookmarkButton(bm, icon, token);
+                mainElements.Add(btn);
+                prevTokenKind = "bm";
+            }
+            else if (token.StartsWith("grp:", StringComparison.Ordinal))
+            {
+                string groupName = token[4..];
+                if (!activeGroupSet.Contains(groupName)) continue;
+                // 当用户尚未插入任何自定义分隔符时，默认在固定项与分组之间保留一条柔和分隔线
+                if (!hasCustomSeparators && prevTokenKind == "bm")
+                    mainElements.Add(CreateSeparator(icon));
+                var gBtn = CreateGroupButton(groupName, icon, token);
+                mainElements.Add(gBtn);
+                prevTokenKind = "grp";
+            }
+            else if (token.StartsWith("sep:", StringComparison.OrdinalIgnoreCase))
+            {
+                mainElements.Add(CreateCustomSeparator(icon, token));
+                prevTokenKind = "sep";
+            }
+        }
+
+        bool showUtilitiesNow = !data.Settings.AutoHideUtilityButtons || isUtilityHoverRevealed;
         var utilityButtons = new List<FrameworkElement>();
         if (overflow.Count > 0)
             utilityButtons.Add(CreateUtilityButton($"…{overflow.Count}", $"更多固定项 · {overflow.Count}", icon, () => OverflowRequested?.Invoke(), isGear: false));
-        utilityButtons.Add(CreateUtilityButton("▦", "全部收藏", icon, () => LibraryRequested?.Invoke(), isGear: false));
-        utilityButtons.Add(CreateUtilityButton("＋", "添加收藏（右键可快速选文件夹/本机应用）", icon, () => AddRequested?.Invoke(), isGear: false));
-
-        var gearSection = new List<FrameworkElement>
+        if (showUtilitiesNow)
         {
-            CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true)
-        };
+            if (data.Settings.ShowLibraryButton)
+                utilityButtons.Add(CreateUtilityButton("▦", "全部收藏", icon, () => LibraryRequested?.Invoke(), isGear: false));
+            if (data.Settings.ShowAddButton)
+                utilityButtons.Add(CreateUtilityButton("＋", "添加收藏（右键可快速选文件夹/本机应用）", icon, () => AddRequested?.Invoke(), isGear: false));
+        }
 
-        foreach (var section in new[] { pinnedButtons, groupButtons, utilityButtons, gearSection })
+        var gearSection = new List<FrameworkElement>();
+        if (showUtilitiesNow && data.Settings.ShowSettingsButton)
+        {
+            gearSection.Add(CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true));
+        }
+
+        // 若主区域和功能按钮都为空（例如用户隐藏了所有功能按钮且还没有固定项），保底显示“设置”与“添加”按钮防止空壳
+        if (mainElements.Count == 0 && utilityButtons.Count == 0 && gearSection.Count == 0)
+        {
+            utilityButtons.Add(CreateUtilityButton("＋", "添加收藏", icon, () => AddRequested?.Invoke(), isGear: false));
+            gearSection.Add(CreateUtilityButton("⚙", "打开设置", icon, () => SettingsRequested?.Invoke(), isGear: true));
+        }
+
+        foreach (var element in mainElements)
+            ItemsPanel.Children.Add(element);
+
+        foreach (var section in new[] { utilityButtons, gearSection })
         {
             if (section.Count == 0) continue;
             if (ItemsPanel.Children.Count > 0) ItemsPanel.Children.Add(CreateSeparator(icon));
             foreach (var element in section) ItemsPanel.Children.Add(element);
         }
-        ((Button)ItemsPanel.Children[^1]).Margin = new Thickness(0);
+
+        if (ItemsPanel.Children.Count > 0)
+            ((FrameworkElement)ItemsPanel.Children[^1]).Margin = new Thickness(0);
     }
 
-    private Button CreateBookmarkButton(Bookmark item, double icon)
+    private Button CreateBookmarkButton(Bookmark item, double icon, string token)
     {
         bool isFolder = BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Folder;
-        var button = CreateChrome(icon, item.Name, isFolder ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"));
+        var button = CreateChrome(icon, item.Name, isFolder ? (Brush)FindResource("FolderBgBrush") : (Brush)FindResource("SoftBrush"), token);
         if (isFolder)
         {
             ((Border)button.Content).Child = CreatePrototypeFolderIcon(icon * 0.62);
@@ -225,6 +323,7 @@ public partial class DockWindow : Window
         }
         button.Click += (_, _) =>
         {
+            if (isReordering || IsDragging) return;
             folderOpenTimer.Stop();
             folderPopup.Hide();
             LaunchRequested?.Invoke(item);
@@ -233,7 +332,7 @@ public partial class DockWindow : Window
         {
             folderOpenTimer.Stop();
             folderPopup.Hide();
-            ShowBookmarkContextMenu(item);
+            ShowBookmarkContextMenu(item, token);
             e.Handled = true;
         };
         return button;
@@ -306,10 +405,148 @@ public partial class DockWindow : Window
         };
     }
 
-    private Button CreateGroupButton(string group, double icon)
+    private Button CreateGroupButton(string group, double icon, string token)
     {
-        var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"));
+        var button = CreateChrome(icon, group, (Brush)FindResource("SoftBrush"), token);
         button.MouseEnter += (_, _) => folderOpenTimer.Stop();
+        ((Border)button.Content).Child = BuildGroupIconVisual(group, icon);
+        button.Click += (_, _) =>
+        {
+            if (isReordering || IsDragging) return;
+            folderOpenTimer.Stop();
+            folderPopup.Hide();
+            var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
+            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+        };
+        button.MouseRightButtonUp += (_, e) =>
+        {
+            folderOpenTimer.Stop();
+            folderPopup.Hide();
+            ShowGroupContextMenu(group, token);
+            e.Handled = true;
+        };
+        return button;
+    }
+
+    private UIElement BuildGroupIconVisual(string group, double icon)
+    {
+        data.GroupIcons.TryGetValue(group, out var cfg);
+        var kind = cfg?.Kind ?? GroupIconKind.DefaultGrid;
+        string val = cfg?.Value ?? "";
+
+        if (kind == GroupIconKind.Preset)
+        {
+            string? pathData = GroupIconPresets.FindPathData(val);
+            if (!string.IsNullOrWhiteSpace(pathData))
+            {
+                var pathShape = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse(pathData),
+                    Fill = (Brush)FindResource("AccentBrush"),
+                    Stretch = Stretch.Uniform
+                };
+                return new Viewbox
+                {
+                    Width = icon * 0.54,
+                    Height = icon * 0.54,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Child = pathShape
+                };
+            }
+        }
+        else if (kind == GroupIconKind.CustomFile && !string.IsNullOrWhiteSpace(val))
+        {
+            var host = new Grid();
+            var fallback = BuildDefaultFourCellGrid(icon);
+            var image = new Image
+            {
+                Width = icon * 0.65,
+                Height = icon * 0.65,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            host.Children.Add(fallback);
+            host.Children.Add(image);
+            _ = LoadIcon(image, fallback, val);
+            return host;
+        }
+        else if (kind == GroupIconKind.MemberPreview)
+        {
+            var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal)).Take(4).ToList();
+            if (members.Count > 0)
+            {
+                var grid = new Grid
+                {
+                    Width = icon * 0.64,
+                    Height = icon * 0.64,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                grid.RowDefinitions.Add(new RowDefinition());
+                grid.RowDefinitions.Add(new RowDefinition());
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+                double miniSize = icon * 0.27;
+                for (int i = 0; i < 4; i++)
+                {
+                    UIElement cellChild;
+                    if (i < members.Count)
+                    {
+                        var m = members[i];
+                        if (BookmarkKindHelper.FromPath(m.Path) == BookmarkKind.Folder)
+                        {
+                            cellChild = CreatePrototypeFolderIcon(miniSize);
+                        }
+                        else
+                        {
+                            var cellHost = new Grid();
+                            var dot = new Border
+                            {
+                                Width = miniSize * 0.7,
+                                Height = miniSize * 0.7,
+                                CornerRadius = new CornerRadius(2),
+                                Background = (Brush)FindResource("AccentBrush"),
+                                Opacity = 0.5
+                            };
+                            var img = new Image
+                            {
+                                Width = miniSize,
+                                Height = miniSize,
+                                Stretch = Stretch.Uniform
+                            };
+                            RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
+                            cellHost.Children.Add(dot);
+                            cellHost.Children.Add(img);
+                            _ = LoadIcon(img, dot, m.Path);
+                            cellChild = cellHost;
+                        }
+                    }
+                    else
+                    {
+                        cellChild = new Border
+                        {
+                            Background = (Brush)FindResource("AccentBrush"),
+                            Opacity = 0.22,
+                            CornerRadius = new CornerRadius(2),
+                            Margin = new Thickness(1.5)
+                        };
+                    }
+                    Grid.SetRow(cellChild, i / 2);
+                    Grid.SetColumn(cellChild, i % 2);
+                    grid.Children.Add(cellChild);
+                }
+                return grid;
+            }
+        }
+
+        return BuildDefaultFourCellGrid(icon);
+    }
+
+    private UIElement BuildDefaultFourCellGrid(double icon)
+    {
         var grid = new Grid { Width = icon * 0.44, Height = icon * 0.44, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         grid.RowDefinitions.Add(new RowDefinition());
         grid.RowDefinitions.Add(new RowDefinition());
@@ -322,20 +559,12 @@ public partial class DockWindow : Window
             Grid.SetColumn(cell, i % 2);
             grid.Children.Add(cell);
         }
-        ((Border)button.Content).Child = grid;
-        button.Click += (_, _) =>
-        {
-            folderOpenTimer.Stop();
-            folderPopup.Hide();
-            var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
-            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
-        };
-        return button;
+        return grid;
     }
 
     private Button CreateUtilityButton(string glyph, string tip, double icon, Action action, bool isGear)
     {
-        var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"));
+        var button = CreateChrome(icon, tip, isGear ? Brushes.Transparent : (Brush)FindResource("SoftBrush"), reorderItemToken: null);
         button.MouseEnter += (_, _) => folderOpenTimer.Stop();
         ((Border)button.Content).Child = new TextBlock
         {
@@ -345,7 +574,11 @@ public partial class DockWindow : Window
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
-        button.Click += (_, _) => action();
+        button.Click += (_, _) =>
+        {
+            if (IsDragging) return;
+            action();
+        };
         return button;
     }
 
@@ -363,7 +596,41 @@ public partial class DockWindow : Window
         };
     }
 
-    private Button CreateChrome(double icon, string tip, Brush background)
+    private FrameworkElement CreateCustomSeparator(double icon, string token)
+    {
+        bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        var line = new Border
+        {
+            Width = vertical ? icon * 0.66 : 2,
+            Height = vertical ? 2 : icon * 0.66,
+            CornerRadius = new CornerRadius(1),
+            Background = (Brush)FindResource("LineBrush"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        var hitBox = new Border
+        {
+            Width = vertical ? icon : 10,
+            Height = vertical ? 10 : icon,
+            Background = Brushes.Transparent,
+            Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
+            Cursor = Cursors.Hand,
+            ToolTip = "分隔符（可拖拽调整位置 · 右键删除）",
+            Tag = token,
+            Child = line
+        };
+        hitBox.MouseEnter += (_, _) => line.Background = (Brush)FindResource("AccentBrush");
+        hitBox.MouseLeave += (_, _) => line.Background = (Brush)FindResource("LineBrush");
+        hitBox.MouseRightButtonUp += (_, e) =>
+        {
+            ShowSeparatorContextMenu(token);
+            e.Handled = true;
+        };
+        AttachReorderOrDrag(hitBox, token);
+        return hitBox;
+    }
+
+    private Button CreateChrome(double icon, string tip, Brush background, string? reorderItemToken)
     {
         var scale = new ScaleTransform(1, 1);
         var translate = new TranslateTransform(0, 0);
@@ -373,6 +640,8 @@ public partial class DockWindow : Window
             Height = icon,
             CornerRadius = new CornerRadius(11),
             Background = background,
+            BorderThickness = new Thickness(1.5),
+            BorderBrush = Brushes.Transparent,
             RenderTransformOrigin = new Point(0.5, 0.5),
             RenderTransform = new TransformGroup { Children = { scale, translate } }
         };
@@ -382,7 +651,8 @@ public partial class DockWindow : Window
             Content = border,
             Style = (Style)FindResource("DockButton"),
             Margin = vertical ? new Thickness(0, 0, 0, 9) : new Thickness(0, 0, 9, 0),
-            ToolTip = tip
+            ToolTip = tip,
+            Tag = reorderItemToken
         };
         ToolTipService.SetInitialShowDelay(button, 120);
         var dur = new Duration(TimeSpan.FromMilliseconds(140));
@@ -399,7 +669,7 @@ public partial class DockWindow : Window
             scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.0, dur));
             translate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, dur));
         };
-        AttachDrag(button);
+        AttachReorderOrDrag(button, reorderItemToken);
         return button;
     }
 
@@ -413,7 +683,7 @@ public partial class DockWindow : Window
         catch (System.ComponentModel.Win32Exception) { }
     }
 
-    private void ShowBookmarkContextMenu(Bookmark item)
+    private void ShowBookmarkContextMenu(Bookmark item, string token)
     {
         var menu = new ContextMenu();
         var openItem = new MenuItem { Header = $"打开“{item.Name}”" };
@@ -423,6 +693,24 @@ public partial class DockWindow : Window
         var revealItem = new MenuItem { Header = "在资源管理器中显示" };
         revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
         menu.Items.Add(revealItem);
+
+        menu.Items.Add(new Separator());
+
+        var sepBefore = new MenuItem { Header = "｜ 在前面插入分隔符" };
+        sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
+        menu.Items.Add(sepBefore);
+
+        var sepAfter = new MenuItem { Header = "｜ 在后面插入分隔符" };
+        sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
+        menu.Items.Add(sepAfter);
+
+        var movePrev = new MenuItem { Header = "← 向前移动一位" };
+        movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
+        menu.Items.Add(movePrev);
+
+        var moveNext = new MenuItem { Header = "→ 向后移动一位" };
+        moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
+        menu.Items.Add(moveNext);
 
         menu.Items.Add(new Separator());
 
@@ -439,6 +727,100 @@ public partial class DockWindow : Window
         menu.Items.Add(removeItem);
 
         menu.IsOpen = true;
+    }
+
+    private void ShowGroupContextMenu(string group, string token)
+    {
+        var menu = new ContextMenu();
+        var openGrp = new MenuItem { Header = $"打开分组“{group}”" };
+        openGrp.Click += (_, _) =>
+        {
+            var members = data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal));
+            groupPopup.ShowGroup(group, members, placement.Bounds, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+        };
+        menu.Items.Add(openGrp);
+
+        var configGrp = new MenuItem { Header = "配置分组与自定义图标…" };
+        configGrp.Click += (_, _) => ConfigureGroupRequested?.Invoke(group);
+        menu.Items.Add(configGrp);
+
+        menu.Items.Add(new Separator());
+
+        var sepBefore = new MenuItem { Header = "｜ 在前面插入分隔符" };
+        sepBefore.Click += (_, _) => InsertSeparatorAround(token, before: true);
+        menu.Items.Add(sepBefore);
+
+        var sepAfter = new MenuItem { Header = "｜ 在后面插入分隔符" };
+        sepAfter.Click += (_, _) => InsertSeparatorAround(token, before: false);
+        menu.Items.Add(sepAfter);
+
+        var movePrev = new MenuItem { Header = "← 向前移动一位" };
+        movePrev.Click += (_, _) => MoveTokenByStep(token, -1);
+        menu.Items.Add(movePrev);
+
+        var moveNext = new MenuItem { Header = "→ 向后移动一位" };
+        moveNext.Click += (_, _) => MoveTokenByStep(token, 1);
+        menu.Items.Add(moveNext);
+
+        menu.IsOpen = true;
+    }
+
+    private void ShowSeparatorContextMenu(string sepToken)
+    {
+        var menu = new ContextMenu();
+        var removeSep = new MenuItem { Header = "删除此分隔符" };
+        removeSep.Click += (_, _) =>
+        {
+            data.DockOrder.Remove(sepToken);
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        menu.Items.Add(removeSep);
+        menu.IsOpen = true;
+    }
+
+    private void InsertSeparatorAround(string anchorToken, bool before)
+    {
+        data.NormalizeDockOrder();
+        int idx = data.DockOrder.IndexOf(anchorToken);
+        string sep = "sep:" + Guid.NewGuid().ToString("N")[..8];
+        if (idx < 0)
+            data.DockOrder.Add(sep);
+        else
+            data.DockOrder.Insert(before ? idx : idx + 1, sep);
+        Relayout();
+        DragEnded?.Invoke();
+    }
+
+    private void MoveTokenByStep(string token, int delta)
+    {
+        data.NormalizeDockOrder();
+        int idx = data.DockOrder.IndexOf(token);
+        if (idx < 0) return;
+        int target = Math.Clamp(idx + delta, 0, data.DockOrder.Count - 1);
+        if (target == idx) return;
+        data.DockOrder.RemoveAt(idx);
+        data.DockOrder.Insert(target, token);
+        SyncItemsOrderFromDockOrder();
+        Relayout();
+        DragEnded?.Invoke();
+    }
+
+    private void SyncItemsOrderFromDockOrder()
+    {
+        var rank = new Dictionary<Guid, int>();
+        int pos = 0;
+        foreach (string token in data.DockOrder)
+        {
+            if (token.StartsWith("bm:", StringComparison.OrdinalIgnoreCase) && Guid.TryParse(token[3..], out var g))
+                rank[g] = pos++;
+        }
+        data.Items.Sort((a, b) =>
+        {
+            int ra = rank.GetValueOrDefault(a.Id, int.MaxValue);
+            int rb = rank.GetValueOrDefault(b.Id, int.MaxValue);
+            return ra.CompareTo(rb);
+        });
     }
 
     private void Window_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -463,6 +845,40 @@ public partial class DockWindow : Window
 
         menu.Items.Add(new Separator());
 
+        var autoSep = new MenuItem { Header = "｜ 按类型自动分隔（应用 / 文件夹 / 分组）" };
+        autoSep.Click += (_, _) =>
+        {
+            data.AutoSeparateByKind();
+            SyncItemsOrderFromDockOrder();
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        menu.Items.Add(autoSep);
+
+        var addSepEnd = new MenuItem { Header = "｜ 插入分隔符" };
+        addSepEnd.Click += (_, _) =>
+        {
+            data.NormalizeDockOrder();
+            data.DockOrder.Add("sep:" + Guid.NewGuid().ToString("N")[..8]);
+            Relayout();
+            DragEnded?.Invoke();
+        };
+        menu.Items.Add(addSepEnd);
+
+        if (data.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase)))
+        {
+            var clearSeps = new MenuItem { Header = "✕ 清除所有自定义分隔符" };
+            clearSeps.Click += (_, _) =>
+            {
+                data.DockOrder.RemoveAll(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase));
+                Relayout();
+                DragEnded?.Invoke();
+            };
+            menu.Items.Add(clearSeps);
+        }
+
+        menu.Items.Add(new Separator());
+
         var allLibrary = new MenuItem { Header = "▦ 打开全部收藏" };
         allLibrary.Click += (_, _) => LibraryRequested?.Invoke();
         menu.Items.Add(allLibrary);
@@ -470,6 +886,12 @@ public partial class DockWindow : Window
         var openSettings = new MenuItem { Header = "⚙ PinDock 设置" };
         openSettings.Click += (_, _) => SettingsRequested?.Invoke();
         menu.Items.Add(openSettings);
+
+        menu.Items.Add(new Separator());
+
+        var exitItem = new MenuItem { Header = "⏻ 退出 PinDock" };
+        exitItem.Click += (_, _) => ExitRequested?.Invoke();
+        menu.Items.Add(exitItem);
 
         menu.IsOpen = true;
         e.Handled = true;
@@ -481,36 +903,190 @@ public partial class DockWindow : Window
             FilesDropped?.Invoke(files);
     }
 
-    private void AttachDrag(Button button)
+    private void DockChrome_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        button.PreviewMouseLeftButtonDown += (_, e) =>
+        if (data.Settings.LockPosition || isReordering) return;
+        var cursor = PointToScreen(e.GetPosition(this));
+        dragStartCursor = new ScreenRect(cursor.X, cursor.Y, 0, 0);
+        dragOriginOffset = data.Settings.EdgeOffset;
+        DockChrome.CaptureMouse();
+    }
+
+    private void DockChrome_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (dragStartCursor is not ScreenRect start || e.LeftButton != MouseButtonState.Pressed) return;
+        var cursor = PointToScreen(e.GetPosition(this));
+        bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+        double delta = vertical ? cursor.Y - start.Y : cursor.X - start.X;
+        if (!IsDragging && Math.Abs(delta) < 4) return;
+        IsDragging = true;
+        double along = vertical ? placement.Bounds.Height : placement.Bounds.Width;
+        data.Settings.EdgeOffset = DockLayout.ClampEdgeOffset(workArea, data.Settings.DockEdge, along, dragOriginOffset + delta);
+        Reposition(placement.Capacity);
+    }
+
+    private void DockChrome_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        dragStartCursor = null;
+        if (DockChrome.IsMouseCaptured) DockChrome.ReleaseMouseCapture();
+        if (!IsDragging) return;
+        IsDragging = false;
+        e.Handled = true;
+        DragEnded?.Invoke();
+    }
+
+    private void AttachReorderOrDrag(FrameworkElement element, string? itemToken)
+    {
+        element.PreviewMouseLeftButtonDown += (_, e) =>
         {
-            if (data.Settings.LockPosition) return;
-            var cursor = button.PointToScreen(e.GetPosition(button));
-            dragStartCursor = new ScreenRect(cursor.X, cursor.Y, 0, 0);
-            dragOriginOffset = data.Settings.EdgeOffset;
+            bool altHeld = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
+            if (altHeld || string.IsNullOrEmpty(itemToken))
+            {
+                if (data.Settings.LockPosition) return;
+                var cursor = element.PointToScreen(e.GetPosition(element));
+                dragStartCursor = new ScreenRect(cursor.X, cursor.Y, 0, 0);
+                dragOriginOffset = data.Settings.EdgeOffset;
+                return;
+            }
+            reorderToken = itemToken;
+            reorderElement = element;
+            reorderStartPoint = e.GetPosition(ItemsPanel);
+            isReordering = false;
         };
-        button.PreviewMouseMove += (_, e) =>
+        element.PreviewMouseMove += (_, e) =>
         {
-            if (dragStartCursor is not ScreenRect start || e.LeftButton != MouseButtonState.Pressed) return;
-            var cursor = button.PointToScreen(e.GetPosition(button));
-            bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
-            double delta = vertical ? cursor.Y - start.Y : cursor.X - start.X;
-            if (!IsDragging && Math.Abs(delta) < 4) return;
-            IsDragging = true;
-            double along = vertical ? placement.Bounds.Height : placement.Bounds.Width;
-            data.Settings.EdgeOffset = DockLayout.ClampEdgeOffset(workArea, data.Settings.DockEdge, along, dragOriginOffset + delta);
-            Reposition(placement.Capacity);
+            if (dragStartCursor is ScreenRect start && e.LeftButton == MouseButtonState.Pressed)
+            {
+                var cursor = element.PointToScreen(e.GetPosition(element));
+                bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+                double delta = vertical ? cursor.Y - start.Y : cursor.X - start.X;
+                if (!IsDragging && Math.Abs(delta) < 4) return;
+                IsDragging = true;
+                double along = vertical ? placement.Bounds.Height : placement.Bounds.Width;
+                data.Settings.EdgeOffset = DockLayout.ClampEdgeOffset(workArea, data.Settings.DockEdge, along, dragOriginOffset + delta);
+                Reposition(placement.Capacity);
+                return;
+            }
+
+            if (reorderToken is null || reorderElement != element || e.LeftButton != MouseButtonState.Pressed) return;
+            var currentPos = e.GetPosition(ItemsPanel);
+            bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+            double moveDelta = isVert ? currentPos.Y - reorderStartPoint.Y : currentPos.X - reorderStartPoint.X;
+            if (!isReordering && Math.Abs(moveDelta) < 6) return;
+
+            if (!isReordering)
+            {
+                isReordering = true;
+                folderOpenTimer.Stop();
+                folderPopup.Hide();
+                element.CaptureMouse();
+                element.Opacity = 0.55;
+            }
+
+            HighlightDropTarget(currentPos, isVert);
         };
-        button.PreviewMouseLeftButtonUp += (_, e) =>
+        element.PreviewMouseLeftButtonUp += (_, e) =>
         {
-            dragStartCursor = null;
-            if (!IsDragging) return;
-            IsDragging = false;
-            e.Handled = true;
-            button.ReleaseMouseCapture();
-            DragEnded?.Invoke();
+            if (dragStartCursor is not null)
+            {
+                dragStartCursor = null;
+                if (IsDragging)
+                {
+                    IsDragging = false;
+                    e.Handled = true;
+                    element.ReleaseMouseCapture();
+                    DragEnded?.Invoke();
+                }
+                return;
+            }
+
+            if (reorderToken is not null && reorderElement == element)
+            {
+                string activeToken = reorderToken;
+                reorderToken = null;
+                reorderElement = null;
+                element.Opacity = 1.0;
+                ClearDropHighlights();
+                if (element.IsMouseCaptured) element.ReleaseMouseCapture();
+
+                if (isReordering)
+                {
+                    isReordering = false;
+                    e.Handled = true;
+                    var dropPos = e.GetPosition(ItemsPanel);
+                    bool isVert = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
+                    CommitReorder(activeToken, dropPos, isVert);
+                }
+            }
         };
+    }
+
+    private void HighlightDropTarget(Point posInPanel, bool vertical)
+    {
+        ClearDropHighlights();
+        var target = FindTargetElementAt(posInPanel, vertical, out _);
+        if (target is Button { Content: Border b })
+        {
+            b.BorderBrush = (Brush)FindResource("AccentBrush");
+        }
+        else if (target is Border sepHit)
+        {
+            sepHit.Opacity = 0.6;
+        }
+    }
+
+    private void ClearDropHighlights()
+    {
+        foreach (UIElement child in ItemsPanel.Children)
+        {
+            if (child is Button { Content: Border b })
+                b.BorderBrush = Brushes.Transparent;
+            else if (child is Border sepHit && sepHit != reorderElement)
+                sepHit.Opacity = 1.0;
+        }
+    }
+
+    private FrameworkElement? FindTargetElementAt(Point posInPanel, bool vertical, out bool insertAfter)
+    {
+        insertAfter = false;
+        FrameworkElement? lastReorderable = null;
+        foreach (UIElement child in ItemsPanel.Children)
+        {
+            if (child is not FrameworkElement fe || fe.Tag is not string) continue;
+            lastReorderable = fe;
+            var topLeft = fe.TranslatePoint(new Point(0, 0), ItemsPanel);
+            double center = vertical ? topLeft.Y + fe.ActualHeight / 2 : topLeft.X + fe.ActualWidth / 2;
+            double cursor = vertical ? posInPanel.Y : posInPanel.X;
+            if (cursor < center)
+            {
+                insertAfter = false;
+                return fe;
+            }
+        }
+        insertAfter = true;
+        return lastReorderable;
+    }
+
+    private void CommitReorder(string draggedToken, Point posInPanel, bool vertical)
+    {
+        var targetFe = FindTargetElementAt(posInPanel, vertical, out bool insertAfter);
+        if (targetFe?.Tag is not string targetToken || string.Equals(draggedToken, targetToken, StringComparison.Ordinal))
+            return;
+
+        data.NormalizeDockOrder();
+        if (!data.DockOrder.Remove(draggedToken)) return;
+        int targetIdx = data.DockOrder.IndexOf(targetToken);
+        if (targetIdx < 0)
+        {
+            data.DockOrder.Add(draggedToken);
+        }
+        else
+        {
+            data.DockOrder.Insert(insertAfter ? targetIdx + 1 : targetIdx, draggedToken);
+        }
+        SyncItemsOrderFromDockOrder();
+        Relayout();
+        DragEnded?.Invoke();
     }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)

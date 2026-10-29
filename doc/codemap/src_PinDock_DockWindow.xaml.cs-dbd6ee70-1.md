@@ -4,40 +4,55 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DockWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 12c393095453767dede17c122c54bae1316a3f17a2835790d0a1c8ec40889723
+Source SHA-256: a87ad0106b93376875e19f155f1d37b8d28e06932fdd3692b8f292e53aee1c13
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [8](../../src/PinDock/DockWindow.xaml.cs#L8) |
 | DockWindow | class_declaration | PinDock | [10](../../src/PinDock/DockWindow.xaml.cs#L10) |
-| IsDragging | property_declaration | PinDock::DockWindow | [40](../../src/PinDock/DockWindow.xaml.cs#L40) |
-| IsShown | property_declaration | PinDock::DockWindow | [41](../../src/PinDock/DockWindow.xaml.cs#L41) |
-| IsGroupOpen | property_declaration | PinDock::DockWindow | [42](../../src/PinDock/DockWindow.xaml.cs#L42) |
-| CurrentBounds | property_declaration | PinDock::DockWindow | [43](../../src/PinDock/DockWindow.xaml.cs#L43) |
-| EdgeHandleRect | property_declaration | PinDock::DockWindow | [44](../../src/PinDock/DockWindow.xaml.cs#L44) |
-| HitArea | property_declaration | PinDock::DockWindow | [45](../../src/PinDock/DockWindow.xaml.cs#L45) |
-| GroupBounds | property_declaration | PinDock::DockWindow | [46](../../src/PinDock/DockWindow.xaml.cs#L46) |
-| OverflowItems | property_declaration | PinDock::DockWindow | [51](../../src/PinDock/DockWindow.xaml.cs#L51) |
-| DockWindow | constructor_declaration | PinDock::DockWindow | [53](../../src/PinDock/DockWindow.xaml.cs#L53) |
-| Bind | method_declaration | PinDock::DockWindow | [83](../../src/PinDock/DockWindow.xaml.cs#L83) |
-| Relayout | method_declaration | PinDock::DockWindow | [90](../../src/PinDock/DockWindow.xaml.cs#L90) |
-| ShowDock | method_declaration | PinDock::DockWindow | [104](../../src/PinDock/DockWindow.xaml.cs#L104) |
-| HideDock | method_declaration | PinDock::DockWindow | [112](../../src/PinDock/DockWindow.xaml.cs#L112) |
-| CloseGroup | method_declaration | PinDock::DockWindow | [122](../../src/PinDock/DockWindow.xaml.cs#L122) |
-| Reposition | method_declaration | PinDock::DockWindow | [128](../../src/PinDock/DockWindow.xaml.cs#L128) |
-| Rebuild | method_declaration | PinDock::DockWindow | [140](../../src/PinDock/DockWindow.xaml.cs#L140) |
-| CreateBookmarkButton | method_declaration | PinDock::DockWindow | [173](../../src/PinDock/DockWindow.xaml.cs#L173) |
-| OpenFolderPopupFor | method_declaration | PinDock::DockWindow | [242](../../src/PinDock/DockWindow.xaml.cs#L242) |
-| CheckFolderPopupLeave | method_declaration | PinDock::DockWindow | [260](../../src/PinDock/DockWindow.xaml.cs#L260) |
-| ExpandRect | method_declaration | PinDock::DockWindow | [279](../../src/PinDock/DockWindow.xaml.cs#L279) |
-| CreatePrototypeFolderIcon | method_declaration | PinDock::DockWindow | [282](../../src/PinDock/DockWindow.xaml.cs#L282) |
-| CreateGroupButton | method_declaration | PinDock::DockWindow | [309](../../src/PinDock/DockWindow.xaml.cs#L309) |
-| CreateUtilityButton | method_declaration | PinDock::DockWindow | [336](../../src/PinDock/DockWindow.xaml.cs#L336) |
-| CreateSeparator | method_declaration | PinDock::DockWindow | [352](../../src/PinDock/DockWindow.xaml.cs#L352) |
-| CreateChrome | method_declaration | PinDock::DockWindow | [366](../../src/PinDock/DockWindow.xaml.cs#L366) |
-| LoadIcon | method_declaration | PinDock::DockWindow | [406](../../src/PinDock/DockWindow.xaml.cs#L406) |
-| ShowBookmarkContextMenu | method_declaration | PinDock::DockWindow | [416](../../src/PinDock/DockWindow.xaml.cs#L416) |
-| Window_MouseRightButtonUp | method_declaration | PinDock::DockWindow | [444](../../src/PinDock/DockWindow.xaml.cs#L444) |
-| Window_Drop | method_declaration | PinDock::DockWindow | [478](../../src/PinDock/DockWindow.xaml.cs#L478) |
-| AttachDrag | method_declaration | PinDock::DockWindow | [484](../../src/PinDock/DockWindow.xaml.cs#L484) |
-| Window_PreviewKeyDown | method_declaration | PinDock::DockWindow | [516](../../src/PinDock/DockWindow.xaml.cs#L516) |
+| IsDragging | property_declaration | PinDock::DockWindow | [48](../../src/PinDock/DockWindow.xaml.cs#L48) |
+| IsShown | property_declaration | PinDock::DockWindow | [49](../../src/PinDock/DockWindow.xaml.cs#L49) |
+| IsGroupOpen | property_declaration | PinDock::DockWindow | [50](../../src/PinDock/DockWindow.xaml.cs#L50) |
+| CurrentBounds | property_declaration | PinDock::DockWindow | [51](../../src/PinDock/DockWindow.xaml.cs#L51) |
+| EdgeHandleRect | property_declaration | PinDock::DockWindow | [52](../../src/PinDock/DockWindow.xaml.cs#L52) |
+| HitArea | property_declaration | PinDock::DockWindow | [53](../../src/PinDock/DockWindow.xaml.cs#L53) |
+| GroupBounds | property_declaration | PinDock::DockWindow | [54](../../src/PinDock/DockWindow.xaml.cs#L54) |
+| OverflowItems | property_declaration | PinDock::DockWindow | [59](../../src/PinDock/DockWindow.xaml.cs#L59) |
+| DockWindow | constructor_declaration | PinDock::DockWindow | [61](../../src/PinDock/DockWindow.xaml.cs#L61) |
+| Bind | method_declaration | PinDock::DockWindow | [118](../../src/PinDock/DockWindow.xaml.cs#L118) |
+| Relayout | method_declaration | PinDock::DockWindow | [125](../../src/PinDock/DockWindow.xaml.cs#L125) |
+| ShowDock | method_declaration | PinDock::DockWindow | [149](../../src/PinDock/DockWindow.xaml.cs#L149) |
+| HideDock | method_declaration | PinDock::DockWindow | [157](../../src/PinDock/DockWindow.xaml.cs#L157) |
+| CloseGroup | method_declaration | PinDock::DockWindow | [169](../../src/PinDock/DockWindow.xaml.cs#L169) |
+| Reposition | method_declaration | PinDock::DockWindow | [175](../../src/PinDock/DockWindow.xaml.cs#L175) |
+| Rebuild | method_declaration | PinDock::DockWindow | [187](../../src/PinDock/DockWindow.xaml.cs#L187) |
+| CreateBookmarkButton | method_declaration | PinDock::DockWindow | [271](../../src/PinDock/DockWindow.xaml.cs#L271) |
+| OpenFolderPopupFor | method_declaration | PinDock::DockWindow | [341](../../src/PinDock/DockWindow.xaml.cs#L341) |
+| CheckFolderPopupLeave | method_declaration | PinDock::DockWindow | [359](../../src/PinDock/DockWindow.xaml.cs#L359) |
+| ExpandRect | method_declaration | PinDock::DockWindow | [378](../../src/PinDock/DockWindow.xaml.cs#L378) |
+| CreatePrototypeFolderIcon | method_declaration | PinDock::DockWindow | [381](../../src/PinDock/DockWindow.xaml.cs#L381) |
+| CreateGroupButton | method_declaration | PinDock::DockWindow | [408](../../src/PinDock/DockWindow.xaml.cs#L408) |
+| BuildGroupIconVisual | method_declaration | PinDock::DockWindow | [431](../../src/PinDock/DockWindow.xaml.cs#L431) |
+| BuildDefaultFourCellGrid | method_declaration | PinDock::DockWindow | [548](../../src/PinDock/DockWindow.xaml.cs#L548) |
+| CreateUtilityButton | method_declaration | PinDock::DockWindow | [565](../../src/PinDock/DockWindow.xaml.cs#L565) |
+| CreateSeparator | method_declaration | PinDock::DockWindow | [585](../../src/PinDock/DockWindow.xaml.cs#L585) |
+| CreateCustomSeparator | method_declaration | PinDock::DockWindow | [599](../../src/PinDock/DockWindow.xaml.cs#L599) |
+| CreateChrome | method_declaration | PinDock::DockWindow | [633](../../src/PinDock/DockWindow.xaml.cs#L633) |
+| LoadIcon | method_declaration | PinDock::DockWindow | [676](../../src/PinDock/DockWindow.xaml.cs#L676) |
+| ShowBookmarkContextMenu | method_declaration | PinDock::DockWindow | [686](../../src/PinDock/DockWindow.xaml.cs#L686) |
+| ShowGroupContextMenu | method_declaration | PinDock::DockWindow | [732](../../src/PinDock/DockWindow.xaml.cs#L732) |
+| ShowSeparatorContextMenu | method_declaration | PinDock::DockWindow | [768](../../src/PinDock/DockWindow.xaml.cs#L768) |
+| InsertSeparatorAround | method_declaration | PinDock::DockWindow | [782](../../src/PinDock/DockWindow.xaml.cs#L782) |
+| MoveTokenByStep | method_declaration | PinDock::DockWindow | [795](../../src/PinDock/DockWindow.xaml.cs#L795) |
+| SyncItemsOrderFromDockOrder | method_declaration | PinDock::DockWindow | [809](../../src/PinDock/DockWindow.xaml.cs#L809) |
+| Window_MouseRightButtonUp | method_declaration | PinDock::DockWindow | [826](../../src/PinDock/DockWindow.xaml.cs#L826) |
+| Window_Drop | method_declaration | PinDock::DockWindow | [900](../../src/PinDock/DockWindow.xaml.cs#L900) |
+| DockChrome_MouseLeftButtonDown | method_declaration | PinDock::DockWindow | [906](../../src/PinDock/DockWindow.xaml.cs#L906) |
+| DockChrome_MouseMove | method_declaration | PinDock::DockWindow | [915](../../src/PinDock/DockWindow.xaml.cs#L915) |
+| DockChrome_MouseLeftButtonUp | method_declaration | PinDock::DockWindow | [928](../../src/PinDock/DockWindow.xaml.cs#L928) |
+| AttachReorderOrDrag | method_declaration | PinDock::DockWindow | [938](../../src/PinDock/DockWindow.xaml.cs#L938) |
+| HighlightDropTarget | method_declaration | PinDock::DockWindow | [1024](../../src/PinDock/DockWindow.xaml.cs#L1024) |
+| ClearDropHighlights | method_declaration | PinDock::DockWindow | [1038](../../src/PinDock/DockWindow.xaml.cs#L1038) |
+| FindTargetElementAt | method_declaration | PinDock::DockWindow | [1049](../../src/PinDock/DockWindow.xaml.cs#L1049) |
+| CommitReorder | method_declaration | PinDock::DockWindow | [1070](../../src/PinDock/DockWindow.xaml.cs#L1070) |
+| Window_PreviewKeyDown | method_declaration | PinDock::DockWindow | [1092](../../src/PinDock/DockWindow.xaml.cs#L1092) |

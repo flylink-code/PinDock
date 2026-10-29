@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppSettings.cs) · page 1/1
 
-Source SHA-256: 4b87d39d59d9a2d74bfd7719fcf66f7f64c52bf52b10d252ddc44adde8e6befe
+Source SHA-256: d84c66a44870c5426fc45faac4a6dea717e29441723df1833a6228e19d8208cb
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -36,25 +36,37 @@ Source SHA-256: 4b87d39d59d9a2d74bfd7719fcf66f7f64c52bf52b10d252ddc44adde8e6befe
 | Compact | enum_member_declaration | PinDock::IconSize | [8](../../src/PinDock/AppSettings.cs#L8) |
 | Standard | enum_member_declaration | PinDock::IconSize | [8](../../src/PinDock/AppSettings.cs#L8) |
 | Comfortable | enum_member_declaration | PinDock::IconSize | [8](../../src/PinDock/AppSettings.cs#L8) |
-| AppSettings | class_declaration | PinDock | [10](../../src/PinDock/AppSettings.cs#L10) |
-| DisplayMode | property_declaration | PinDock::AppSettings | [16](../../src/PinDock/AppSettings.cs#L16) |
-| DockEdge | property_declaration | PinDock::AppSettings | [17](../../src/PinDock/AppSettings.cs#L17) |
-| ThemeMode | property_declaration | PinDock::AppSettings | [18](../../src/PinDock/AppSettings.cs#L18) |
-| Palette | property_declaration | PinDock::AppSettings | [19](../../src/PinDock/AppSettings.cs#L19) |
-| MonitorPolicy | property_declaration | PinDock::AppSettings | [20](../../src/PinDock/AppSettings.cs#L20) |
-| IconSize | property_declaration | PinDock::AppSettings | [21](../../src/PinDock/AppSettings.cs#L21) |
-| Opacity | property_declaration | PinDock::AppSettings | [22](../../src/PinDock/AppSettings.cs#L22) |
-| Topmost | property_declaration | PinDock::AppSettings | [23](../../src/PinDock/AppSettings.cs#L23) |
-| AvoidFullscreen | property_declaration | PinDock::AppSettings | [24](../../src/PinDock/AppSettings.cs#L24) |
-| LockPosition | property_declaration | PinDock::AppSettings | [25](../../src/PinDock/AppSettings.cs#L25) |
-| CollapseAfterLaunch | property_declaration | PinDock::AppSettings | [26](../../src/PinDock/AppSettings.cs#L26) |
-| EdgeOffset | property_declaration | PinDock::AppSettings | [27](../../src/PinDock/AppSettings.cs#L27) |
-| MonitorDeviceName | property_declaration | PinDock::AppSettings | [28](../../src/PinDock/AppSettings.cs#L28) |
-| ExplorerContextMenu | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
-| HotkeyModifiers | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
-| HotkeyKey | property_declaration | PinDock::AppSettings | [31](../../src/PinDock/AppSettings.cs#L31) |
-| HasHotkey | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
-| BookmarkKind | enum_declaration | PinDock | [36](../../src/PinDock/AppSettings.cs#L36) |
-| Application | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |
-| Folder | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |
-| File | enum_member_declaration | PinDock::BookmarkKind | [36](../../src/PinDock/AppSettings.cs#L36) |
+| CloseAction | enum_declaration | PinDock | [9](../../src/PinDock/AppSettings.cs#L9) |
+| MinimizeToTray | enum_member_declaration | PinDock::CloseAction | [9](../../src/PinDock/AppSettings.cs#L9) |
+| ExitApplication | enum_member_declaration | PinDock::CloseAction | [9](../../src/PinDock/AppSettings.cs#L9) |
+| AppSettings | class_declaration | PinDock | [11](../../src/PinDock/AppSettings.cs#L11) |
+| DisplayMode | property_declaration | PinDock::AppSettings | [18](../../src/PinDock/AppSettings.cs#L18) |
+| DockEdge | property_declaration | PinDock::AppSettings | [19](../../src/PinDock/AppSettings.cs#L19) |
+| ThemeMode | property_declaration | PinDock::AppSettings | [20](../../src/PinDock/AppSettings.cs#L20) |
+| Palette | property_declaration | PinDock::AppSettings | [21](../../src/PinDock/AppSettings.cs#L21) |
+| MonitorPolicy | property_declaration | PinDock::AppSettings | [22](../../src/PinDock/AppSettings.cs#L22) |
+| IconSize | property_declaration | PinDock::AppSettings | [23](../../src/PinDock/AppSettings.cs#L23) |
+| Opacity | property_declaration | PinDock::AppSettings | [24](../../src/PinDock/AppSettings.cs#L24) |
+| Topmost | property_declaration | PinDock::AppSettings | [25](../../src/PinDock/AppSettings.cs#L25) |
+| AvoidFullscreen | property_declaration | PinDock::AppSettings | [26](../../src/PinDock/AppSettings.cs#L26) |
+| LockPosition | property_declaration | PinDock::AppSettings | [27](../../src/PinDock/AppSettings.cs#L27) |
+| CollapseAfterLaunch | property_declaration | PinDock::AppSettings | [28](../../src/PinDock/AppSettings.cs#L28) |
+| EdgeOffset | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
+| MonitorDeviceName | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
+| ExplorerContextMenu | property_declaration | PinDock::AppSettings | [31](../../src/PinDock/AppSettings.cs#L31) |
+| HotkeyModifiers | property_declaration | PinDock::AppSettings | [32](../../src/PinDock/AppSettings.cs#L32) |
+| HotkeyKey | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
+| ShowLibraryButton | property_declaration | PinDock::AppSettings | [36](../../src/PinDock/AppSettings.cs#L36) |
+| ShowAddButton | property_declaration | PinDock::AppSettings | [37](../../src/PinDock/AppSettings.cs#L37) |
+| ShowSettingsButton | property_declaration | PinDock::AppSettings | [38](../../src/PinDock/AppSettings.cs#L38) |
+| AutoHideUtilityButtons | property_declaration | PinDock::AppSettings | [39](../../src/PinDock/AppSettings.cs#L39) |
+| LaunchAtStartup | property_declaration | PinDock::AppSettings | [42](../../src/PinDock/AppSettings.cs#L42) |
+| ClosePanelBehavior | property_declaration | PinDock::AppSettings | [43](../../src/PinDock/AppSettings.cs#L43) |
+| ConfirmBeforeExit | property_declaration | PinDock::AppSettings | [44](../../src/PinDock/AppSettings.cs#L44) |
+| UseGithubMirror | property_declaration | PinDock::AppSettings | [47](../../src/PinDock/AppSettings.cs#L47) |
+| GithubMirrorUrl | property_declaration | PinDock::AppSettings | [48](../../src/PinDock/AppSettings.cs#L48) |
+| HasHotkey | property_declaration | PinDock::AppSettings | [50](../../src/PinDock/AppSettings.cs#L50) |
+| BookmarkKind | enum_declaration | PinDock | [53](../../src/PinDock/AppSettings.cs#L53) |
+| Application | enum_member_declaration | PinDock::BookmarkKind | [53](../../src/PinDock/AppSettings.cs#L53) |
+| Folder | enum_member_declaration | PinDock::BookmarkKind | [53](../../src/PinDock/AppSettings.cs#L53) |
+| File | enum_member_declaration | PinDock::BookmarkKind | [53](../../src/PinDock/AppSettings.cs#L53) |

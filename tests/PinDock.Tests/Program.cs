@@ -201,7 +201,75 @@ try
             throw new Exception($"Palette {p} light/dark differentiation failed");
     }
 
-    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, hotkey clear, app discovery, explorer args, palettes");
+    // 1. 分组自定义图标配置、预设与导入导出测试
+    if (string.IsNullOrWhiteSpace(GroupIconPresets.FindPathData("code")))
+        throw new Exception("GroupIconPresets lookup failed");
+    var customGroupData = new LibraryData
+    {
+        Items =
+        [
+            new Bookmark { Name = "App1", Path = Environment.ProcessPath!, Group = "开发工具", Pinned = true },
+            new Bookmark { Name = "Folder1", Path = directory, Group = "", Pinned = true }
+        ],
+        Groups = ["开发工具"],
+        GroupIcons = new Dictionary<string, GroupIconConfig>
+        {
+            ["开发工具"] = new GroupIconConfig { Kind = GroupIconKind.Preset, Value = "code" }
+        },
+        Settings = new AppSettings
+        {
+            ShowLibraryButton = false,
+            ShowAddButton = true,
+            ShowSettingsButton = false,
+            AutoHideUtilityButtons = true,
+            LaunchAtStartup = true,
+            ClosePanelBehavior = CloseAction.ExitApplication,
+            ConfirmBeforeExit = true,
+            UseGithubMirror = true,
+            GithubMirrorUrl = "https://gh-proxy.com/"
+        }
+    };
+    // 2. Dock 排序与自动按类型分隔测试
+    customGroupData.AutoSeparateByKind();
+    if (!customGroupData.DockOrder.Any(t => t.StartsWith("sep:", StringComparison.Ordinal)) ||
+        customGroupData.DockOrder.Count < 4)
+        throw new Exception("AutoSeparateByKind did not insert separators between apps, folders and groups");
+
+    store.Save(customGroupData);
+    var reloadedCustom = store.Load();
+    if (!reloadedCustom.GroupIcons.TryGetValue("开发工具", out var loadedIconCfg) ||
+        loadedIconCfg.Kind != GroupIconKind.Preset || loadedIconCfg.Value != "code")
+        throw new Exception("GroupIcons round trip failed");
+    if (reloadedCustom.Settings.ShowLibraryButton ||
+        !reloadedCustom.Settings.AutoHideUtilityButtons ||
+        reloadedCustom.Settings.ClosePanelBehavior != CloseAction.ExitApplication ||
+        !reloadedCustom.Settings.ConfirmBeforeExit ||
+        reloadedCustom.Settings.GithubMirrorUrl != "https://gh-proxy.com/")
+        throw new Exception("Extended settings round trip failed");
+
+    LibraryTransfer.RenameGroup(reloadedCustom, "开发工具", "核心研发");
+    if (!reloadedCustom.GroupIcons.ContainsKey("核心研发") ||
+        !reloadedCustom.DockOrder.Contains("grp:核心研发"))
+        throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
+
+    // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
+    if (UpdateService.GetCurrentVersion() != "0.1.0")
+        throw new Exception($"Expected version 0.1.0, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.0", "v0.1.1") ||
+        !UpdateService.IsNewerVersion("0.1.0", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.0", "v0.1.0"))
+        throw new Exception("UpdateService version comparison failed");
+
+    string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";
+    string mirroredUrl = UpdateService.ApplyMirror(rawReleaseAssetUrl, true, "https://ghfast.top");
+    if (mirroredUrl != "https://ghfast.top/" + rawReleaseAssetUrl)
+        throw new Exception($"Mirror URL rewrite failed: {mirroredUrl}");
+    if (UpdateService.ApplyMirror(rawReleaseAssetUrl, false, "https://ghfast.top") != rawReleaseAssetUrl)
+        throw new Exception("Disabled mirror should keep raw URL");
+    if (StartupService.BuildCommand(@"C:\App\PinDock.exe") != "\"C:\\App\\PinDock.exe\"")
+        throw new Exception("StartupService BuildCommand failed");
+
+    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, custom group icons, dock separators, utility hide, startup/close, updater mirror, palettes");
 }
 finally
 {

@@ -2,4 +2,6 @@
 **/obj/
 .vs/
 artifacts/
+dist/
+installer/PinDock.Setup/payload.zip
 *.user

@@ -429,6 +429,7 @@ input[type="range"] {
         <button class="chip-btn" data-filter="文件" aria-pressed="false">文件</button>
         <button class="chip-btn" data-filter="installed" aria-pressed="false">本机软件库</button>
         <span class="filters-spacer"></span>
+        <button class="chip-btn" id="btn-auto-separate" title="将 Dock 图标按应用、文件夹、分组自动插入分隔符">｜ 按类型分隔</button>
         <button class="chip-btn" id="btn-quick-folder">＋ 添加文件夹</button>
         <button class="chip-btn" id="btn-open-add">＋ 添加收藏</button>
         <button class="chip-btn" id="btn-open-group">▦ 管理分组</button>
@@ -545,6 +546,35 @@ input[type="range"] {
             <span>悬停名称提示</span>
             <span class="badge">默认开启</span>
           </div>
+          <div class="section-label" style="margin-top:18px">Dock 功能按钮精简与隐藏</div>
+          <div class="row">
+            <span>
+              仅鼠标悬停 Dock 时展开功能按钮
+              <small>平时仅展示你的应用、文件夹与分组，鼠标移入 Dock 时自动渐显功能区</small>
+            </span>
+            <button class="switch" id="sw-autohide-utility" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              显示「▦ 全部收藏」按钮
+              <small>隐藏后仍可通过 Dock 右键菜单或右下角托盘浮窗进入</small>
+            </span>
+            <button class="switch" id="sw-show-library-btn" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row">
+            <span>
+              显示「＋ 添加收藏」按钮
+              <small>隐藏后仍可直接拖入文件或右键添加</small>
+            </span>
+            <button class="switch" id="sw-show-add-btn" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row">
+            <span>
+              显示「⚙ 设置」按钮
+              <small>隐藏后仍可通过 Dock 右键菜单或右下角托盘进入设置</small>
+            </span>
+            <button class="switch" id="sw-show-settings-btn" role="switch" aria-checked="true"></button>
+          </div>
           <p class="notice">自动提取应用与快捷方式 48×48 高清系统图标，文件夹使用原型定制双层矢量图标。</p>
         </section>
 
@@ -570,9 +600,16 @@ input[type="range"] {
           <div class="row">
             <span>
               锁定 Dock 位置
-              <small>未锁定时可按住 Dock 图标沿停靠边拖动</small>
+              <small>未锁定时可按住 Dock 空白边框或按住 Alt 拖动整体位置；直接拖拽图标可调整顺序</small>
             </span>
             <button class="switch" id="sw-lock" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              Dock 图标分组与分隔符
+              <small>在 Dock 图标上右键可自由插入/删除分隔符，或点击右侧一键按应用和文件夹分隔</small>
+            </span>
+            <button class="chip-btn" id="btn-settings-auto-sep">｜ 按应用/文件夹分隔</button>
           </div>
           <div class="row">
             <span>
@@ -580,6 +617,38 @@ input[type="range"] {
               <small>在 Windows 文件夹上右键可直接选择“添加到 PinDock”</small>
             </span>
             <button class="switch" id="sw-explorer-menu" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="section-label" style="margin-top:18px">系统启动与退出行为</div>
+          <div class="row">
+            <span>
+              开机自动启动
+              <small>登录 Windows 时自动在后台启动 PinDock</small>
+            </span>
+            <button class="switch" id="sw-startup" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              点击面板右上角关闭按钮 (×) 时
+              <small>选择关闭《全部收藏 / 设置》窗口时的默认行为</small>
+            </span>
+            <select id="sel-close-behavior" aria-label="关闭按钮行为">
+              <option value="MinimizeToTray">自动最小化隐藏到托盘（保持 Dock 运行）</option>
+              <option value="ExitApplication">直接退出关闭 PinDock</option>
+            </select>
+          </div>
+          <div class="row">
+            <span>
+              退出程序前弹窗确认
+              <small>防止误触导致整个 Dock 退出</small>
+            </span>
+            <button class="switch" id="sw-confirm-exit" role="switch" aria-checked="false"></button>
+          </div>
+          <div class="row">
+            <span>
+              立即退出程序
+              <small>完全关闭 PinDock 悬浮栏与托盘驻留</small>
+            </span>
+            <button class="danger-btn" id="btn-exit-app" style="margin-right:0">⏻ 退出 PinDock</button>
           </div>
           <div class="section-label" style="margin-top:18px">停靠位置 · 点击屏幕四边切换</div>
           <div class="position-picker" role="group" aria-label="停靠位置">
@@ -596,7 +665,41 @@ input[type="range"] {
         <section data-panel="about" hidden>
           <h2>你的收藏，留在本地</h2>
           <p class="subtitle">PinDock · Windows 独立悬浮启动栏</p>
-          <p class="notice">收藏与设置保存在 %LocalAppData%\PinDock\library.json，不联网、不上传。移除收藏不会删除目标文件。</p>
+          <p class="notice">收藏与设置保存在 %LocalAppData%\PinDock\library.json，仅检查版本更新时按需访问 GitHub Release。移除收藏不会删除目标文件。</p>
+          <div class="section-label">版本更新与 GitHub 国内镜像加速</div>
+          <div class="row">
+            <span>
+              当前版本：<strong id="lbl-current-version">v0.1.0</strong>
+              <small id="lbl-update-status">支持通过 GitHub Releases 检查并一键覆盖升级安装包</small>
+            </span>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="chip-btn" id="btn-check-update">检查更新</button>
+              <button class="primary-btn" id="btn-install-update" hidden>立即下载升级</button>
+            </div>
+          </div>
+          <div class="row">
+            <span>
+              使用国内镜像加速下载升级包
+              <small>开启后下载 GitHub Release 安装包时自动通过镜像加速源中转</small>
+            </span>
+            <button class="switch" id="sw-github-mirror" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row" id="row-mirror-url">
+            <span style="flex:1">
+              国内镜像源地址
+              <small>可选择内置加速源，或输入自定义镜像前缀（如 https://ghfast.top/）</small>
+            </span>
+            <div style="display:flex;gap:6px;align-items:center;width:320px">
+              <select id="sel-mirror-preset" style="width:120px">
+                <option value="https://ghfast.top/">ghfast.top</option>
+                <option value="https://gh-proxy.com/">gh-proxy.com</option>
+                <option value="https://mirror.ghproxy.com/">ghproxy.com</option>
+                <option value="custom">自定义…</option>
+              </select>
+              <input class="field-input" id="inp-github-mirror" placeholder="https://ghfast.top/" style="flex:1">
+            </div>
+          </div>
+          <div class="section-label" style="margin-top:18px">备份与数据迁移</div>
           <div class="row">
             <span>导入收藏<small>按目标与启动配置去重，已存在的会被跳过</small></span>
             <button class="chip-btn" id="btn-import">导入 JSON…</button>
@@ -677,11 +780,11 @@ input[type="range"] {
 
 <!-- 弹窗 2：新建 / 配置分组及成员 -->
 <div class="modal-backdrop" id="modal-group">
-  <div class="modal-card" style="width:min(500px,calc(100vw - 44px))">
+  <div class="modal-card" style="width:min(520px,calc(100vw - 44px))">
     <div class="modal-header">
       <div>
         <h3 id="group-modal-title">新建 / 配置收藏组</h3>
-        <small>设置分组名称，并直接勾选要归入该分组的收藏项（有成员的分组将显示在 Dock 上）</small>
+        <small>设置分组名称、自定义分组图标，并勾选要归入该分组的收藏项</small>
       </div>
       <button class="close-btn" id="btn-close-group">×</button>
     </div>
@@ -692,10 +795,33 @@ input[type="range"] {
           <option value="">＋ 新建收藏组</option>
         </select>
       </div>
-      <label class="field-label">
-        <span>分组名称</span>
-        <input class="field-input" id="group-name-input" placeholder="例如：开发项目、常用工具、客户资料" maxlength="40">
-      </label>
+      <div class="grid-2">
+        <label class="field-label">
+          <span>分组名称</span>
+          <input class="field-input" id="group-name-input" placeholder="例如：开发项目、常用工具" maxlength="40">
+        </label>
+        <label class="field-label">
+          <span>分组图标样式</span>
+          <select id="group-icon-kind" class="field-input">
+            <option value="DefaultGrid">默认四宫格</option>
+            <option value="MemberPreview">组内成员 2×2 缩略图</option>
+            <option value="Preset">内置分类矢量图标</option>
+            <option value="CustomFile">自定义图片 / 程序图标</option>
+          </select>
+        </label>
+      </div>
+      <div class="field-label" id="group-preset-wrap" hidden>
+        <span>选择内置分类图标</span>
+        <div id="group-preset-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+      <div class="field-label" id="group-custom-file-wrap" hidden>
+        <span>自定义图标文件（支持 .png / .ico / .jpg / .exe / .lnk）</span>
+        <div class="field-row">
+          <span class="entry-icon" id="group-custom-icon-preview" style="width:32px;height:32px"><svg><use href="#ico-app"/></svg></span>
+          <input class="field-input" id="group-custom-icon-path" placeholder="选择本地图片或应用程序提取图标…">
+          <button class="chip-btn" type="button" id="btn-pick-group-icon">浏览…</button>
+        </div>
+      </div>
       <div class="field-label">
         <span>勾选属于该分组的收藏项（可多选）</span>
         <div class="member-checklist" id="group-member-list"></div>
@@ -716,12 +842,16 @@ const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
 let state = {
+  version: '0.1.0',
   view: 'library',
   overflowOnly: false,
   filter: 'all',
   items: [],
   overflowIds: [],
   groups: [],
+  groupIcons: {},
+  groupIconPresets: [],
+  dockOrder: [],
   installedApps: [],
   icons: {},
   monitors: [],
@@ -731,6 +861,9 @@ let state = {
 let editingId = null;
 let recordingHotkey = false;
 let toastTimer = null;
+let selectedPresetKey = 'code';
+let pendingUpdateDownloadUrl = '';
+let pendingUpdateAssetName = '';
 
 function send(cmd, payload = {}) {
   if (window.chrome && window.chrome.webview) {
@@ -1056,6 +1189,46 @@ $('#btn-save-editor').onclick = () => {
 // 新建 / 配置分组及成员弹窗
 let editingGroupOriginalName = '';
 
+function renderGroupPresetGrid() {
+  const grid = $('#group-preset-grid');
+  grid.replaceChildren();
+  (state.groupIconPresets || []).forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn';
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+    btn.style.gap = '6px';
+    btn.setAttribute('aria-pressed', String(selectedPresetKey === p.key));
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="${p.pathData}"/></svg><span>${p.label}</span>`;
+    btn.onclick = () => {
+      selectedPresetKey = p.key;
+      renderGroupPresetGrid();
+    };
+    grid.append(btn);
+  });
+}
+
+function updateGroupIconKindVisibility() {
+  const kind = $('#group-icon-kind').value;
+  $('#group-preset-wrap').hidden = kind !== 'Preset';
+  $('#group-custom-file-wrap').hidden = kind !== 'CustomFile';
+  if (kind === 'Preset') renderGroupPresetGrid();
+}
+
+$('#group-icon-kind').onchange = updateGroupIconKindVisibility;
+$('#btn-pick-group-icon').onclick = () => send('pickIconForGroup');
+
+function updateGroupCustomIconPreview(path, dataUri) {
+  const wrap = $('#group-custom-icon-preview');
+  const uri = dataUri || (path && state.icons[path]);
+  if (uri) {
+    wrap.innerHTML = `<img src="${uri}" alt="">`;
+  } else {
+    wrap.innerHTML = `<svg><use href="#ico-app"/></svg>`;
+  }
+}
+
 function openGroupModal(groupName = '', preselectIds = []) {
   editingGroupOriginalName = groupName || '';
   const sel = $('#group-select-existing');
@@ -1078,6 +1251,17 @@ function populateGroupModalFields(groupName, preselectIds = []) {
   $('#group-name-input').value = editingGroupOriginalName;
   $('#btn-delete-group').hidden = !editingGroupOriginalName;
   const preSet = new Set(preselectIds);
+
+  const iconCfg = (editingGroupOriginalName && state.groupIcons && state.groupIcons[editingGroupOriginalName]) || { kind: 'DefaultGrid', value: '' };
+  $('#group-icon-kind').value = iconCfg.kind || 'DefaultGrid';
+  if (iconCfg.kind === 'Preset' && iconCfg.value) {
+    selectedPresetKey = iconCfg.value;
+  } else if (state.groupIconPresets && state.groupIconPresets.length > 0) {
+    selectedPresetKey = state.groupIconPresets[0].key;
+  }
+  $('#group-custom-icon-path').value = iconCfg.kind === 'CustomFile' ? (iconCfg.value || '') : '';
+  updateGroupCustomIconPreview($('#group-custom-icon-path').value);
+  updateGroupIconKindVisibility();
 
   const list = $('#group-member-list');
   list.replaceChildren();
@@ -1118,21 +1302,34 @@ $('#btn-delete-group').onclick = () => {
 $('#btn-save-group').onclick = () => {
   const name = $('#group-name-input').value.trim();
   if (!name) { notify('请输入分组名称'); return; }
+  const iconKind = $('#group-icon-kind').value;
+  let iconValue = '';
+  if (iconKind === 'Preset') iconValue = selectedPresetKey;
+  else if (iconKind === 'CustomFile') iconValue = $('#group-custom-icon-path').value.trim();
+
   const memberIds = [...$$('#group-member-list input[type="checkbox"]:checked')].map(cb => cb.value);
   send('saveGroupConfig', {
     originalName: editingGroupOriginalName,
     name,
-    memberIds
+    memberIds,
+    iconKind,
+    iconValue
   });
   $('#modal-group').classList.remove('open');
   notify(`已保存分组「${name}」（共 ${memberIds.length} 个成员）`);
 };
 
+function switchSettingsPage(pageName) {
+  $$('.nav').forEach(b => b.classList.toggle('active', b.dataset.page === pageName));
+  $$('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== pageName);
+}
+
 // 设置页导航与控件
-$$('.nav').forEach(btn => btn.onclick = () => {
-  $$('.nav').forEach(b => b.classList.toggle('active', b === btn));
-  $$('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== btn.dataset.page);
-});
+$$('.nav').forEach(btn => btn.onclick = () => switchSettingsPage(btn.dataset.page));
+
+$('#btn-auto-separate').onclick = () => send('autoSeparateDock');
+$('#btn-settings-auto-sep').onclick = () => send('autoSeparateDock');
+$('#btn-exit-app').onclick = () => send('exitApp');
 
 $$('[data-mode]').forEach(btn => btn.onclick = () => {
   state.settings.displayMode = btn.dataset.mode;
@@ -1165,6 +1362,34 @@ $('#sel-monitor-policy').onchange = e => {
   applySettingsToUi();
   send('updateSettings', { settings: state.settings });
 };
+$('#sel-close-behavior').onchange = e => {
+  state.settings.closePanelBehavior = e.target.value;
+  send('updateSettings', { settings: state.settings });
+};
+
+$('#sel-mirror-preset').onchange = e => {
+  if (e.target.value !== 'custom') {
+    $('#inp-github-mirror').value = e.target.value;
+    state.settings.githubMirrorUrl = e.target.value;
+    send('updateSettings', { settings: state.settings });
+  } else {
+    $('#inp-github-mirror').focus();
+  }
+};
+$('#inp-github-mirror').onchange = e => {
+  state.settings.githubMirrorUrl = e.target.value.trim() || 'https://ghfast.top/';
+  applySettingsToUi();
+  send('updateSettings', { settings: state.settings });
+};
+
+$('#btn-check-update').onclick = () => send('checkUpdate');
+$('#btn-install-update').onclick = () => {
+  if (!pendingUpdateDownloadUrl) return;
+  send('downloadAndInstallUpdate', {
+    downloadUrl: pendingUpdateDownloadUrl,
+    assetName: pendingUpdateAssetName
+  });
+};
 
 $('#rng-opacity').oninput = e => {
   const val = parseInt(e.target.value, 10);
@@ -1179,6 +1404,8 @@ function bindSwitch(id, prop, cmdName = 'updateSettings') {
     applySettingsToUi();
     if (cmdName === 'toggleExplorerMenu') {
       send('toggleExplorerMenu', { enabled: state.settings[prop] });
+    } else if (cmdName === 'toggleStartup') {
+      send('toggleStartup', { enabled: state.settings[prop] });
     } else {
       send('updateSettings', { settings: state.settings });
     }
@@ -1189,6 +1416,13 @@ bindSwitch('#sw-topmost', 'topmost');
 bindSwitch('#sw-fullscreen', 'avoidFullscreen');
 bindSwitch('#sw-lock', 'lockPosition');
 bindSwitch('#sw-explorer-menu', 'explorerContextMenu', 'toggleExplorerMenu');
+bindSwitch('#sw-startup', 'launchAtStartup', 'toggleStartup');
+bindSwitch('#sw-confirm-exit', 'confirmBeforeExit');
+bindSwitch('#sw-autohide-utility', 'autoHideUtilityButtons');
+bindSwitch('#sw-show-library-btn', 'showLibraryButton');
+bindSwitch('#sw-show-add-btn', 'showAddButton');
+bindSwitch('#sw-show-settings-btn', 'showSettingsButton');
+bindSwitch('#sw-github-mirror', 'useGithubMirror');
 
 // 快捷键录制与清除
 $('#btn-hotkey-record').onclick = () => {
@@ -1307,6 +1541,21 @@ function applySettingsToUi() {
   $('#sw-fullscreen').setAttribute('aria-checked', String(!!s.avoidFullscreen));
   $('#sw-lock').setAttribute('aria-checked', String(!!s.lockPosition));
   $('#sw-explorer-menu').setAttribute('aria-checked', String(!!s.explorerContextMenu));
+  $('#sw-startup').setAttribute('aria-checked', String(!!s.launchAtStartup));
+  $('#sw-confirm-exit').setAttribute('aria-checked', String(!!s.confirmBeforeExit));
+  $('#sw-autohide-utility').setAttribute('aria-checked', String(!!s.autoHideUtilityButtons));
+  $('#sw-show-library-btn').setAttribute('aria-checked', String(s.showLibraryButton !== false));
+  $('#sw-show-add-btn').setAttribute('aria-checked', String(s.showAddButton !== false));
+  $('#sw-show-settings-btn').setAttribute('aria-checked', String(s.showSettingsButton !== false));
+  $('#sw-github-mirror').setAttribute('aria-checked', String(s.useGithubMirror !== false));
+
+  $('#sel-close-behavior').value = s.closePanelBehavior || 'MinimizeToTray';
+  $('#lbl-current-version').textContent = 'v' + (state.version || '0.1.0');
+
+  const mirrorUrl = s.githubMirrorUrl || 'https://ghfast.top/';
+  $('#inp-github-mirror').value = mirrorUrl;
+  const presetOptions = [...$('#sel-mirror-preset').options].map(o => o.value);
+  $('#sel-mirror-preset').value = presetOptions.includes(mirrorUrl) ? mirrorUrl : 'custom';
 
   renderHotkeyUi();
 
@@ -1336,9 +1585,13 @@ if (window.chrome && window.chrome.webview) {
     if (!msg || !msg.type) return;
 
     if (msg.type === 'state') {
+      state.version = msg.version || state.version;
       state.items = msg.items || [];
       state.overflowIds = msg.overflowIds || [];
       state.groups = msg.groups || [];
+      state.groupIcons = msg.groupIcons || state.groupIcons;
+      state.groupIconPresets = msg.groupIconPresets || state.groupIconPresets;
+      state.dockOrder = msg.dockOrder || state.dockOrder;
       state.installedApps = msg.installedApps || state.installedApps;
       state.monitors = msg.monitors || state.monitors;
       state.settings = msg.settings || state.settings;
@@ -1348,6 +1601,12 @@ if (window.chrome && window.chrome.webview) {
       renderLibrary();
       if (msg.openView) {
         switchView(msg.openView, { overflowOnly: !!msg.overflowOnly, filter: msg.filter });
+      }
+      if (msg.settingsPage) {
+        switchSettingsPage(msg.settingsPage);
+      }
+      if (msg.openGroupModalName !== undefined && msg.openGroupModalName !== null) {
+        openGroupModal(msg.openGroupModalName);
       }
       if (msg.openEditorItem !== undefined) {
         openEditor(msg.openEditorItem);
@@ -1365,6 +1624,47 @@ if (window.chrome && window.chrome.webview) {
       if (!$('#editor-name').value.trim() && msg.suggestedName) {
         $('#editor-name').value = msg.suggestedName;
       }
+    } else if (msg.type === 'pickedGroupIcon') {
+      $('#group-custom-icon-path').value = msg.path || '';
+      if (msg.path && msg.dataUri) state.icons[msg.path] = msg.dataUri;
+      updateGroupCustomIconPreview(msg.path, msg.dataUri);
+    } else if (msg.type === 'updateChecking') {
+      $('#btn-check-update').disabled = true;
+      $('#btn-check-update').textContent = '正在检查…';
+      $('#lbl-update-status').textContent = '正在连接 GitHub Releases 检查最新版本…';
+    } else if (msg.type === 'updateStatus') {
+      $('#btn-check-update').disabled = false;
+      $('#btn-check-update').textContent = '检查更新';
+      if (!msg.ok) {
+        $('#lbl-update-status').textContent = `检查失败：${msg.error || '网络异常'}`;
+        return;
+      }
+      if (msg.hasUpdate) {
+        $('#lbl-update-status').textContent = `发现新版本 v${msg.latestVersion}（当前 v${msg.currentVersion}）`;
+        if (msg.downloadUrl) {
+          pendingUpdateDownloadUrl = msg.downloadUrl;
+          pendingUpdateAssetName = msg.assetName || `PinDock-Setup-${msg.latestVersion}.exe`;
+          $('#btn-install-update').hidden = false;
+          $('#btn-install-update').disabled = false;
+          $('#btn-install-update').textContent = `立即升级 v${msg.latestVersion}`;
+        } else {
+          $('#btn-install-update').hidden = false;
+          $('#btn-install-update').disabled = false;
+          $('#btn-install-update').textContent = '前往下载页';
+          $('#btn-install-update').onclick = () => send('openExternalUrl', { url: msg.releasePageUrl });
+        }
+      } else {
+        $('#lbl-update-status').textContent = `当前已是最新版本 (v${msg.currentVersion})`;
+        $('#btn-install-update').hidden = true;
+      }
+    } else if (msg.type === 'updateProgress') {
+      $('#btn-install-update').disabled = true;
+      $('#btn-install-update').textContent = `正在下载 (${msg.percent}%)…`;
+      $('#lbl-update-status').textContent = `正在下载升级安装包：${msg.percent}%`;
+    } else if (msg.type === 'updateError') {
+      $('#btn-install-update').disabled = false;
+      $('#btn-install-update').textContent = '重试下载升级';
+      $('#lbl-update-status').textContent = `升级失败：${msg.error || '下载错误'}`;
     } else if (msg.type === 'toast') {
       notify(msg.message);
     }

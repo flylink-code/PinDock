@@ -17,6 +17,7 @@ public sealed class AppController : IDisposable
     private readonly DockWindow dock;
     private readonly EdgeHandleWindow edgeHandle = new();
     private readonly WebPanelWindow webPanel;
+    private readonly TrayFlyoutWindow trayFlyout;
     private DisplayMode appliedMode;
     private bool dialogOpen;
     private bool suppressedByFullscreen;
@@ -26,6 +27,7 @@ public sealed class AppController : IDisposable
     public LibraryData Data { get; }
     public InstalledAppsService InstalledApps { get; } = new();
     public IReadOnlyList<Bookmark> OverflowItems => dock.OverflowItems;
+    public bool IsDockVisible => dock.IsShown;
 
     public AppController(string? initialAddPath = null)
     {
@@ -40,12 +42,14 @@ public sealed class AppController : IDisposable
         theme.Apply(Data.Settings.ThemeMode, Data.Settings.Palette);
         dock = new DockWindow(icons);
         webPanel = new WebPanelWindow(this, icons);
+        trayFlyout = new TrayFlyoutWindow(this, icons);
         webPanel.Prewarm();
 
         dock.LaunchRequested += bookmark => _ = LaunchAsync(bookmark);
         dock.EditRequested += EditBookmarkInteractive;
         dock.UnpinRequested += TogglePin;
         dock.RemoveRequested += RemoveBookmarkWithConfirm;
+        dock.ConfigureGroupRequested += groupName => webPanel.ShowGroupModal(groupName);
         dock.LibraryRequested += () => webPanel.ShowLibrary();
         dock.InstalledAppsRequested += () => webPanel.ShowLibrary(focusInstalledApps: true);
         dock.OverflowRequested += () => webPanel.ShowLibrary(true);
@@ -54,25 +58,36 @@ public sealed class AppController : IDisposable
         dock.AddFileRequested += AddFileInteractive;
         dock.FilesDropped += AddPaths;
         dock.SettingsRequested += () => webPanel.ShowSettings();
-        dock.DragEnded += Persist;
+        dock.ExitRequested += RequestExitApplication;
+        dock.DragEnded += () =>
+        {
+            Persist();
+            webPanel.RefreshIfVisible();
+        };
 
         edgeHandle.Hovered += () => autoHide.Reveal(false);
         autoHide.Configure(
-            () => dock.IsGroupOpen,
+            () => dock.IsGroupOpen || trayFlyout.IsVisible,
             () => dock.IsDragging,
             () => dialogOpen || webPanel.IsVisible,
             () => dock.HitArea,
             () => dock.GroupBounds);
         autoHide.StateChanged += _ => SyncVisuals();
 
+        tray.FlyoutRequested += () => trayFlyout.ToggleFlyout();
         tray.ToggleRequested += ToggleVisibility;
         tray.LibraryRequested += () => webPanel.ShowLibrary();
         tray.SettingsRequested += () => webPanel.ShowSettings();
-        tray.ExitRequested += () => Application.Current.Shutdown();
+        tray.ExitRequested += RequestExitApplication;
 
         hotkeys.Pressed += ToggleVisibility;
         fullscreen.Changed += OnFullscreenChanged;
-        theme.Changed += RelayoutDock;
+        theme.Changed += () =>
+        {
+            RelayoutDock();
+            webPanel.RefreshIfVisible();
+            trayFlyout.RefreshIfVisible();
+        };
 
         dock.Bind(Data);
         dock.Relayout();
@@ -82,6 +97,32 @@ public sealed class AppController : IDisposable
 
         if (!string.IsNullOrWhiteSpace(initialAddPath))
             AddPaths([initialAddPath]);
+    }
+
+    public void ToggleDockFromFlyout() => ToggleVisibility();
+
+    public void OpenEditorForNew() => webPanel.ShowEditor(null);
+
+    public void OpenLibraryPanel() => webPanel.ShowLibrary();
+
+    public void OpenSettingsPanel(string? page = null) => webPanel.ShowSettings(page);
+
+    public void RequestExitApplication()
+    {
+        if (Data.Settings.ConfirmBeforeExit)
+        {
+            dialogOpen = true;
+            try
+            {
+                if (MessageBox.Show("确定要退出 PinDock 吗？", "退出 PinDock", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    return;
+            }
+            finally
+            {
+                dialogOpen = false;
+            }
+        }
+        Application.Current.Shutdown();
     }
 
     public void UpdateOpacityOnly()
@@ -126,6 +167,12 @@ public sealed class AppController : IDisposable
         {
             MessageBox.Show($"无法打开收藏“{item.Name}”（{item.Path}）：{ex.Message}");
             return;
+        }
+        if (Data.Items.Contains(item))
+        {
+            item.LastLaunchedTicks = DateTime.UtcNow.Ticks;
+            item.LaunchCount++;
+            Persist();
         }
         if (!Data.Settings.CollapseAfterLaunch) return;
         if (appliedMode == DisplayMode.EdgeAutoHide) autoHide.HideNow();
@@ -201,17 +248,30 @@ public sealed class AppController : IDisposable
         webPanel.RefreshIfVisible();
     }
 
-    public void SaveGroupConfig(string originalName, string newName, IReadOnlySet<Guid> memberIds)
+    public void SaveGroupConfig(string originalName, string newName, IReadOnlySet<Guid> memberIds, GroupIconConfig? iconConfig = null)
     {
         if (!string.IsNullOrEmpty(originalName) && !string.Equals(originalName, newName, StringComparison.Ordinal))
         {
             int idx = Data.Groups.IndexOf(originalName);
             if (idx >= 0) Data.Groups[idx] = newName;
             else if (!Data.Groups.Contains(newName, StringComparer.Ordinal)) Data.Groups.Add(newName);
+
+            if (Data.GroupIcons.Remove(originalName, out var oldIcon))
+                Data.GroupIcons[newName] = oldIcon;
+            for (int i = 0; i < Data.DockOrder.Count; i++)
+            {
+                if (string.Equals(Data.DockOrder[i], "grp:" + originalName, StringComparison.Ordinal))
+                    Data.DockOrder[i] = "grp:" + newName;
+            }
         }
         else if (!Data.Groups.Contains(newName, StringComparer.Ordinal))
         {
             Data.Groups.Add(newName);
+        }
+
+        if (iconConfig is not null)
+        {
+            Data.GroupIcons[newName] = iconConfig;
         }
 
         foreach (var item in Data.Items)
@@ -226,6 +286,16 @@ public sealed class AppController : IDisposable
             }
         }
 
+        Data.NormalizeDockOrder();
+        Persist();
+        RelayoutDock();
+        webPanel.RefreshIfVisible();
+        trayFlyout.RefreshIfVisible();
+    }
+
+    public void AutoSeparateDockItems()
+    {
+        Data.AutoSeparateByKind();
         Persist();
         RelayoutDock();
         webPanel.RefreshIfVisible();

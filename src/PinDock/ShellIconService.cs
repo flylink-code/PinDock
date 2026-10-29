@@ -81,6 +81,31 @@ public sealed class ShellIconService
 
     private static ImageSource Extract(string path)
     {
+        string ext = Path.GetExtension(path);
+        if (File.Exists(path) && (
+            string.Equals(ext, ".png", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ext, ".ico", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ext, ".jpg", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ext, ".jpeg", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ext, ".bmp", StringComparison.OrdinalIgnoreCase)))
+        {
+            try
+            {
+                var bmp = new BitmapImage();
+                bmp.BeginInit();
+                bmp.CacheOption = BitmapCacheOption.OnLoad;
+                bmp.UriSource = new Uri(Path.GetFullPath(path), UriKind.Absolute);
+                bmp.DecodePixelWidth = 64;
+                bmp.EndInit();
+                bmp.Freeze();
+                return bmp;
+            }
+            catch (Exception ex) when (ex is IOException or NotSupportedException or InvalidOperationException)
+            {
+                // 回退到系统图标提取
+            }
+        }
+
         var shResult = SHGetFileInfo(path, 0, out var info, (uint)Marshal.SizeOf<SHFILEINFO>(), 0x4000 | 0x100);
         if (shResult == IntPtr.Zero)
             throw new Win32Exception($"无法提取图标：{path}");

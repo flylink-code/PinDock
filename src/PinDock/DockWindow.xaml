@@ -19,7 +19,10 @@
         </Style>
     </Window.Resources>
     <Border x:Name="DockChrome" Background="{DynamicResource GlassBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
-            BorderThickness="1" CornerRadius="19" Padding="12,10" SnapsToDevicePixels="True">
+            BorderThickness="1" CornerRadius="19" Padding="12,10" SnapsToDevicePixels="True"
+            MouseLeftButtonDown="DockChrome_MouseLeftButtonDown"
+            MouseMove="DockChrome_MouseMove"
+            MouseLeftButtonUp="DockChrome_MouseLeftButtonUp">
         <StackPanel x:Name="ItemsPanel" Orientation="Horizontal"/>
     </Border>
 </Window>

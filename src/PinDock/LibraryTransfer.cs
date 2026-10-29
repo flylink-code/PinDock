@@ -14,6 +14,8 @@ public static class LibraryTransfer
             Version = 2,
             Items = data.Items.Select(Clone).ToList(),
             Groups = [.. data.Groups],
+            GroupIcons = data.GroupIcons.ToDictionary(k => k.Key, v => new GroupIconConfig { Kind = v.Value.Kind, Value = v.Value.Value }, StringComparer.Ordinal),
+            DockOrder = [.. data.DockOrder],
             Settings = CloneSettings(data.Settings)
         };
         File.WriteAllText(filePath, JsonSerializer.Serialize(copy, Options));
@@ -47,19 +49,32 @@ public static class LibraryTransfer
                 Arguments = item.Arguments,
                 WorkingDirectory = item.WorkingDirectory,
                 Group = item.Group,
-                Pinned = item.Pinned
+                Pinned = item.Pinned,
+                LastLaunchedTicks = item.LastLaunchedTicks,
+                LaunchCount = item.LaunchCount
             });
             if (item.Group.Length > 0 && !target.Groups.Contains(item.Group, StringComparer.Ordinal))
                 target.Groups.Add(item.Group);
             added++;
         }
+        if (imported.GroupIcons is not null)
+        {
+            foreach (var kv in imported.GroupIcons)
+            {
+                if (!target.GroupIcons.ContainsKey(kv.Key))
+                    target.GroupIcons[kv.Key] = new GroupIconConfig { Kind = kv.Value.Kind, Value = kv.Value.Value ?? "" };
+            }
+        }
         target.Items = items;
+        target.NormalizeDockOrder();
         return (added, skipped);
     }
 
     public static void RemoveGroup(LibraryData data, string group)
     {
         data.Groups.RemoveAll(g => string.Equals(g, group, StringComparison.Ordinal));
+        data.GroupIcons.Remove(group);
+        data.DockOrder.RemoveAll(t => string.Equals(t, "grp:" + group, StringComparison.Ordinal));
         foreach (var item in data.Items.Where(i => string.Equals(i.Group, group, StringComparison.Ordinal)))
             item.Group = "";
     }
@@ -69,6 +84,13 @@ public static class LibraryTransfer
         int index = data.Groups.FindIndex(g => string.Equals(g, oldName, StringComparison.Ordinal));
         if (index < 0) return;
         data.Groups[index] = newName;
+        if (data.GroupIcons.Remove(oldName, out var iconCfg))
+            data.GroupIcons[newName] = iconCfg;
+        for (int i = 0; i < data.DockOrder.Count; i++)
+        {
+            if (string.Equals(data.DockOrder[i], "grp:" + oldName, StringComparison.Ordinal))
+                data.DockOrder[i] = "grp:" + newName;
+        }
         foreach (var item in data.Items.Where(i => string.Equals(i.Group, oldName, StringComparison.Ordinal)))
             item.Group = newName;
     }
@@ -81,7 +103,9 @@ public static class LibraryTransfer
         Arguments = item.Arguments,
         WorkingDirectory = item.WorkingDirectory,
         Group = item.Group,
-        Pinned = item.Pinned
+        Pinned = item.Pinned,
+        LastLaunchedTicks = item.LastLaunchedTicks,
+        LaunchCount = item.LaunchCount
     };
 
     private static AppSettings CloneSettings(AppSettings s) => new()
@@ -99,7 +123,17 @@ public static class LibraryTransfer
         CollapseAfterLaunch = s.CollapseAfterLaunch,
         EdgeOffset = s.EdgeOffset,
         MonitorDeviceName = s.MonitorDeviceName,
+        ExplorerContextMenu = s.ExplorerContextMenu,
         HotkeyModifiers = s.HotkeyModifiers,
-        HotkeyKey = s.HotkeyKey
+        HotkeyKey = s.HotkeyKey,
+        ShowLibraryButton = s.ShowLibraryButton,
+        ShowAddButton = s.ShowAddButton,
+        ShowSettingsButton = s.ShowSettingsButton,
+        AutoHideUtilityButtons = s.AutoHideUtilityButtons,
+        LaunchAtStartup = s.LaunchAtStartup,
+        ClosePanelBehavior = s.ClosePanelBehavior,
+        ConfirmBeforeExit = s.ConfirmBeforeExit,
+        UseGithubMirror = s.UseGithubMirror,
+        GithubMirrorUrl = s.GithubMirrorUrl
     };
 }

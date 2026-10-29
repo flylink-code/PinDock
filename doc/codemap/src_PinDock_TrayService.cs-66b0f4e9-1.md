@@ -4,11 +4,11 @@
 
 [Module](app.md) · [Source](../../src/PinDock/TrayService.cs) · page 1/1
 
-Source SHA-256: 3c914c66d8ba870fde77f38555d62031022e5860f98b3828e8e98b6eff5f57a2
+Source SHA-256: b7bca51c213a551e1947acf0de2fe88f213be6c64c1aa2b3db635d207f9aa952
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/TrayService.cs#L3) |
 | TrayService | class_declaration | PinDock | [5](../../src/PinDock/TrayService.cs#L5) |
-| TrayService | constructor_declaration | PinDock::TrayService | [14](../../src/PinDock/TrayService.cs#L14) |
-| Dispose | method_declaration | PinDock::TrayService | [33](../../src/PinDock/TrayService.cs#L33) |
+| TrayService | constructor_declaration | PinDock::TrayService | [15](../../src/PinDock/TrayService.cs#L15) |
+| Dispose | method_declaration | PinDock::TrayService | [39](../../src/PinDock/TrayService.cs#L39) |

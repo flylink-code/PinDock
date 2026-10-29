@@ -4,15 +4,15 @@
 
 [Module](app.md) · [Source](../../src/PinDock/LibraryTransfer.cs) · page 1/1
 
-Source SHA-256: 4f38b42e2a38bf27199effa6e7cb006fd03d0e9e694f852d2074dc1a1b03e81e
+Source SHA-256: c7a16baa278b420d4df7f3ad198bf3701e13727889e72217b420f7fca2eeaa92
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/LibraryTransfer.cs#L4) |
 | LibraryTransfer | class_declaration | PinDock | [6](../../src/PinDock/LibraryTransfer.cs#L6) |
 | Export | method_declaration | PinDock::LibraryTransfer | [10](../../src/PinDock/LibraryTransfer.cs#L10) |
-| Import | method_declaration | PinDock::LibraryTransfer | [22](../../src/PinDock/LibraryTransfer.cs#L22) |
-| RemoveGroup | method_declaration | PinDock::LibraryTransfer | [60](../../src/PinDock/LibraryTransfer.cs#L60) |
-| RenameGroup | method_declaration | PinDock::LibraryTransfer | [67](../../src/PinDock/LibraryTransfer.cs#L67) |
-| Clone | method_declaration | PinDock::LibraryTransfer | [76](../../src/PinDock/LibraryTransfer.cs#L76) |
-| CloneSettings | method_declaration | PinDock::LibraryTransfer | [87](../../src/PinDock/LibraryTransfer.cs#L87) |
+| Import | method_declaration | PinDock::LibraryTransfer | [24](../../src/PinDock/LibraryTransfer.cs#L24) |
+| RemoveGroup | method_declaration | PinDock::LibraryTransfer | [73](../../src/PinDock/LibraryTransfer.cs#L73) |
+| RenameGroup | method_declaration | PinDock::LibraryTransfer | [82](../../src/PinDock/LibraryTransfer.cs#L82) |
+| Clone | method_declaration | PinDock::LibraryTransfer | [98](../../src/PinDock/LibraryTransfer.cs#L98) |
+| CloneSettings | method_declaration | PinDock::LibraryTransfer | [111](../../src/PinDock/LibraryTransfer.cs#L111) |

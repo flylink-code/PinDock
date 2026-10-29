@@ -24,52 +24,73 @@ public partial class WebPanelWindow : Window
     private string? pendingFilter;
     private Bookmark? pendingEditorItem;
     private bool hasPendingEditor;
+    private string? pendingSettingsPage;
+    private string? pendingGroupModalName;
 
     public WebPanelWindow(AppController controller, ShellIconService icons)
     {
         this.controller = controller;
         this.icons = icons;
         InitializeComponent();
+        Width = 812;
+        Height = 620;
         SourceInitialized += (_, _) => NativeWindow.EnableHardwareRoundedCorners(this);
+        SizeChanged += (_, _) =>
+        {
+            Browser.InvalidateMeasure();
+            Browser.UpdateLayout();
+        };
     }
 
     public void Prewarm()
     {
+        SyncBrowserBackgroundColor();
         _ = EnsureInitializedAsync();
     }
 
     public async void ShowLibrary(bool moreOverflow = false, bool focusInstalledApps = false)
     {
-        Width = 812;
-        Height = 620;
         pendingView = "library";
         pendingOverflow = moreOverflow;
         pendingFilter = focusInstalledApps ? "installed" : "all";
         hasPendingEditor = false;
+        pendingSettingsPage = null;
+        pendingGroupModalName = null;
         ShowAndFocus();
         await EnsureInitializedAsync();
         if (webReady) PushState("library", moreOverflow, pendingFilter);
     }
 
-    public async void ShowSettings()
+    public async void ShowSettings(string? page = null)
     {
-        Width = 772;
-        Height = 560;
         pendingView = "settings";
         hasPendingEditor = false;
+        pendingSettingsPage = page;
+        pendingGroupModalName = null;
         ShowAndFocus();
         await EnsureInitializedAsync();
-        if (webReady) PushState("settings", false, null);
+        if (webReady) PushState("settings", false, null, settingsPage: page);
+    }
+
+    public async void ShowGroupModal(string groupName)
+    {
+        if (!IsVisible)
+            pendingView = "library";
+        hasPendingEditor = false;
+        pendingGroupModalName = groupName;
+        ShowAndFocus();
+        await EnsureInitializedAsync();
+        if (webReady)
+        {
+            PushState(pendingView, false, null, groupModalName: groupName);
+            pendingGroupModalName = null;
+        }
     }
 
     public async void ShowEditor(Bookmark? item)
     {
         if (!IsVisible)
-        {
-            Width = 812;
-            Height = 620;
             pendingView = "library";
-        }
         pendingEditorItem = item;
         hasPendingEditor = true;
         ShowAndFocus();
@@ -79,13 +100,27 @@ public partial class WebPanelWindow : Window
 
     public void RefreshIfVisible()
     {
-        if (IsVisible && webReady)
+        SyncBrowserBackgroundColor();
+        if (webReady)
             PushState(null, false, null);
+    }
+
+    private void SyncBrowserBackgroundColor()
+    {
+        var s = controller.Data.Settings;
+        bool isDark = s.ThemeMode == PinDock.ThemeMode.Dark || (s.ThemeMode == PinDock.ThemeMode.System && ThemeService.IsSystemDark());
+        var colors = Palettes.Resolve(s.Palette, isDark);
+        Browser.DefaultBackgroundColor = System.Drawing.Color.FromArgb(255, colors.Paper.R, colors.Paper.G, colors.Paper.B);
     }
 
     private void ShowAndFocus()
     {
+        SyncBrowserBackgroundColor();
+        Width = 812;
+        Height = 620;
         Show();
+        UpdateLayout();
+        Browser.UpdateLayout();
         Activate();
     }
 
@@ -126,8 +161,17 @@ public partial class WebPanelWindow : Window
         {
             case "ready":
                 webReady = true;
-                PushState(pendingView ?? "library", pendingOverflow, pendingFilter, hasPendingEditor, pendingEditorItem);
+                PushState(
+                    pendingView ?? "library",
+                    pendingOverflow,
+                    pendingFilter,
+                    hasPendingEditor,
+                    pendingEditorItem,
+                    pendingSettingsPage,
+                    pendingGroupModalName);
                 hasPendingEditor = false;
+                pendingSettingsPage = null;
+                pendingGroupModalName = null;
                 break;
 
             case "dragWindow":
@@ -135,16 +179,19 @@ public partial class WebPanelWindow : Window
                 break;
 
             case "closeWindow":
-                Hide();
+                if (controller.Data.Settings.ClosePanelBehavior == CloseAction.ExitApplication)
+                    controller.RequestExitApplication();
+                else
+                    Hide();
+                break;
+
+            case "exitApp":
+                controller.RequestExitApplication();
                 break;
 
             case "viewChanged":
-                if (root.TryGetProperty("view", out var vProp))
-                {
-                    string? v = vProp.GetString();
-                    if (v == "settings") { Width = 772; Height = 560; }
-                    else if (v == "library") { Width = 812; Height = 620; }
-                }
+                Browser.InvalidateMeasure();
+                Browser.UpdateLayout();
                 break;
 
             case "launch":
@@ -222,8 +269,23 @@ public partial class WebPanelWindow : Window
                                 ids.Add(g);
                         }
                     }
-                    controller.SaveGroupConfig(origName, targetName, ids);
+                    GroupIconConfig? iconCfg = null;
+                    if (root.TryGetProperty("iconKind", out var ikEl) && Enum.TryParse<GroupIconKind>(ikEl.GetString(), ignoreCase: true, out var parsedKind))
+                    {
+                        string iconVal = root.TryGetProperty("iconValue", out var ivEl) ? (ivEl.GetString() ?? "").Trim() : "";
+                        iconCfg = new GroupIconConfig { Kind = parsedKind, Value = iconVal };
+                    }
+                    controller.SaveGroupConfig(origName, targetName, ids, iconCfg);
                 }
+                break;
+
+            case "pickIconForGroup":
+                HandlePickIconForGroup();
+                break;
+
+            case "autoSeparateDock":
+                controller.AutoSeparateDockItems();
+                PostToast("已按类型（应用 / 文件夹 / 分组）插入分隔符");
                 break;
 
             case "deleteGroup":
@@ -286,6 +348,40 @@ public partial class WebPanelWindow : Window
                 {
                     PostToast($"设置失败：{ex.Message}");
                     PushState(null, false, null);
+                }
+                break;
+
+            case "toggleStartup":
+                bool startEnabled = root.TryGetProperty("enabled", out var stEl) && stEl.GetBoolean();
+                try
+                {
+                    StartupService.SetRegistered(startEnabled);
+                    controller.Data.Settings.LaunchAtStartup = startEnabled;
+                    controller.ApplySettings();
+                    PostToast(startEnabled ? "已开启开机自动启动" : "已关闭开机自动启动");
+                }
+                catch (Exception ex) when (ex is UnauthorizedAccessException or InvalidOperationException or System.Security.SecurityException)
+                {
+                    PostToast($"开机启动设置失败：{ex.Message}");
+                    PushState(null, false, null);
+                }
+                break;
+
+            case "checkUpdate":
+                _ = HandleCheckUpdateAsync();
+                break;
+
+            case "downloadAndInstallUpdate":
+                string dlUrl = root.TryGetProperty("downloadUrl", out var dlEl) ? (dlEl.GetString() ?? "") : "";
+                string assetName = root.TryGetProperty("assetName", out var anEl) ? (anEl.GetString() ?? "") : "";
+                if (!string.IsNullOrWhiteSpace(dlUrl))
+                    _ = HandleDownloadAndInstallUpdateAsync(dlUrl, assetName);
+                break;
+
+            case "openExternalUrl":
+                if (root.TryGetProperty("url", out var urlEl) && urlEl.GetString() is string extUrl && extUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(extUrl) { UseShellExecute = true });
                 }
                 break;
 
@@ -381,6 +477,77 @@ public partial class WebPanelWindow : Window
         }
     }
 
+    private async void HandlePickIconForGroup()
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "选择分组自定义图标或程序文件",
+            Filter = "图标、图片或程序 (*.png;*.ico;*.jpg;*.jpeg;*.bmp;*.exe;*.lnk)|*.png;*.ico;*.jpg;*.jpeg;*.bmp;*.exe;*.lnk|所有文件 (*.*)|*.*",
+            DereferenceLinks = false
+        };
+        if (dlg.ShowDialog(this) != true) return;
+        string? dataUri = await icons.GetDataUriAsync(dlg.FileName);
+        PostJson(new
+        {
+            type = "pickedGroupIcon",
+            path = dlg.FileName,
+            dataUri
+        });
+    }
+
+    private async Task HandleCheckUpdateAsync()
+    {
+        var s = controller.Data.Settings;
+        PostJson(new { type = "updateChecking" });
+        try
+        {
+            var result = await UpdateService.CheckForUpdateAsync(s.UseGithubMirror, s.GithubMirrorUrl);
+            PostJson(new
+            {
+                type = "updateStatus",
+                ok = true,
+                hasUpdate = result.HasUpdate,
+                currentVersion = result.CurrentVersion,
+                latestVersion = result.LatestVersion,
+                releaseNotes = result.ReleaseNotes,
+                releasePageUrl = result.ReleasePageUrl,
+                assetName = result.AssetName,
+                downloadUrl = result.DownloadUrl
+            });
+            PostToast(result.HasUpdate ? $"发现新版本 v{result.LatestVersion}" : $"当前已是最新版本 v{result.CurrentVersion}");
+        }
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or TaskCanceledException or JsonException)
+        {
+            PostJson(new
+            {
+                type = "updateStatus",
+                ok = false,
+                error = ex.Message
+            });
+            PostToast($"检查更新失败：{ex.Message}");
+        }
+    }
+
+    private async Task HandleDownloadAndInstallUpdateAsync(string downloadUrl, string assetName)
+    {
+        try
+        {
+            PostJson(new { type = "updateProgress", percent = 0 });
+            string installerPath = await UpdateService.DownloadInstallerAsync(
+                downloadUrl,
+                assetName,
+                pct => _ = Dispatcher.InvokeAsync(() => PostJson(new { type = "updateProgress", percent = pct })));
+            PostToast("安装包下载完成，正在启动升级安装程序…");
+            await Task.Delay(500);
+            UpdateService.LaunchInstallerAndExit(installerPath);
+        }
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or IOException or TaskCanceledException or Win32Exception)
+        {
+            PostJson(new { type = "updateError", error = ex.Message });
+            PostToast($"下载或启动升级包失败：{ex.Message}");
+        }
+    }
+
     private void HandleUpdateSettings(JsonElement sEl)
     {
         var s = controller.Data.Settings;
@@ -406,8 +573,25 @@ public partial class WebPanelWindow : Window
             s.AvoidFullscreen = af.GetBoolean();
         if (sEl.TryGetProperty("lockPosition", out var lp))
             s.LockPosition = lp.GetBoolean();
+        if (sEl.TryGetProperty("showLibraryButton", out var slb))
+            s.ShowLibraryButton = slb.GetBoolean();
+        if (sEl.TryGetProperty("showAddButton", out var sab))
+            s.ShowAddButton = sab.GetBoolean();
+        if (sEl.TryGetProperty("showSettingsButton", out var ssb))
+            s.ShowSettingsButton = ssb.GetBoolean();
+        if (sEl.TryGetProperty("autoHideUtilityButtons", out var ahub))
+            s.AutoHideUtilityButtons = ahub.GetBoolean();
+        if (sEl.TryGetProperty("closePanelBehavior", out var cpb) && Enum.TryParse<CloseAction>(cpb.GetString(), out var parsedCpb))
+            s.ClosePanelBehavior = parsedCpb;
+        if (sEl.TryGetProperty("confirmBeforeExit", out var cbe))
+            s.ConfirmBeforeExit = cbe.GetBoolean();
+        if (sEl.TryGetProperty("useGithubMirror", out var ugm))
+            s.UseGithubMirror = ugm.GetBoolean();
+        if (sEl.TryGetProperty("githubMirrorUrl", out var gmu) && gmu.GetString() is string mirrorStr)
+            s.GithubMirrorUrl = string.IsNullOrWhiteSpace(mirrorStr) ? AppSettings.DefaultGithubMirror : mirrorStr.Trim();
 
         controller.ApplySettings();
+        SyncBrowserBackgroundColor();
         PushState(null, false, null);
     }
 
@@ -471,7 +655,14 @@ public partial class WebPanelWindow : Window
         return false;
     }
 
-    private void PushState(string? openView, bool overflowOnly, string? filter, bool openEditor = false, Bookmark? editorItem = null)
+    private void PushState(
+        string? openView,
+        bool overflowOnly,
+        string? filter,
+        bool openEditor = false,
+        Bookmark? editorItem = null,
+        string? settingsPage = null,
+        string? groupModalName = null)
     {
         if (!webReady || Browser.CoreWebView2 is null) return;
         var s = controller.Data.Settings;
@@ -482,10 +673,19 @@ public partial class WebPanelWindow : Window
             if (icons.TryGetCachedDataUri(item.Path) is string uri)
                 cachedIcons[item.Path] = uri;
         }
+        foreach (var gIcon in controller.Data.GroupIcons.Values)
+        {
+            if (gIcon.Kind == GroupIconKind.CustomFile && !string.IsNullOrWhiteSpace(gIcon.Value) &&
+                icons.TryGetCachedDataUri(gIcon.Value) is string gUri)
+            {
+                cachedIcons[gIcon.Value] = gUri;
+            }
+        }
 
         var payload = new Dictionary<string, object?>
         {
             ["type"] = "state",
+            ["version"] = UpdateService.GetCurrentVersion(),
             ["isDark"] = isDark,
             ["items"] = controller.Data.Items.Select(i => new
             {
@@ -500,6 +700,16 @@ public partial class WebPanelWindow : Window
             }).ToList(),
             ["overflowIds"] = controller.OverflowItems.Select(i => i.Id.ToString()).ToList(),
             ["groups"] = controller.Data.Groups,
+            ["groupIcons"] = controller.Data.GroupIcons.ToDictionary(
+                kv => kv.Key,
+                kv => new { kind = kv.Value.Kind.ToString(), value = kv.Value.Value }),
+            ["groupIconPresets"] = GroupIconPresets.All.Select(p => new
+            {
+                key = p.Key,
+                label = p.Label,
+                pathData = p.PathData
+            }).ToList(),
+            ["dockOrder"] = controller.Data.DockOrder,
             ["installedApps"] = controller.InstalledApps.GetInstalledApps().Select(a => new
             {
                 name = a.Name,
@@ -529,7 +739,16 @@ public partial class WebPanelWindow : Window
                 monitorDeviceName = s.MonitorDeviceName,
                 explorerContextMenu = s.ExplorerContextMenu || ExplorerMenuService.IsRegistered(),
                 hotkeyModifiers = s.HotkeyModifiers,
-                hotkeyKey = s.HotkeyKey
+                hotkeyKey = s.HotkeyKey,
+                showLibraryButton = s.ShowLibraryButton,
+                showAddButton = s.ShowAddButton,
+                showSettingsButton = s.ShowSettingsButton,
+                autoHideUtilityButtons = s.AutoHideUtilityButtons,
+                launchAtStartup = s.LaunchAtStartup || StartupService.IsRegistered(),
+                closePanelBehavior = s.ClosePanelBehavior.ToString(),
+                confirmBeforeExit = s.ConfirmBeforeExit,
+                useGithubMirror = s.UseGithubMirror,
+                githubMirrorUrl = s.GithubMirrorUrl
             },
             ["icons"] = cachedIcons
         };
@@ -539,6 +758,14 @@ public partial class WebPanelWindow : Window
             payload["openView"] = openView;
             payload["overflowOnly"] = overflowOnly;
             payload["filter"] = filter;
+        }
+        if (settingsPage is not null)
+        {
+            payload["settingsPage"] = settingsPage;
+        }
+        if (groupModalName is not null)
+        {
+            payload["openGroupModalName"] = groupModalName;
         }
         if (openEditor)
         {
@@ -584,6 +811,12 @@ public partial class WebPanelWindow : Window
 
     protected override void OnClosing(CancelEventArgs e)
     {
+        if (controller.Data.Settings.ClosePanelBehavior == CloseAction.ExitApplication)
+        {
+            e.Cancel = true;
+            controller.RequestExitApplication();
+            return;
+        }
         e.Cancel = true;
         Hide();
     }
