@@ -9,10 +9,20 @@ using Microsoft.Win32;
 
 namespace PinDock.Setup;
 
+public sealed record PreviousInstallInfo(
+    bool IsInstalled,
+    string InstallDir,
+    string? InstalledVersion,
+    bool CreateDesktopShortcut,
+    bool CreateStartMenuShortcut,
+    bool LaunchAtStartup);
+
 public static class Program
 {
     private const string UninstallRegKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\PinDock";
+    private const string InnoUninstallRegKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\{8F96D13B-4C7E-4B18-9F53-0D726EA18C90}_is1";
     private const string RunRegKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    private const string ExplorerShellCommandKey = @"Software\Classes\Directory\shell\PinDock\command";
 
     [STAThread]
     public static int Main(string[] args)
@@ -20,10 +30,12 @@ public static class Program
         string version = Assembly.GetExecutingAssembly().GetName().Version is Version v
             ? $"{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}"
             : "0.1.0";
-        string defaultInstallDir = Path.Combine(
+        string fallbackInstallDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Programs",
             "PinDock");
+
+        var prev = DetectPreviousInstall(fallbackInstallDir);
 
         bool isSilent = args.Any(a =>
             string.Equals(a, "/SILENT", StringComparison.OrdinalIgnoreCase) ||
@@ -35,35 +47,174 @@ public static class Program
 
         if (isUninstall)
         {
-            RunUninstall(defaultInstallDir, isSilent);
+            RunUninstall(prev.InstallDir, isSilent);
             return 0;
         }
 
         if (isSilent)
         {
-            InstallCore(defaultInstallDir, version, createDesktopShortcut: true, createStartMenuShortcut: true, launchAtStartup: false, launchNow: true);
+            InstallCore(
+                prev.InstallDir,
+                version,
+                createDesktopShortcut: prev.CreateDesktopShortcut,
+                createStartMenuShortcut: prev.CreateStartMenuShortcut,
+                launchAtStartup: prev.LaunchAtStartup,
+                launchNow: true);
             return 0;
         }
 
         var app = new Application();
-        var win = BuildSetupWindow(defaultInstallDir, version);
+        var win = BuildSetupWindow(prev, version);
         app.Run(win);
         return 0;
     }
 
-    private static Window BuildSetupWindow(string defaultInstallDir, string version)
+    private static PreviousInstallInfo DetectPreviousInstall(string fallbackInstallDir)
+    {
+        string? detectedDir = null;
+        string? detectedVersion = null;
+        int? savedDesktopOpt = null;
+        int? savedStartMenuOpt = null;
+        int? savedStartupOpt = null;
+
+        // 1. 从注册表 Uninstall\PinDock 读取之前记录的安装目录、版本与勾选项
+        foreach (string keyPath in new[] { UninstallRegKey, InnoUninstallRegKey })
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(keyPath) ?? Registry.LocalMachine.OpenSubKey(keyPath);
+            if (key is null) continue;
+
+            if (string.IsNullOrWhiteSpace(detectedDir) && key.GetValue("InstallLocation") is string loc && !string.IsNullOrWhiteSpace(loc))
+                detectedDir = loc.Trim().TrimEnd('\\', '/');
+            if (string.IsNullOrWhiteSpace(detectedVersion) && key.GetValue("DisplayVersion") is string ver && !string.IsNullOrWhiteSpace(ver))
+                detectedVersion = ver.Trim();
+            if (savedDesktopOpt is null && key.GetValue("CreateDesktopShortcut") is int dOpt)
+                savedDesktopOpt = dOpt;
+            if (savedStartMenuOpt is null && key.GetValue("CreateStartMenuShortcut") is int sOpt)
+                savedStartMenuOpt = sOpt;
+            if (savedStartupOpt is null && key.GetValue("LaunchAtStartup") is int rOpt)
+                savedStartupOpt = rOpt;
+        }
+
+        // 2. 若注册表未记录或目录已移动，尝试从正在运行的 PinDock 进程定位安装目录
+        if (string.IsNullOrWhiteSpace(detectedDir) || !Directory.Exists(detectedDir))
+        {
+            int selfPid = Environment.ProcessId;
+            foreach (var proc in Process.GetProcessesByName("PinDock"))
+            {
+                try
+                {
+                    if (proc.Id == selfPid) continue;
+                    string? exePath = proc.MainModule?.FileName;
+                    if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
+                    {
+                        detectedDir = Path.GetDirectoryName(exePath);
+                        detectedVersion ??= FileVersionInfo.GetVersionInfo(exePath).ProductVersion?.Split('+')[0];
+                        break;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+                finally
+                {
+                    proc.Dispose();
+                }
+            }
+        }
+
+        // 3. 尝试从开机自启注册表项或右键菜单注册表项反推安装目录
+        if (string.IsNullOrWhiteSpace(detectedDir))
+        {
+            detectedDir = TryExtractExeDirectoryFromRegistry(RunRegKey, "PinDock")
+                       ?? TryExtractExeDirectoryFromRegistry(ExplorerShellCommandKey, null);
+        }
+
+        // 4. 尝试从桌面或开始菜单现有快捷方式读取目标路径
+        string desktopLnk = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "PinDock.lnk");
+        string startMenuLnk = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "PinDock.lnk");
+        if (string.IsNullOrWhiteSpace(detectedDir))
+        {
+            detectedDir = TryReadShortcutTargetDir(desktopLnk) ?? TryReadShortcutTargetDir(startMenuLnk);
+        }
+
+        bool isInstalled = !string.IsNullOrWhiteSpace(detectedDir) && File.Exists(Path.Combine(detectedDir, "PinDock.exe"));
+        if (isInstalled && string.IsNullOrWhiteSpace(detectedVersion))
+        {
+            string exe = Path.Combine(detectedDir!, "PinDock.exe");
+            detectedVersion = FileVersionInfo.GetVersionInfo(exe).ProductVersion?.Split('+')[0];
+        }
+
+        bool hasRunReg = false;
+        using (var runKey = Registry.CurrentUser.OpenSubKey(RunRegKey))
+        {
+            hasRunReg = runKey?.GetValue("PinDock") is string s && !string.IsNullOrWhiteSpace(s);
+        }
+
+        bool createDesktop = savedDesktopOpt.HasValue ? savedDesktopOpt.Value != 0 : (!isInstalled || File.Exists(desktopLnk));
+        bool createStartMenu = savedStartMenuOpt.HasValue ? savedStartMenuOpt.Value != 0 : (!isInstalled || File.Exists(startMenuLnk));
+        bool launchAtStartup = savedStartupOpt.HasValue ? savedStartupOpt.Value != 0 : hasRunReg;
+
+        return new PreviousInstallInfo(
+            IsInstalled: isInstalled,
+            InstallDir: !string.IsNullOrWhiteSpace(detectedDir) ? detectedDir! : fallbackInstallDir,
+            InstalledVersion: detectedVersion,
+            CreateDesktopShortcut: createDesktop,
+            CreateStartMenuShortcut: createStartMenu,
+            LaunchAtStartup: launchAtStartup);
+    }
+
+    private static string? TryExtractExeDirectoryFromRegistry(string subKeyPath, string? valueName)
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(subKeyPath);
+        if (key?.GetValue(valueName) is not string raw || string.IsNullOrWhiteSpace(raw))
+            return null;
+        string cleaned = raw.Trim();
+        if (cleaned.StartsWith('"'))
+        {
+            int endQuote = cleaned.IndexOf('"', 1);
+            if (endQuote > 1) cleaned = cleaned[1..endQuote];
+        }
+        else
+        {
+            int space = cleaned.IndexOf(' ');
+            if (space > 0) cleaned = cleaned[..space];
+        }
+        return File.Exists(cleaned) ? Path.GetDirectoryName(cleaned) : null;
+    }
+
+    private static string? TryReadShortcutTargetDir(string shortcutPath)
+    {
+        if (!File.Exists(shortcutPath)) return null;
+        try
+        {
+            Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
+            if (shellType is null) return null;
+            dynamic shell = Activator.CreateInstance(shellType)!;
+            dynamic shortcut = shell.CreateShortcut(shortcutPath);
+            string? target = shortcut.TargetPath as string;
+            if (!string.IsNullOrWhiteSpace(target) && File.Exists(target))
+                return Path.GetDirectoryName(target);
+        }
+        catch (Exception)
+        {
+        }
+        return null;
+    }
+
+    private static Window BuildSetupWindow(PreviousInstallInfo prev, string version)
     {
         var ink = (Brush)new BrushConverter().ConvertFromString("#1F3530")!;
         var muted = (Brush)new BrushConverter().ConvertFromString("#6A7B74")!;
         var paper = (Brush)new BrushConverter().ConvertFromString("#F8F9F5")!;
         var line = (Brush)new BrushConverter().ConvertFromString("#DDE4DC")!;
         var accent = (Brush)new BrushConverter().ConvertFromString("#236950")!;
+        var soft = (Brush)new BrushConverter().ConvertFromString("#E6EFE3")!;
 
         var win = new Window
         {
-            Title = $"PinDock v{version} 安装向导",
-            Width = 500,
-            Height = 365,
+            Title = prev.IsInstalled ? $"PinDock v{version} 覆盖更新 / 安装向导" : $"PinDock v{version} 安装向导",
+            Width = 515,
+            Height = prev.IsInstalled ? 405 : 370,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             ResizeMode = ResizeMode.NoResize,
             Background = paper
@@ -75,10 +226,10 @@ public static class Program
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-        var header = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
+        var header = new StackPanel { Margin = new Thickness(0, 0, 0, 14) };
         header.Children.Add(new TextBlock
         {
-            Text = $"安装 PinDock v{version}",
+            Text = prev.IsInstalled ? $"更新 / 重新安装 PinDock v{version}" : $"安装 PinDock v{version}",
             FontSize = 20,
             FontWeight = FontWeights.SemiBold,
             Foreground = ink
@@ -90,6 +241,24 @@ public static class Program
             Foreground = muted,
             Margin = new Thickness(0, 5, 0, 0)
         });
+        if (prev.IsInstalled)
+        {
+            var detectedBanner = new Border
+            {
+                Background = soft,
+                CornerRadius = new CornerRadius(7),
+                Padding = new Thickness(10, 7, 10, 7),
+                Margin = new Thickness(0, 10, 0, 0),
+                Child = new TextBlock
+                {
+                    Text = $"已自动读取历史安装信息（当前已安装 v{prev.InstalledVersion ?? version}），将直接覆盖更新并保留全部收藏数据。",
+                    FontSize = 11.5,
+                    Foreground = accent,
+                    TextWrapping = TextWrapping.Wrap
+                }
+            };
+            header.Children.Add(detectedBanner);
+        }
         Grid.SetRow(header, 0);
         root.Children.Add(header);
 
@@ -115,7 +284,7 @@ public static class Program
         DockPanel.SetDock(browseBtn, Dock.Right);
         var dirBox = new TextBox
         {
-            Text = defaultInstallDir,
+            Text = prev.InstallDir,
             Padding = new Thickness(8, 6, 8, 6),
             FontSize = 12,
             BorderBrush = line,
@@ -124,8 +293,16 @@ public static class Program
         browseBtn.Click += (_, _) =>
         {
             var dlg = new OpenFolderDialog { Title = "选择安装目录" };
+            if (Directory.Exists(dirBox.Text))
+                dlg.InitialDirectory = dirBox.Text;
             if (dlg.ShowDialog(win) == true)
-                dirBox.Text = Path.Combine(dlg.FolderName, "PinDock");
+            {
+                string chosen = dlg.FolderName.TrimEnd('\\', '/');
+                bool alreadyPinDockFolder =
+                    string.Equals(Path.GetFileName(chosen), "PinDock", StringComparison.OrdinalIgnoreCase) ||
+                    File.Exists(Path.Combine(chosen, "PinDock.exe"));
+                dirBox.Text = alreadyPinDockFolder ? chosen : Path.Combine(chosen, "PinDock");
+            }
         };
         dirRow.Children.Add(browseBtn);
         dirRow.Children.Add(dirBox);
@@ -134,9 +311,9 @@ public static class Program
         root.Children.Add(dirPanel);
 
         var opts = new StackPanel();
-        var cbDesktop = new CheckBox { Content = "创建桌面快捷方式", IsChecked = true, Margin = new Thickness(0, 4, 0, 6), Foreground = ink };
-        var cbStartMenu = new CheckBox { Content = "创建开始菜单快捷方式", IsChecked = true, Margin = new Thickness(0, 0, 0, 6), Foreground = ink };
-        var cbStartup = new CheckBox { Content = "开机自动启动 PinDock", IsChecked = false, Margin = new Thickness(0, 0, 0, 6), Foreground = ink };
+        var cbDesktop = new CheckBox { Content = "创建桌面快捷方式", IsChecked = prev.CreateDesktopShortcut, Margin = new Thickness(0, 4, 0, 6), Foreground = ink };
+        var cbStartMenu = new CheckBox { Content = "创建开始菜单快捷方式", IsChecked = prev.CreateStartMenuShortcut, Margin = new Thickness(0, 0, 0, 6), Foreground = ink };
+        var cbStartup = new CheckBox { Content = "开机自动启动 PinDock", IsChecked = prev.LaunchAtStartup, Margin = new Thickness(0, 0, 0, 6), Foreground = ink };
         var cbLaunchNow = new CheckBox { Content = "安装完成后立即启动 PinDock", IsChecked = true, Margin = new Thickness(0, 0, 0, 6), Foreground = ink };
         var statusText = new TextBlock { Text = "", FontSize = 11.5, Foreground = accent, Margin = new Thickness(0, 8, 0, 0) };
         opts.Children.Add(cbDesktop);
@@ -161,7 +338,7 @@ public static class Program
 
         var installBtn = new Button
         {
-            Content = "立即安装",
+            Content = prev.IsInstalled ? "覆盖更新" : "立即安装",
             Padding = new Thickness(20, 7, 20, 7),
             Background = accent,
             Foreground = Brushes.White,
@@ -243,6 +420,8 @@ public static class Program
         {
             if (launchAtStartup)
                 runKey.SetValue("PinDock", $"\"{mainExe}\"");
+            else
+                runKey.DeleteValue("PinDock", throwOnMissingValue: false);
         }
 
         using (var uninstKey = Registry.CurrentUser.CreateSubKey(UninstallRegKey))
@@ -253,6 +432,9 @@ public static class Program
             uninstKey.SetValue("InstallLocation", installDir);
             uninstKey.SetValue("DisplayIcon", mainExe);
             uninstKey.SetValue("UninstallString", $"\"{uninstallerExe}\" --uninstall");
+            uninstKey.SetValue("CreateDesktopShortcut", createDesktopShortcut ? 1 : 0, RegistryValueKind.DWord);
+            uninstKey.SetValue("CreateStartMenuShortcut", createStartMenuShortcut ? 1 : 0, RegistryValueKind.DWord);
+            uninstKey.SetValue("LaunchAtStartup", launchAtStartup ? 1 : 0, RegistryValueKind.DWord);
             uninstKey.SetValue("NoModify", 1, RegistryValueKind.DWord);
             uninstKey.SetValue("NoRepair", 1, RegistryValueKind.DWord);
         }

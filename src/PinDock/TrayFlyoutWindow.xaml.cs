@@ -40,8 +40,10 @@ public partial class TrayFlyoutWindow : Window
         SearchBox.Text = "";
         SearchPlaceholder.Visibility = Visibility.Visible;
         RefreshContent();
-        PositionNearTray();
+        NativeWindow.MoveTo(this, -32000, 0);
         Show();
+        UpdateLayout();
+        PositionNearTray();
         Activate();
         SearchBox.Focus();
     }
@@ -69,9 +71,9 @@ public partial class TrayFlyoutWindow : Window
                 workArea = mon.WorkingArea;
         }
 
-        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
-        double pixelW = Width * scale;
-        double pixelH = Height * scale;
+        var actualSize = NativeWindow.GetPixelBounds(this);
+        double pixelW = actualSize.Width > 0 ? actualSize.Width : Width * VisualTreeHelper.GetDpi(this).DpiScaleX;
+        double pixelH = actualSize.Height > 0 ? actualSize.Height : Height * VisualTreeHelper.GetDpi(this).DpiScaleY;
 
         double x = Math.Clamp(cursorX - pixelW / 2, workArea.X + 8, Math.Max(workArea.X + 8, workArea.X + workArea.Width - pixelW - 8));
         double y = cursorY > workArea.Y + workArea.Height / 2
@@ -121,7 +123,6 @@ public partial class TrayFlyoutWindow : Window
         {
             var btn = new Button
             {
-                Style = (Style)FindResource("SubtleButton"),
                 Padding = new Thickness(8, 4, 8, 4),
                 Margin = new Thickness(0, 0, 5, 4),
                 ToolTip = item.Path,
@@ -165,11 +166,12 @@ public partial class TrayFlyoutWindow : Window
             bool selected = key == activeTab;
             var btn = new Button
             {
-                Style = (Style)FindResource(selected ? "PrimaryButton" : "SubtleButton"),
                 Padding = new Thickness(9, 4, 9, 4),
                 Margin = new Thickness(0, 0, 5, 0),
                 Content = new TextBlock { Text = title, FontSize = 11 }
             };
+            if (selected)
+                btn.Style = (Style)FindResource("PrimaryButton");
             btn.Click += (_, _) =>
             {
                 activeTab = key;

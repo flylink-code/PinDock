@@ -92,6 +92,7 @@ public sealed class AppController : IDisposable
         dock.Bind(Data);
         dock.Relayout();
         ApplyDisplayMode();
+        RevealDock();
         RegisterHotkey();
         fullscreen.SetEnabled(Data.Settings.AvoidFullscreen);
 
