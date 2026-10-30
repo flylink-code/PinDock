@@ -148,7 +148,7 @@ public partial class TrayFlyoutWindow : Window
             {
                 Padding = new Thickness(8, 4, 8, 4),
                 Margin = new Thickness(0, 0, 5, 4),
-                ToolTip = item.Path,
+                ToolTip = string.IsNullOrWhiteSpace(item.Path) ? item.Name : $"{item.Name}\n{item.Path}",
                 Content = new TextBlock
                 {
                     Text = item.Name,
@@ -157,6 +157,8 @@ public partial class TrayFlyoutWindow : Window
                     TextTrimming = TextTrimming.CharacterEllipsis
                 }
             };
+            ToolTipService.SetInitialShowDelay(btn, 160);
+            ToolTipService.SetBetweenShowDelay(btn, 80);
             btn.Click += (_, _) =>
             {
                 Hide();
@@ -281,8 +283,12 @@ public partial class TrayFlyoutWindow : Window
             BorderThickness = new Thickness(0),
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Padding = new Thickness(6, 7, 6, 7),
-            Cursor = Cursors.Hand
+            Cursor = Cursors.Hand,
+            ToolTip = string.IsNullOrWhiteSpace(item.Path) ? item.Name : $"{item.Name}\n{item.Path}"
         };
+        ToolTipService.SetInitialShowDelay(button, 160);
+        ToolTipService.SetBetweenShowDelay(button, 80);
+        ToolTipService.SetShowDuration(button, 15000);
 
         var iconHost = new Border
         {

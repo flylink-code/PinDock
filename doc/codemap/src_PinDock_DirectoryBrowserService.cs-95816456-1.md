@@ -4,16 +4,23 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DirectoryBrowserService.cs) · page 1/1
 
-Source SHA-256: 1c410a288da4969aae626dc635a18ebbd1e27257bd1c9da0b90f4214c457cf97
+Source SHA-256: e89be151fca8356448dcbb075fc4ab1132c1fb11988a4eb019d8561ecd991767
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/DirectoryBrowserService.cs#L4) |
-| DirectoryBrowserService | class_declaration | PinDock | [13](../../src/PinDock/DirectoryBrowserService.cs#L13) |
-| ListEntries | method_declaration | PinDock::DirectoryBrowserService | [29](../../src/PinDock/DirectoryBrowserService.cs#L29) |
-| SortGroup | method_declaration | PinDock::DirectoryBrowserService | [85](../../src/PinDock/DirectoryBrowserService.cs#L85) |
-| CompareNatural | method_declaration | PinDock::DirectoryBrowserService | [97](../../src/PinDock/DirectoryBrowserService.cs#L97) |
-| CompareTimeThenName | method_declaration | PinDock::DirectoryBrowserService | [99](../../src/PinDock/DirectoryBrowserService.cs#L99) |
-| SafeTime | method_declaration | PinDock::DirectoryBrowserService | [105](../../src/PinDock/DirectoryBrowserService.cs#L105) |
-| ShouldSkip | method_declaration | PinDock::DirectoryBrowserService | [111](../../src/PinDock/DirectoryBrowserService.cs#L111) |
-| StrCmpLogicalW | method_declaration | PinDock::DirectoryBrowserService | [120](../../src/PinDock/DirectoryBrowserService.cs#L120) |
+| DirectoryBrowserService | class_declaration | PinDock | [14](../../src/PinDock/DirectoryBrowserService.cs#L14) |
+| CachedDirectoryListing | record_declaration | PinDock::DirectoryBrowserService | [18](../../src/PinDock/DirectoryBrowserService.cs#L18) |
+| ListEntries | method_declaration | PinDock::DirectoryBrowserService | [42](../../src/PinDock/DirectoryBrowserService.cs#L42) |
+| InvalidateCache | method_declaration | PinDock::DirectoryBrowserService | [121](../../src/PinDock/DirectoryBrowserService.cs#L121) |
+| FormatFileSize | method_declaration | PinDock::DirectoryBrowserService | [131](../../src/PinDock/DirectoryBrowserService.cs#L131) |
+| SortGroup | method_declaration | PinDock::DirectoryBrowserService | [143](../../src/PinDock/DirectoryBrowserService.cs#L143) |
+| CompareNatural | method_declaration | PinDock::DirectoryBrowserService | [155](../../src/PinDock/DirectoryBrowserService.cs#L155) |
+| CompareTimeThenName | method_declaration | PinDock::DirectoryBrowserService | [157](../../src/PinDock/DirectoryBrowserService.cs#L157) |
+| NormalizeCacheKey | method_declaration | PinDock::DirectoryBrowserService | [163](../../src/PinDock/DirectoryBrowserService.cs#L163) |
+| SafeDirectoryLastWriteUtc | method_declaration | PinDock::DirectoryBrowserService | [175](../../src/PinDock/DirectoryBrowserService.cs#L175) |
+| SafeLastWriteTime | method_declaration | PinDock::DirectoryBrowserService | [181](../../src/PinDock/DirectoryBrowserService.cs#L181) |
+| SafeCreationTime | method_declaration | PinDock::DirectoryBrowserService | [187](../../src/PinDock/DirectoryBrowserService.cs#L187) |
+| SafeFileLength | method_declaration | PinDock::DirectoryBrowserService | [193](../../src/PinDock/DirectoryBrowserService.cs#L193) |
+| ShouldSkip | method_declaration | PinDock::DirectoryBrowserService | [199](../../src/PinDock/DirectoryBrowserService.cs#L199) |
+| StrCmpLogicalW | method_declaration | PinDock::DirectoryBrowserService | [208](../../src/PinDock/DirectoryBrowserService.cs#L208) |

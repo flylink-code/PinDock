@@ -28,6 +28,7 @@ public partial class GroupPopupWindow : Window
         isEn = english;
         items = bookmarks.ToList();
         TitleText.Text = groupName;
+        TitleText.ToolTip = groupName;
         CountText.Text = isEn ? $"{items.Count} items" : $"{items.Count} 个收藏";
         SearchBox.Text = "";
         Opacity = opacity;
@@ -96,8 +97,12 @@ public partial class GroupPopupWindow : Window
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 Padding = new Thickness(5, 10, 5, 10),
                 Cursor = Cursors.Hand,
-                Tag = item
+                Tag = item,
+                ToolTip = string.IsNullOrWhiteSpace(item.Path) ? item.Name : $"{item.Name}\n{item.Path}"
             };
+            ToolTipService.SetInitialShowDelay(button, 160);
+            ToolTipService.SetBetweenShowDelay(button, 80);
+            ToolTipService.SetShowDuration(button, 15000);
             var iconHost = new Border
             {
                 Width = 35,
@@ -116,7 +121,7 @@ public partial class GroupPopupWindow : Window
                 }
             };
             var texts = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-            texts.Children.Add(new TextBlock { Text = item.Name, FontSize = 12, FontWeight = FontWeights.Medium, Foreground = (Brush)FindResource("InkBrush") });
+            texts.Children.Add(new TextBlock { Text = item.Name, FontSize = 12, FontWeight = FontWeights.Medium, Foreground = (Brush)FindResource("InkBrush"), TextTrimming = TextTrimming.CharacterEllipsis });
             texts.Children.Add(new TextBlock { Text = item.Path, FontSize = 10, Margin = new Thickness(0, 4, 0, 0), Foreground = (Brush)FindResource("MutedBrush"), TextTrimming = TextTrimming.CharacterEllipsis });
             var row = new DockPanel();
             DockPanel.SetDock(iconHost, Dock.Left);

@@ -4,20 +4,24 @@
 
 [Module](app.md) · [Source](../../src/PinDock/ShellIconService.cs) · page 1/1
 
-Source SHA-256: 834134ed3e5aea99c496e44535cae2abbdedc7cb5a12fca7d488ef6e68668836
+Source SHA-256: 4ded4951786d1d41e4f5449ed72021c0dedf2931cc5eee5e20cb6291bf7dedbe
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [9](../../src/PinDock/ShellIconService.cs#L9) |
 | ShellIconService | class_declaration | PinDock | [15](../../src/PinDock/ShellIconService.cs#L15) |
-| ShellIconService | constructor_declaration | PinDock::ShellIconService | [21](../../src/PinDock/ShellIconService.cs#L21) |
-| GetAsync | method_declaration | PinDock::ShellIconService | [28](../../src/PinDock/ShellIconService.cs#L28) |
-| TryGetCachedDataUri | method_declaration | PinDock::ShellIconService | [44](../../src/PinDock/ShellIconService.cs#L44) |
-| GetDataUriAsync | method_declaration | PinDock::ShellIconService | [47](../../src/PinDock/ShellIconService.cs#L47) |
-| Run | method_declaration | PinDock::ShellIconService | [71](../../src/PinDock/ShellIconService.cs#L71) |
-| Extract | method_declaration | PinDock::ShellIconService | [82](../../src/PinDock/ShellIconService.cs#L82) |
-| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [140](../../src/PinDock/ShellIconService.cs#L140) |
-| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [150](../../src/PinDock/ShellIconService.cs#L150) |
-| SHGetImageList | method_declaration | PinDock::ShellIconService | [153](../../src/PinDock/ShellIconService.cs#L153) |
-| ImageList_GetIcon | method_declaration | PinDock::ShellIconService | [156](../../src/PinDock/ShellIconService.cs#L156) |
-| DestroyIcon | method_declaration | PinDock::ShellIconService | [159](../../src/PinDock/ShellIconService.cs#L159) |
+| ShellIconService | constructor_declaration | PinDock::ShellIconService | [28](../../src/PinDock/ShellIconService.cs#L28) |
+| TryGetCached | method_declaration | PinDock::ShellIconService | [35](../../src/PinDock/ShellIconService.cs#L35) |
+| TryGetCachedFileIcon | method_declaration | PinDock::ShellIconService | [42](../../src/PinDock/ShellIconService.cs#L42) |
+| GetFileIconAsync | method_declaration | PinDock::ShellIconService | [52](../../src/PinDock/ShellIconService.cs#L52) |
+| GetFileCacheKey | method_declaration | PinDock::ShellIconService | [69](../../src/PinDock/ShellIconService.cs#L69) |
+| GetAsync | method_declaration | PinDock::ShellIconService | [77](../../src/PinDock/ShellIconService.cs#L77) |
+| TryGetCachedDataUri | method_declaration | PinDock::ShellIconService | [93](../../src/PinDock/ShellIconService.cs#L93) |
+| GetDataUriAsync | method_declaration | PinDock::ShellIconService | [96](../../src/PinDock/ShellIconService.cs#L96) |
+| Run | method_declaration | PinDock::ShellIconService | [120](../../src/PinDock/ShellIconService.cs#L120) |
+| Extract | method_declaration | PinDock::ShellIconService | [131](../../src/PinDock/ShellIconService.cs#L131) |
+| SHFILEINFO | struct_declaration | PinDock::ShellIconService | [189](../../src/PinDock/ShellIconService.cs#L189) |
+| SHGetFileInfo | method_declaration | PinDock::ShellIconService | [199](../../src/PinDock/ShellIconService.cs#L199) |
+| SHGetImageList | method_declaration | PinDock::ShellIconService | [202](../../src/PinDock/ShellIconService.cs#L202) |
+| ImageList_GetIcon | method_declaration | PinDock::ShellIconService | [205](../../src/PinDock/ShellIconService.cs#L205) |
+| DestroyIcon | method_declaration | PinDock::ShellIconService | [208](../../src/PinDock/ShellIconService.cs#L208) |

@@ -80,9 +80,18 @@
                                         Visibility="{Binding SavedActionsVisibility}" Background="Transparent" Foreground="{DynamicResource MutedBrush}"/>
                             </StackPanel>
                             <Button Click="RowOpen_Click" Tag="{Binding}" Background="Transparent" BorderThickness="0" Padding="3,2"
-                                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center">
+                                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
+                                    ToolTipService.InitialShowDelay="160" ToolTipService.BetweenShowDelay="80" ToolTipService.ShowDuration="15000">
+                                <Button.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel MaxWidth="380">
+                                            <TextBlock Text="{Binding Bookmark.Name}" FontSize="12" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Subtitle}" FontSize="10.5" Foreground="#CCFFFFFF" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </Button.ToolTip>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Bookmark.Name}" FontSize="13" FontWeight="Medium" Foreground="{DynamicResource InkBrush}"/>
+                                    <TextBlock Text="{Binding Bookmark.Name}" FontSize="13" FontWeight="Medium" Foreground="{DynamicResource InkBrush}" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding Subtitle}" FontSize="11" FontFamily="Consolas, Microsoft YaHei UI" Margin="0,4,0,0"
                                                Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>

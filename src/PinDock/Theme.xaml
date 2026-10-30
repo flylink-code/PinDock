@@ -490,13 +490,20 @@
     <Style TargetType="ToolTip">
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="HasDropShadow" Value="False"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="MaxWidth" Value="420"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
                     <Border Background="{DynamicResource TooltipBgBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
-                            BorderThickness="1" CornerRadius="6" Padding="9,6">
+                            BorderThickness="1" CornerRadius="7" Padding="10,7" SnapsToDevicePixels="True">
+                        <Border.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                            </Style>
+                        </Border.Resources>
                         <ContentPresenter/>
                     </Border>
                 </ControlTemplate>

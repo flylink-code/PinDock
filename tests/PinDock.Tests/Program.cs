@@ -179,13 +179,29 @@ try
     if (browseEntries.Count != 3 ||
         !browseEntries[0].IsDirectory || browseEntries[0].Name != "Project2" ||
         !browseEntries[1].IsDirectory || browseEntries[1].Name != "Project10" ||
-        browseEntries[2].IsDirectory || browseEntries[2].Name != "readme.md")
+        browseEntries[2].IsDirectory || browseEntries[2].Name != "readme.md" ||
+        browseEntries[2].FileSize != 2)
     {
-        throw new Exception("DirectoryBrowserService natural name sorting failed");
+        throw new Exception("DirectoryBrowserService natural name sorting or file size failed");
     }
+    var cachedBrowseEntries = DirectoryBrowserService.ListEntries(browseRoot, DirectorySortMode.NameAsc);
+    if (!ReferenceEquals(browseEntries, cachedBrowseEntries))
+        throw new Exception("DirectoryBrowserService listing cache did not reuse cached list");
+    DirectoryBrowserService.InvalidateCache(browseRoot);
+    if (DirectoryBrowserService.FormatFileSize(512) != "512 B" ||
+        DirectoryBrowserService.FormatFileSize(2048) != "2.0 KB")
+        throw new Exception("DirectoryBrowserService FormatFileSize failed");
     var byModified = DirectoryBrowserService.ListEntries(browseRoot, DirectorySortMode.ModifiedDesc);
     if (byModified[0].Name != "Project10" || byModified[1].Name != "Project2")
         throw new Exception("DirectoryBrowserService ModifiedDesc sorting failed");
+
+    // 扩展名级别图标共享缓存与同步直取测试
+    string secondTextFile = Path.Combine(directory, "另一个文档.txt");
+    File.WriteAllText(secondTextFile, "PinDock2");
+    var fileIconByExt = await icons.GetFileIconAsync(textFile);
+    var cachedSecondTxtIcon = icons.TryGetCachedFileIcon(secondTextFile);
+    if (cachedSecondTxtIcon is null || !ReferenceEquals(fileIconByExt, cachedSecondTxtIcon))
+        throw new Exception("ShellIconService extension-level icon cache sharing failed");
 
     // 资源管理器右键命令与参数提取测试
     if (ExplorerMenuService.TryExtractAddPath(["--add", @"D:\Work\ProjectA"]) != @"D:\Work\ProjectA")
@@ -286,11 +302,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.5")
-        throw new Exception($"Expected version 0.1.5, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.5", "v0.1.6") ||
-        !UpdateService.IsNewerVersion("0.1.5", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.5", "v0.1.5"))
+    if (UpdateService.GetCurrentVersion() != "0.1.6")
+        throw new Exception($"Expected version 0.1.6, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.6", "v0.1.7") ||
+        !UpdateService.IsNewerVersion("0.1.6", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.6", "v0.1.6"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";

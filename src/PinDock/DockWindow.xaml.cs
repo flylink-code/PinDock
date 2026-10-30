@@ -393,15 +393,15 @@ public partial class DockWindow : Window
             {
                 pendingHoverFolder = item;
                 pendingHoverButton = button;
-                if (folderPopup.IsVisible)
-                {
-                    OpenFolderPopupFor(item, button);
-                }
-                else
+                if (folderPopup.IsVisible && folderPopup.IsShowingRoot(item.Path))
                 {
                     folderOpenTimer.Stop();
-                    folderOpenTimer.Start();
+                    UpdateActiveFolderButtonRect(button);
+                    return;
                 }
+                folderOpenTimer.Stop();
+                folderOpenTimer.Interval = TimeSpan.FromMilliseconds(folderPopup.IsVisible ? 45 : 180);
+                folderOpenTimer.Start();
             };
             button.MouseLeave += (_, _) =>
             {
@@ -545,9 +545,8 @@ public partial class DockWindow : Window
         return defaultHost;
     }
 
-    private void OpenFolderPopupFor(Bookmark folderItem, Button anchorButton)
+    private ScreenRect UpdateActiveFolderButtonRect(Button anchorButton)
     {
-        if (groupPopup.IsVisible) groupPopup.Hide();
         var topLeft = anchorButton.PointToScreen(new Point(0, 0));
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         var buttonRect = new ScreenRect(
@@ -556,6 +555,13 @@ public partial class DockWindow : Window
             anchorButton.ActualWidth * scale,
             anchorButton.ActualHeight * scale);
         activeFolderButtonRect = buttonRect;
+        return buttonRect;
+    }
+
+    private void OpenFolderPopupFor(Bookmark folderItem, Button anchorButton)
+    {
+        if (groupPopup.IsVisible) groupPopup.Hide();
+        var buttonRect = UpdateActiveFolderButtonRect(anchorButton);
         var anchor = data.Settings.DockEdge is DockEdge.Bottom or DockEdge.Top
             ? new ScreenRect(buttonRect.X, placement.Bounds.Y, buttonRect.Width, placement.Bounds.Height)
             : new ScreenRect(placement.Bounds.X, buttonRect.Y, placement.Bounds.Width, buttonRect.Height);
@@ -938,6 +944,12 @@ public partial class DockWindow : Window
 
     private async Task LoadIcon(Image image, UIElement fallback, string path)
     {
+        if (icons.TryGetCached(path) is { } cached)
+        {
+            image.Source = cached;
+            fallback.Visibility = Visibility.Collapsed;
+            return;
+        }
         try
         {
             image.Source = await icons.GetAsync(path);

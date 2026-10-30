@@ -8,10 +8,23 @@ public readonly record struct DirectoryEntryItem(
     string FullPath,
     bool IsDirectory,
     DateTime LastWriteTime,
-    DateTime CreationTime);
+    DateTime CreationTime,
+    long FileSize = 0);
 
 public static class DirectoryBrowserService
 {
+    private const long CacheTtlMs = 12_000;
+
+    private sealed record CachedDirectoryListing(
+        DateTime DirectoryLastWriteUtc,
+        DirectorySortMode SortMode,
+        int MaxEntries,
+        long CachedAtTick,
+        IReadOnlyList<DirectoryEntryItem> Entries);
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, CachedDirectoryListing> ListingCache =
+        new(StringComparer.OrdinalIgnoreCase);
+
     private static readonly HashSet<string> IgnoredNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "$RECYCLE.BIN",
@@ -34,19 +47,53 @@ public static class DirectoryBrowserService
         if (string.IsNullOrWhiteSpace(directoryPath) || !Directory.Exists(directoryPath))
             return [];
 
+        string cacheKey = NormalizeCacheKey(directoryPath);
+        DateTime dirWriteUtc = SafeDirectoryLastWriteUtc(directoryPath);
+        long nowTick = Environment.TickCount64;
+
+        if (ListingCache.TryGetValue(cacheKey, out var cached) &&
+            cached.DirectoryLastWriteUtc == dirWriteUtc &&
+            cached.SortMode == sortMode &&
+            cached.MaxEntries == maxEntries &&
+            nowTick - cached.CachedAtTick <= CacheTtlMs)
+        {
+            return cached.Entries;
+        }
+
         var dirs = new List<DirectoryEntryItem>();
+        var files = new List<DirectoryEntryItem>();
         try
         {
             var dirInfo = new DirectoryInfo(directoryPath);
-            foreach (var subDir in dirInfo.EnumerateDirectories())
+            foreach (var entry in dirInfo.EnumerateFileSystemInfos())
             {
-                if (ShouldSkip(subDir.Name, subDir.Attributes)) continue;
-                dirs.Add(new DirectoryEntryItem(
-                    subDir.Name,
-                    subDir.FullName,
-                    IsDirectory: true,
-                    SafeTime(() => subDir.LastWriteTime),
-                    SafeTime(() => subDir.CreationTime)));
+                var attributes = entry.Attributes;
+                if (ShouldSkip(entry.Name, attributes)) continue;
+
+                bool isDir = (attributes & FileAttributes.Directory) != 0;
+                DateTime lastWrite = SafeLastWriteTime(entry);
+                DateTime created = SafeCreationTime(entry);
+
+                if (isDir)
+                {
+                    dirs.Add(new DirectoryEntryItem(
+                        entry.Name,
+                        entry.FullName,
+                        IsDirectory: true,
+                        lastWrite,
+                        created));
+                }
+                else
+                {
+                    long size = entry is FileInfo fi ? SafeFileLength(fi) : 0;
+                    files.Add(new DirectoryEntryItem(
+                        entry.Name,
+                        entry.FullName,
+                        IsDirectory: false,
+                        lastWrite,
+                        created,
+                        size));
+                }
             }
         }
         catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
@@ -54,32 +101,43 @@ public static class DirectoryBrowserService
         }
 
         SortGroup(dirs, sortMode);
-
-        var files = new List<DirectoryEntryItem>();
-        try
-        {
-            var dirInfo = new DirectoryInfo(directoryPath);
-            foreach (var file in dirInfo.EnumerateFiles())
-            {
-                if (ShouldSkip(file.Name, file.Attributes)) continue;
-                files.Add(new DirectoryEntryItem(
-                    file.Name,
-                    file.FullName,
-                    IsDirectory: false,
-                    SafeTime(() => file.LastWriteTime),
-                    SafeTime(() => file.CreationTime)));
-            }
-        }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
-        {
-        }
-
         SortGroup(files, sortMode);
         dirs.AddRange(files);
 
-        if (dirs.Count > maxEntries)
-            return dirs.Take(maxEntries).ToList();
-        return dirs;
+        IReadOnlyList<DirectoryEntryItem> result = dirs.Count > maxEntries
+            ? dirs.Take(maxEntries).ToList()
+            : dirs;
+
+        ListingCache[cacheKey] = new CachedDirectoryListing(
+            dirWriteUtc,
+            sortMode,
+            maxEntries,
+            nowTick,
+            result);
+
+        return result;
+    }
+
+    public static void InvalidateCache(string? directoryPath = null)
+    {
+        if (string.IsNullOrWhiteSpace(directoryPath))
+        {
+            ListingCache.Clear();
+            return;
+        }
+        ListingCache.TryRemove(NormalizeCacheKey(directoryPath), out _);
+    }
+
+    public static string FormatFileSize(long bytes)
+    {
+        if (bytes < 0) return "";
+        if (bytes < 1024) return $"{bytes} B";
+        double kb = bytes / 1024.0;
+        if (kb < 1024) return kb >= 100 ? $"{kb:F0} KB" : $"{kb:F1} KB";
+        double mb = kb / 1024.0;
+        if (mb < 1024) return mb >= 100 ? $"{mb:F0} MB" : $"{mb:F1} MB";
+        double gb = mb / 1024.0;
+        return $"{gb:F2} GB";
     }
 
     public static void SortGroup(List<DirectoryEntryItem> list, DirectorySortMode sortMode)
@@ -102,10 +160,40 @@ public static class DirectoryBrowserService
         return cmp != 0 ? cmp : CompareNatural(nameA, nameB);
     }
 
-    private static DateTime SafeTime(Func<DateTime> getter)
+    private static string NormalizeCacheKey(string directoryPath)
     {
-        try { return getter(); }
+        try
+        {
+            return Path.GetFullPath(directoryPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+    }
+
+    private static DateTime SafeDirectoryLastWriteUtc(string directoryPath)
+    {
+        try { return Directory.GetLastWriteTimeUtc(directoryPath); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return DateTime.MinValue; }
+    }
+
+    private static DateTime SafeLastWriteTime(FileSystemInfo info)
+    {
+        try { return info.LastWriteTime; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return DateTime.MinValue; }
+    }
+
+    private static DateTime SafeCreationTime(FileSystemInfo info)
+    {
+        try { return info.CreationTime; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return DateTime.MinValue; }
+    }
+
+    private static long SafeFileLength(FileInfo file)
+    {
+        try { return file.Length; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return 0; }
     }
 
     private static bool ShouldSkip(string name, FileAttributes attributes)

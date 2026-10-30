@@ -8,8 +8,9 @@
             BorderThickness="1" CornerRadius="15" Padding="18" SnapsToDevicePixels="True">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
-                <TextBlock x:Name="TitleText" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource InkBrush}"/>
-                <TextBlock x:Name="CountText" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource MutedBrush}"/>
+                <TextBlock x:Name="CountText" DockPanel.Dock="Right" VerticalAlignment="Center" FontSize="10" Margin="8,0,0,0" Foreground="{DynamicResource MutedBrush}"/>
+                <TextBlock x:Name="TitleText" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource InkBrush}"
+                           TextTrimming="CharacterEllipsis" ToolTipService.InitialShowDelay="160"/>
             </DockPanel>
             <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                 <TextBox x:Name="SearchBox" Padding="10,7" FontSize="12"

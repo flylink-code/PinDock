@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/GroupPopupWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 11e118690709da12d2bd9cf8f76ae4dba4cfc50a5d1e340a7d3116430b1f0211
+Source SHA-256: b6d08ecc0df5e589bfa4bbdef9214ce5671be61594c495d253f92fcfd44571bb
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,10 +12,10 @@ Source SHA-256: 11e118690709da12d2bd9cf8f76ae4dba4cfc50a5d1e340a7d3116430b1f0211
 | GroupPopupWindow | class_declaration | PinDock | [8](../../src/PinDock/GroupPopupWindow.xaml.cs#L8) |
 | GroupPopupWindow | constructor_declaration | PinDock::GroupPopupWindow | [19](../../src/PinDock/GroupPopupWindow.xaml.cs#L19) |
 | ShowGroup | method_declaration | PinDock::GroupPopupWindow | [26](../../src/PinDock/GroupPopupWindow.xaml.cs#L26) |
-| Place | method_declaration | PinDock::GroupPopupWindow | [46](../../src/PinDock/GroupPopupWindow.xaml.cs#L46) |
-| RenderList | method_declaration | PinDock::GroupPopupWindow | [75](../../src/PinDock/GroupPopupWindow.xaml.cs#L75) |
-| ApplyBookmarkIcon | method_declaration | PinDock::GroupPopupWindow | [132](../../src/PinDock/GroupPopupWindow.xaml.cs#L132) |
-| LoadMiniIcon | method_declaration | PinDock::GroupPopupWindow | [174](../../src/PinDock/GroupPopupWindow.xaml.cs#L174) |
-| SearchBox_TextChanged | method_declaration | PinDock::GroupPopupWindow | [184](../../src/PinDock/GroupPopupWindow.xaml.cs#L184) |
-| Window_PreviewKeyDown | method_declaration | PinDock::GroupPopupWindow | [186](../../src/PinDock/GroupPopupWindow.xaml.cs#L186) |
-| Window_Deactivated | method_declaration | PinDock::GroupPopupWindow | [195](../../src/PinDock/GroupPopupWindow.xaml.cs#L195) |
+| Place | method_declaration | PinDock::GroupPopupWindow | [47](../../src/PinDock/GroupPopupWindow.xaml.cs#L47) |
+| RenderList | method_declaration | PinDock::GroupPopupWindow | [76](../../src/PinDock/GroupPopupWindow.xaml.cs#L76) |
+| ApplyBookmarkIcon | method_declaration | PinDock::GroupPopupWindow | [137](../../src/PinDock/GroupPopupWindow.xaml.cs#L137) |
+| LoadMiniIcon | method_declaration | PinDock::GroupPopupWindow | [179](../../src/PinDock/GroupPopupWindow.xaml.cs#L179) |
+| SearchBox_TextChanged | method_declaration | PinDock::GroupPopupWindow | [189](../../src/PinDock/GroupPopupWindow.xaml.cs#L189) |
+| Window_PreviewKeyDown | method_declaration | PinDock::GroupPopupWindow | [191](../../src/PinDock/GroupPopupWindow.xaml.cs#L191) |
+| Window_Deactivated | method_declaration | PinDock::GroupPopupWindow | [200](../../src/PinDock/GroupPopupWindow.xaml.cs#L200) |

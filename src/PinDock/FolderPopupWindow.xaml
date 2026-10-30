@@ -4,20 +4,22 @@
         Title="目录浏览" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" SizeToContent="WidthAndHeight" Topmost="True"
         PreviewKeyDown="Window_PreviewKeyDown" Deactivated="Window_Deactivated">
-    <Border Width="376" MaxHeight="460" Background="{DynamicResource PaperBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
+    <Border Width="420" MaxHeight="460" Background="{DynamicResource PaperBrush}" BorderBrush="{DynamicResource GlassBorderBrush}"
             BorderThickness="1" CornerRadius="15" Padding="16" SnapsToDevicePixels="True">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                     <Button x:Name="UpButton" Content="⬅ 上一级" Padding="8,4" FontSize="11" Margin="0,0,6,0"
                             Click="Up_Click" Visibility="Collapsed"/>
                     <Button x:Name="OpenCurrentButton" Content="↗ 打开当前目录" Padding="8,4" FontSize="11" Click="OpenCurrent_Click"/>
                 </StackPanel>
                 <TextBlock x:Name="TitleText" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"
-                           Foreground="{DynamicResource InkBrush}" TextTrimming="CharacterEllipsis"/>
+                           Foreground="{DynamicResource InkBrush}" TextTrimming="CharacterEllipsis"
+                           ToolTipService.InitialShowDelay="160"/>
             </DockPanel>
             <TextBlock x:Name="PathText" DockPanel.Dock="Top" FontSize="10" FontFamily="Consolas, Microsoft YaHei UI"
-                       Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,10" TextTrimming="CharacterEllipsis"/>
+                       Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,10" TextTrimming="CharacterEllipsis"
+                       ToolTipService.InitialShowDelay="160"/>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
                 <Button x:Name="SortButton" DockPanel.Dock="Right" Style="{StaticResource SubtleButton}"
                         Content="⇅ 名称 A-Z" Padding="9,7" FontSize="11" Margin="6,0,0,0"
@@ -43,15 +45,17 @@
             </DockPanel>
             <Border DockPanel.Dock="Bottom" Margin="0,8,0,0" Padding="0,9,0,0" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0">
                 <DockPanel>
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                         <Button x:Name="ToggleHiddenBtn" Style="{StaticResource SubtleButton}" Content="已隐藏 0 项" Padding="8,3" FontSize="10.5" Margin="0,0,8,0"
                                 Visibility="Collapsed" Click="ToggleHiddenBtn_Click"/>
                         <TextBlock x:Name="CountText" FontSize="10.5" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
                     </StackPanel>
-                    <TextBlock x:Name="FooterTipText" FontSize="10.5" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Text="单击直接打开 · 右键或悬停可隐藏"/>
+                    <TextBlock x:Name="FooterTipText" FontSize="10.5" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"
+                               Text="单击直接打开 · 右键或悬停可隐藏" TextTrimming="CharacterEllipsis"
+                               ToolTipService.InitialShowDelay="160"/>
                 </DockPanel>
             </Border>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+            <ScrollViewer x:Name="ListScrollViewer" VerticalScrollBarVisibility="Auto" MaxHeight="300">
                 <StackPanel x:Name="ListPanel"/>
             </ScrollViewer>
         </DockPanel>

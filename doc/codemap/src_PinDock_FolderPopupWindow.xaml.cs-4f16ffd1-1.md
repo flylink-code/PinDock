@@ -4,28 +4,38 @@
 
 [Module](app.md) · [Source](../../src/PinDock/FolderPopupWindow.xaml.cs) · page 1/1
 
-Source SHA-256: f0bd0e4410275381df65b4a32acd1ab5cfdda6c40e227350bfb4bf32c6133de8
+Source SHA-256: 809a18eed20c45bd62cdf0f6d73d5acdd89626d81a6cbae8dd20d70b4ca43885
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [7](../../src/PinDock/FolderPopupWindow.xaml.cs#L7) |
-| FolderPopupWindow | class_declaration | PinDock | [9](../../src/PinDock/FolderPopupWindow.xaml.cs#L9) |
-| CurrentRootPath | property_declaration | PinDock::FolderPopupWindow | [29](../../src/PinDock/FolderPopupWindow.xaml.cs#L29) |
-| IsContextMenuOpen | property_declaration | PinDock::FolderPopupWindow | [30](../../src/PinDock/FolderPopupWindow.xaml.cs#L30) |
-| FolderPopupWindow | constructor_declaration | PinDock::FolderPopupWindow | [32](../../src/PinDock/FolderPopupWindow.xaml.cs#L32) |
-| Bind | method_declaration | PinDock::FolderPopupWindow | [39](../../src/PinDock/FolderPopupWindow.xaml.cs#L39) |
-| T | method_declaration | PinDock::FolderPopupWindow | [44](../../src/PinDock/FolderPopupWindow.xaml.cs#L44) |
-| ShowFolder | method_declaration | PinDock::FolderPopupWindow | [46](../../src/PinDock/FolderPopupWindow.xaml.cs#L46) |
-| NavigateTo | method_declaration | PinDock::FolderPopupWindow | [74](../../src/PinDock/FolderPopupWindow.xaml.cs#L74) |
-| UpdateSortButtonLabel | method_declaration | PinDock::FolderPopupWindow | [92](../../src/PinDock/FolderPopupWindow.xaml.cs#L92) |
-| SortButton_Click | method_declaration | PinDock::FolderPopupWindow | [105](../../src/PinDock/FolderPopupWindow.xaml.cs#L105) |
-| Place | method_declaration | PinDock::FolderPopupWindow | [144](../../src/PinDock/FolderPopupWindow.xaml.cs#L144) |
-| RenderList | method_declaration | PinDock::FolderPopupWindow | [173](../../src/PinDock/FolderPopupWindow.xaml.cs#L173) |
-| ShowEntryContextMenu | method_declaration | PinDock::FolderPopupWindow | [417](../../src/PinDock/FolderPopupWindow.xaml.cs#L417) |
-| ToggleHiddenBtn_Click | method_declaration | PinDock::FolderPopupWindow | [455](../../src/PinDock/FolderPopupWindow.xaml.cs#L455) |
-| LoadFileIconAsync | method_declaration | PinDock::FolderPopupWindow | [461](../../src/PinDock/FolderPopupWindow.xaml.cs#L461) |
-| Up_Click | method_declaration | PinDock::FolderPopupWindow | [479](../../src/PinDock/FolderPopupWindow.xaml.cs#L479) |
-| OpenCurrent_Click | method_declaration | PinDock::FolderPopupWindow | [486](../../src/PinDock/FolderPopupWindow.xaml.cs#L486) |
-| SearchBox_TextChanged | method_declaration | PinDock::FolderPopupWindow | [492](../../src/PinDock/FolderPopupWindow.xaml.cs#L492) |
-| Window_PreviewKeyDown | method_declaration | PinDock::FolderPopupWindow | [494](../../src/PinDock/FolderPopupWindow.xaml.cs#L494) |
-| Window_Deactivated | method_declaration | PinDock::FolderPopupWindow | [503](../../src/PinDock/FolderPopupWindow.xaml.cs#L503) |
+| PinDock | file_scoped_namespace_declaration |  | [9](../../src/PinDock/FolderPopupWindow.xaml.cs#L9) |
+| FolderPopupWindow | class_declaration | PinDock | [11](../../src/PinDock/FolderPopupWindow.xaml.cs#L11) |
+| RowResources | record_declaration | PinDock::FolderPopupWindow | [18](../../src/PinDock/FolderPopupWindow.xaml.cs#L18) |
+| CurrentRootPath | property_declaration | PinDock::FolderPopupWindow | [46](../../src/PinDock/FolderPopupWindow.xaml.cs#L46) |
+| IsContextMenuOpen | property_declaration | PinDock::FolderPopupWindow | [47](../../src/PinDock/FolderPopupWindow.xaml.cs#L47) |
+| FolderPopupWindow | constructor_declaration | PinDock::FolderPopupWindow | [49](../../src/PinDock/FolderPopupWindow.xaml.cs#L49) |
+| Bind | method_declaration | PinDock::FolderPopupWindow | [56](../../src/PinDock/FolderPopupWindow.xaml.cs#L56) |
+| T | method_declaration | PinDock::FolderPopupWindow | [61](../../src/PinDock/FolderPopupWindow.xaml.cs#L61) |
+| IsShowingRoot | method_declaration | PinDock::FolderPopupWindow | [63](../../src/PinDock/FolderPopupWindow.xaml.cs#L63) |
+| ShowFolder | method_declaration | PinDock::FolderPopupWindow | [80](../../src/PinDock/FolderPopupWindow.xaml.cs#L80) |
+| RepositionPopup | method_declaration | PinDock::FolderPopupWindow | [116](../../src/PinDock/FolderPopupWindow.xaml.cs#L116) |
+| ResetFooterTip | method_declaration | PinDock::FolderPopupWindow | [124](../../src/PinDock/FolderPopupWindow.xaml.cs#L124) |
+| SetFooterPreviewName | method_declaration | PinDock::FolderPopupWindow | [131](../../src/PinDock/FolderPopupWindow.xaml.cs#L131) |
+| NavigateTo | method_declaration | PinDock::FolderPopupWindow | [138](../../src/PinDock/FolderPopupWindow.xaml.cs#L138) |
+| UpdateSortButtonLabel | method_declaration | PinDock::FolderPopupWindow | [163](../../src/PinDock/FolderPopupWindow.xaml.cs#L163) |
+| SortButton_Click | method_declaration | PinDock::FolderPopupWindow | [176](../../src/PinDock/FolderPopupWindow.xaml.cs#L176) |
+| Place | method_declaration | PinDock::FolderPopupWindow | [215](../../src/PinDock/FolderPopupWindow.xaml.cs#L215) |
+| GetRowResources | method_declaration | PinDock::FolderPopupWindow | [244](../../src/PinDock/FolderPopupWindow.xaml.cs#L244) |
+| RenderList | method_declaration | PinDock::FolderPopupWindow | [255](../../src/PinDock/FolderPopupWindow.xaml.cs#L255) |
+| AppendRemainingRowsAsync | method_declaration | PinDock::FolderPopupWindow | [317](../../src/PinDock/FolderPopupWindow.xaml.cs#L317) |
+| CreateEntryRow | method_declaration | PinDock::FolderPopupWindow | [344](../../src/PinDock/FolderPopupWindow.xaml.cs#L344) |
+| BuildEntryToolTip | method_declaration | PinDock::FolderPopupWindow | [591](../../src/PinDock/FolderPopupWindow.xaml.cs#L591) |
+| ShowEntryContextMenu | method_declaration | PinDock::FolderPopupWindow | [640](../../src/PinDock/FolderPopupWindow.xaml.cs#L640) |
+| ToggleHiddenBtn_Click | method_declaration | PinDock::FolderPopupWindow | [697](../../src/PinDock/FolderPopupWindow.xaml.cs#L697) |
+| CreateFileIconImage | method_declaration | PinDock::FolderPopupWindow | [703](../../src/PinDock/FolderPopupWindow.xaml.cs#L703) |
+| LoadFileIconAsync | method_declaration | PinDock::FolderPopupWindow | [713](../../src/PinDock/FolderPopupWindow.xaml.cs#L713) |
+| Up_Click | method_declaration | PinDock::FolderPopupWindow | [725](../../src/PinDock/FolderPopupWindow.xaml.cs#L725) |
+| OpenCurrent_Click | method_declaration | PinDock::FolderPopupWindow | [732](../../src/PinDock/FolderPopupWindow.xaml.cs#L732) |
+| SearchBox_TextChanged | method_declaration | PinDock::FolderPopupWindow | [738](../../src/PinDock/FolderPopupWindow.xaml.cs#L738) |
+| Window_PreviewKeyDown | method_declaration | PinDock::FolderPopupWindow | [740](../../src/PinDock/FolderPopupWindow.xaml.cs#L740) |
+| Window_Deactivated | method_declaration | PinDock::FolderPopupWindow | [749](../../src/PinDock/FolderPopupWindow.xaml.cs#L749) |

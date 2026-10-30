@@ -14,6 +14,13 @@ namespace PinDock;
 /// </summary>
 public sealed class ShellIconService
 {
+    private static readonly HashSet<string> PerFileIconExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".exe", ".dll", ".ocx", ".lnk", ".ico", ".cur", ".ani",
+        ".url", ".scr", ".cpl", ".msc", ".appref-ms",
+        ".png", ".jpg", ".jpeg", ".bmp"
+    };
+
     private readonly ConcurrentDictionary<string, Task<ImageSource>> cache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, string> dataUriCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly BlockingCollection<(string Path, TaskCompletionSource<ImageSource> Result)> queue = [];
@@ -23,6 +30,48 @@ public sealed class ShellIconService
         var worker = new Thread(Run) { IsBackground = true, Name = "PinDock.ShellIcons" };
         worker.SetApartmentState(ApartmentState.STA);
         worker.Start();
+    }
+
+    public ImageSource? TryGetCached(string path)
+    {
+        if (cache.TryGetValue(path, out var task) && task.IsCompletedSuccessfully)
+            return task.Result;
+        return null;
+    }
+
+    public ImageSource? TryGetCachedFileIcon(string filePath)
+    {
+        string key = GetFileCacheKey(filePath);
+        if (cache.TryGetValue(key, out var task) && task.IsCompletedSuccessfully)
+            return task.Result;
+        if (cache.TryGetValue(filePath, out var directTask) && directTask.IsCompletedSuccessfully)
+            return directTask.Result;
+        return null;
+    }
+
+    public async Task<ImageSource> GetFileIconAsync(string filePath)
+    {
+        string key = GetFileCacheKey(filePath);
+        var task = cache.GetOrAdd(key, _ =>
+        {
+            var result = new TaskCompletionSource<ImageSource>(TaskCreationOptions.RunContinuationsAsynchronously);
+            queue.Add((filePath, result));
+            return result.Task;
+        });
+        try { return await task; }
+        catch
+        {
+            cache.TryRemove(new KeyValuePair<string, Task<ImageSource>>(key, task));
+            throw;
+        }
+    }
+
+    private static string GetFileCacheKey(string filePath)
+    {
+        string ext = Path.GetExtension(filePath);
+        if (!string.IsNullOrEmpty(ext) && !PerFileIconExtensions.Contains(ext))
+            return "ext:" + ext;
+        return filePath;
     }
 
     public async Task<ImageSource> GetAsync(string path)

@@ -20,12 +20,12 @@
 | [src/PinDock/BookmarkRow.cs](../../src/PinDock/BookmarkRow.cs) | 16 | [1](src_PinDock_BookmarkRow.cs-335705d0-1.md) |
 | [src/PinDock/CardWindowBase.cs](../../src/PinDock/CardWindowBase.cs) | 6 | [1](src_PinDock_CardWindowBase.cs-fb3d7391-1.md) |
 | [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 57 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
-| [src/PinDock/DirectoryBrowserService.cs](../../src/PinDock/DirectoryBrowserService.cs) | 9 | [1](src_PinDock_DirectoryBrowserService.cs-95816456-1.md) |
+| [src/PinDock/DirectoryBrowserService.cs](../../src/PinDock/DirectoryBrowserService.cs) | 16 | [1](src_PinDock_DirectoryBrowserService.cs-95816456-1.md) |
 | [src/PinDock/DockLayout.cs](../../src/PinDock/DockLayout.cs) | 9 | [1](src_PinDock_DockLayout.cs-fd425178-1.md) |
-| [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 58 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
+| [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 59 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
 | [src/PinDock/EdgeHandleWindow.xaml.cs](../../src/PinDock/EdgeHandleWindow.xaml.cs) | 6 | [1](src_PinDock_EdgeHandleWindow.xaml.cs-52e7dde9-1.md) |
 | [src/PinDock/ExplorerMenuService.cs](../../src/PinDock/ExplorerMenuService.cs) | 18 | [1](src_PinDock_ExplorerMenuService.cs-64b5d39a-1.md) |
-| [src/PinDock/FolderPopupWindow.xaml.cs](../../src/PinDock/FolderPopupWindow.xaml.cs) | 21 | [1](src_PinDock_FolderPopupWindow.xaml.cs-4f16ffd1-1.md) |
+| [src/PinDock/FolderPopupWindow.xaml.cs](../../src/PinDock/FolderPopupWindow.xaml.cs) | 31 | [1](src_PinDock_FolderPopupWindow.xaml.cs-4f16ffd1-1.md) |
 | [src/PinDock/FullscreenWatcher.cs](../../src/PinDock/FullscreenWatcher.cs) | 8 | [1](src_PinDock_FullscreenWatcher.cs-2103578f-1.md) |
 | [src/PinDock/GlobalUsings.cs](../../src/PinDock/GlobalUsings.cs) | 0 | [1](src_PinDock_GlobalUsings.cs-e47550c3-1.md) |
 | [src/PinDock/GroupIconPresets.cs](../../src/PinDock/GroupIconPresets.cs) | 4 | [1](src_PinDock_GroupIconPresets.cs-40094964-1.md) |
@@ -40,7 +40,7 @@
 | [src/PinDock/Palettes.cs](../../src/PinDock/Palettes.cs) | 5 | [1](src_PinDock_Palettes.cs-db761e61-1.md) |
 | [src/PinDock/PromptDialog.xaml.cs](../../src/PinDock/PromptDialog.xaml.cs) | 5 | [1](src_PinDock_PromptDialog.xaml.cs-865af51d-1.md) |
 | [src/PinDock/SettingsWindow.xaml.cs](../../src/PinDock/SettingsWindow.xaml.cs) | 20 | [1](src_PinDock_SettingsWindow.xaml.cs-a5b18687-1.md) |
-| [src/PinDock/ShellIconService.cs](../../src/PinDock/ShellIconService.cs) | 13 | [1](src_PinDock_ShellIconService.cs-5a643bb8-1.md) |
+| [src/PinDock/ShellIconService.cs](../../src/PinDock/ShellIconService.cs) | 17 | [1](src_PinDock_ShellIconService.cs-5a643bb8-1.md) |
 | [src/PinDock/StartupService.cs](../../src/PinDock/StartupService.cs) | 5 | [1](src_PinDock_StartupService.cs-74f10e6e-1.md) |
 | [src/PinDock/ThemeService.cs](../../src/PinDock/ThemeService.cs) | 10 | [1](src_PinDock_ThemeService.cs-c58fdb5c-1.md) |
 | [src/PinDock/TrayFlyoutWindow.xaml.cs](../../src/PinDock/TrayFlyoutWindow.xaml.cs) | 28 | [1](src_PinDock_TrayFlyoutWindow.xaml.cs-5bccd4b7-1.md) |

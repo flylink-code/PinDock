@@ -26,8 +26,8 @@ powershell -ExecutionPolicy Bypass -File scripts\build-msix.ps1 `
   -PublisherDisplayName "你的开发者名称"
 ```
 
-- 产物路径：`dist\PinDock-0.1.5-x64.msix`
-- 上传位置：在 Partner Center 的 **包 (Packages)** 页面直接拖入 `dist\PinDock-0.1.5-x64.msix` 即可。
+- 产物路径：`dist\PinDock-0.1.6-x64.msix`
+- 上传位置：在 Partner Center 的 **包 (Packages)** 页面直接拖入 `dist\PinDock-0.1.6-x64.msix` 即可。
 - **隐私政策 URL（必填）**：直接填写本仓库的隐私声明地址：
   `https://github.com/flylink-code/PinDock/blob/main/PRIVACY.md`
 - **提交审核说明 (Notes for certification)**：由于使用了 `runFullTrust`，在提交审核的备注框粘贴以下说明即可快速通过人工审核：
@@ -39,7 +39,7 @@ powershell -ExecutionPolicy Bypass -File scripts\build-msix.ps1 `
 
 如果你在 Partner Center 创建产品时选择了 **EXE 或 MSI 应用**：
 1. **安装包 URL**：填写 GitHub Release 安装包直链：
-   `https://github.com/flylink-code/PinDock/releases/download/v0.1.5/PinDock-Setup-0.1.5.exe`
+   `https://github.com/flylink-code/PinDock/releases/download/v0.1.6/PinDock-Setup-0.1.6.exe`
 2. **安装程序参数 (Installer parameters)**：填写 `/SILENT`
 3. **隐私政策 URL**：填写 `https://github.com/flylink-code/PinDock/blob/main/PRIVACY.md`
 
