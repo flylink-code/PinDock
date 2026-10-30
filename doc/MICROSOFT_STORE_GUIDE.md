@@ -4,11 +4,30 @@
 
 ---
 
-## 一、准备工作：注册微软开发者账号（个人免费）
+## 一、准备工作：注册并开通「应用和游戏」工作区（个人免费）
 
-1. 访问 [Microsoft Partner Center (合作伙伴中心)](https://partner.microsoft.com/dashboard/windowsoverview) 并使用个人 Microsoft 账号登录注册（目前个人开发者免注册费）。
-2. 在 **应用和游戏 -> 新产品 -> MSIX 或 PWA 应用**（或选择 **EXE 或 MSI 应用**）中预留应用名称 `PinDock`。
-3. 进入 **产品管理 -> 产品标识 (Product Identity)** 页面，复制微软分配给你的 3 个参数：
+如果你刚用微软账号登录 [Microsoft Partner Center (合作伙伴中心)](https://partner.microsoft.com/dashboard/home)，主页的「工作区」里**只有一个蓝色的 `＋` 号（「我的访问权限」）**，没有看到「应用和游戏」，说明你的账号还没有开通微软商店（Windows 和 Xbox）开发者计划，请按以下步骤开通：
+
+### 1. 开通「Windows 和 Xbox」开发者计划
+1. **方式 A（在合作伙伴中心内操作）**：
+   - 点击主页「工作区」里的蓝色 **`＋` 号卡片（我的访问权限）** 进入「帐户设置 | 我的访问权限」页面；
+   - 点击页面中间「快速入门」下的第 3 张卡片 **「注册计划」**，或者点击左侧导航栏第 4 项 **「程序」**（即 Programs）；
+   - 在展开的列表中找到 **「Windows 和 Xbox」（Microsoft Store）**，点击右侧的 **「开始使用」 (Get started)**。
+2. **方式 B（如果方式 A 列表里没看到 Windows 和 Xbox，直接走官方商店注册通道）**：
+   - 直接打开微软商店开发者免费注册入口：https://storedeveloper.microsoft.com/ （或 https://partner.microsoft.com/dashboard/registration/windows ）；
+   - 点击页面上的 **Sign up / 立即免费注册**，使用同一个个人 Microsoft 账号登录。
+3. **填写开发者信息（0 元免费）**：
+   - **账户类型**：选择 **个人 (Individual)**（个人开发者免费，无需公司营业执照）；
+   - **国家/地区**：选择 **中国 (China)**；
+   - **发布者显示名称 (Publisher display name)**：填写你想在微软商店展示的开发者名字（例如 `flylink` 或 `flylink-code`）；
+   - 按页面提示完成手机/身份验证即可。
+
+### 2. 进入「应用和游戏」工作区并创建应用
+1. 注册完成后，重新打开或刷新 [合作伙伴中心主页](https://partner.microsoft.com/dashboard/home)（或直接访问 [Windows 概览页](https://partner.microsoft.com/dashboard/windowsoverview)），此时「工作区」下方会出现 **「应用和游戏 (Apps and games)」** 卡片。
+2. 点击进入 **「应用和游戏」**，点击左上角的 **「＋ 新产品 (New product)」**：
+   - 如果准备走 **方式 1（上传 `.msix` 包）**：选择 **「MSIX 或 PWA 应用」**，输入 `PinDock` 并点击 **预留产品名称 (Reserve product name)**。
+   - 如果准备走 **方式 2（直接填 GitHub `.exe` 链接，最省事）**：选择 **「EXE 或 MSI 应用」**，输入 `PinDock` 预留名称后直接跳到下方「三、方式 2」。
+3. （仅方式 1 需要）创建 MSIX 应用后，点击左侧菜单 **产品管理 (Product management) -> 产品标识 (Product Identity)**，复制微软分配给你的 3 个参数：
    - `Package/Identity/Name`（例如：`12345YourName.PinDock`）
    - `Package/Identity/Publisher`（例如：`CN=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX`）
    - `Package/Properties/PublisherDisplayName`（你的开发者显示名称）
