@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppSettings.cs) · page 1/1
 
-Source SHA-256: 630f84640678a5a4d9ff09c91a05eb083de846e38abd1f2db21c532121dc9997
+Source SHA-256: fea295c45ed546accd0f235b807f55691a377417d9f3dfaa6268285a097cd384
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -51,27 +51,28 @@ Source SHA-256: 630f84640678a5a4d9ff09c91a05eb083de846e38abd1f2db21c532121dc9997
 | AvoidFullscreen | property_declaration | PinDock::AppSettings | [26](../../src/PinDock/AppSettings.cs#L26) |
 | LockPosition | property_declaration | PinDock::AppSettings | [27](../../src/PinDock/AppSettings.cs#L27) |
 | CollapseAfterLaunch | property_declaration | PinDock::AppSettings | [28](../../src/PinDock/AppSettings.cs#L28) |
-| EdgeOffset | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
-| MonitorDeviceName | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
-| ExplorerContextMenu | property_declaration | PinDock::AppSettings | [31](../../src/PinDock/AppSettings.cs#L31) |
-| HotkeyModifiers | property_declaration | PinDock::AppSettings | [32](../../src/PinDock/AppSettings.cs#L32) |
-| HotkeyKey | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
-| Language | property_declaration | PinDock::AppSettings | [36](../../src/PinDock/AppSettings.cs#L36) |
-| ShowIconLabels | property_declaration | PinDock::AppSettings | [39](../../src/PinDock/AppSettings.cs#L39) |
-| UtilityCollapsed | property_declaration | PinDock::AppSettings | [42](../../src/PinDock/AppSettings.cs#L42) |
-| ShowLibraryButton | property_declaration | PinDock::AppSettings | [43](../../src/PinDock/AppSettings.cs#L43) |
-| ShowAddButton | property_declaration | PinDock::AppSettings | [44](../../src/PinDock/AppSettings.cs#L44) |
-| ShowSettingsButton | property_declaration | PinDock::AppSettings | [45](../../src/PinDock/AppSettings.cs#L45) |
-| AutoHideUtilityButtons | property_declaration | PinDock::AppSettings | [46](../../src/PinDock/AppSettings.cs#L46) |
-| Win11ClassicMenu | property_declaration | PinDock::AppSettings | [49](../../src/PinDock/AppSettings.cs#L49) |
-| LaunchAtStartup | property_declaration | PinDock::AppSettings | [52](../../src/PinDock/AppSettings.cs#L52) |
-| ClosePanelBehavior | property_declaration | PinDock::AppSettings | [53](../../src/PinDock/AppSettings.cs#L53) |
-| ConfirmBeforeExit | property_declaration | PinDock::AppSettings | [54](../../src/PinDock/AppSettings.cs#L54) |
-| UseGithubMirror | property_declaration | PinDock::AppSettings | [57](../../src/PinDock/AppSettings.cs#L57) |
-| GithubMirrorUrl | property_declaration | PinDock::AppSettings | [58](../../src/PinDock/AppSettings.cs#L58) |
-| HasHotkey | property_declaration | PinDock::AppSettings | [60](../../src/PinDock/AppSettings.cs#L60) |
-| IsEnglish | property_declaration | PinDock::AppSettings | [61](../../src/PinDock/AppSettings.cs#L61) |
-| BookmarkKind | enum_declaration | PinDock | [64](../../src/PinDock/AppSettings.cs#L64) |
-| Application | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |
-| Folder | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |
-| File | enum_member_declaration | PinDock::BookmarkKind | [64](../../src/PinDock/AppSettings.cs#L64) |
+| EnableAppRecentPreview | property_declaration | PinDock::AppSettings | [29](../../src/PinDock/AppSettings.cs#L29) |
+| EdgeOffset | property_declaration | PinDock::AppSettings | [30](../../src/PinDock/AppSettings.cs#L30) |
+| MonitorDeviceName | property_declaration | PinDock::AppSettings | [31](../../src/PinDock/AppSettings.cs#L31) |
+| ExplorerContextMenu | property_declaration | PinDock::AppSettings | [32](../../src/PinDock/AppSettings.cs#L32) |
+| HotkeyModifiers | property_declaration | PinDock::AppSettings | [33](../../src/PinDock/AppSettings.cs#L33) |
+| HotkeyKey | property_declaration | PinDock::AppSettings | [34](../../src/PinDock/AppSettings.cs#L34) |
+| Language | property_declaration | PinDock::AppSettings | [37](../../src/PinDock/AppSettings.cs#L37) |
+| ShowIconLabels | property_declaration | PinDock::AppSettings | [40](../../src/PinDock/AppSettings.cs#L40) |
+| UtilityCollapsed | property_declaration | PinDock::AppSettings | [43](../../src/PinDock/AppSettings.cs#L43) |
+| ShowLibraryButton | property_declaration | PinDock::AppSettings | [44](../../src/PinDock/AppSettings.cs#L44) |
+| ShowAddButton | property_declaration | PinDock::AppSettings | [45](../../src/PinDock/AppSettings.cs#L45) |
+| ShowSettingsButton | property_declaration | PinDock::AppSettings | [46](../../src/PinDock/AppSettings.cs#L46) |
+| AutoHideUtilityButtons | property_declaration | PinDock::AppSettings | [47](../../src/PinDock/AppSettings.cs#L47) |
+| Win11ClassicMenu | property_declaration | PinDock::AppSettings | [50](../../src/PinDock/AppSettings.cs#L50) |
+| LaunchAtStartup | property_declaration | PinDock::AppSettings | [53](../../src/PinDock/AppSettings.cs#L53) |
+| ClosePanelBehavior | property_declaration | PinDock::AppSettings | [54](../../src/PinDock/AppSettings.cs#L54) |
+| ConfirmBeforeExit | property_declaration | PinDock::AppSettings | [55](../../src/PinDock/AppSettings.cs#L55) |
+| UseGithubMirror | property_declaration | PinDock::AppSettings | [58](../../src/PinDock/AppSettings.cs#L58) |
+| GithubMirrorUrl | property_declaration | PinDock::AppSettings | [59](../../src/PinDock/AppSettings.cs#L59) |
+| HasHotkey | property_declaration | PinDock::AppSettings | [61](../../src/PinDock/AppSettings.cs#L61) |
+| IsEnglish | property_declaration | PinDock::AppSettings | [62](../../src/PinDock/AppSettings.cs#L62) |
+| BookmarkKind | enum_declaration | PinDock | [65](../../src/PinDock/AppSettings.cs#L65) |
+| Application | enum_member_declaration | PinDock::BookmarkKind | [65](../../src/PinDock/AppSettings.cs#L65) |
+| Folder | enum_member_declaration | PinDock::BookmarkKind | [65](../../src/PinDock/AppSettings.cs#L65) |
+| File | enum_member_declaration | PinDock::BookmarkKind | [65](../../src/PinDock/AppSettings.cs#L65) |

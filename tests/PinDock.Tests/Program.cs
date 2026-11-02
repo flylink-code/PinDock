@@ -302,11 +302,11 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.6")
-        throw new Exception($"Expected version 0.1.6, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.6", "v0.1.7") ||
-        !UpdateService.IsNewerVersion("0.1.6", "0.2.0") ||
-        UpdateService.IsNewerVersion("0.1.6", "v0.1.6"))
+    if (UpdateService.GetCurrentVersion() != "0.1.7")
+        throw new Exception($"Expected version 0.1.7, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.7", "v0.1.8") ||
+        !UpdateService.IsNewerVersion("0.1.7", "0.2.0") ||
+        UpdateService.IsNewerVersion("0.1.7", "v0.1.7"))
         throw new Exception("UpdateService version comparison failed");
 
     string rawReleaseAssetUrl = "https://github.com/flylink-code/PinDock/releases/download/v0.2.0/PinDock-Setup-0.2.0.exe";
@@ -346,7 +346,114 @@ try
     if (StartupService.BuildCommand(@"C:\App\PinDock.exe") != "\"C:\\App\\PinDock.exe\"")
         throw new Exception("StartupService BuildCommand failed");
 
-    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, custom group icons, dock separators, utility hide, startup/close, updater mirror, palettes");
+    // 4. 应用最近打开服务 (AppRecentService) 与跨应用适配测试
+    if (AppRecentService.ComputeJumpListHash("Microsoft.VisualStudioCode") != "1ced32d74a95c7bc" ||
+        AppRecentService.ComputeJumpListHash("Microsoft.Windows.Explorer") != "f01b4d95cf55d32a")
+        throw new Exception("JumpList CRC64 hash calculation failed");
+
+    var resolvedLnk = AppRecentService.ResolveAppTarget(Path.Combine(directory, "快捷方式.lnk"));
+    if (!string.Equals(resolvedLnk.ExecutablePath, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase))
+        throw new Exception($"Shortcut target resolution failed: {resolvedLnk.ExecutablePath}");
+
+    string sampleProjectDir = Path.Combine(directory, "SampleRepo");
+    Directory.CreateDirectory(sampleProjectDir);
+    string sampleWorkspaceFile = Path.Combine(sampleProjectDir, "demo.code-workspace");
+    File.WriteAllText(sampleWorkspaceFile, "{}");
+
+    string folderFileUri = new Uri(sampleProjectDir).AbsoluteUri;
+    string wsFileUri = new Uri(sampleWorkspaceFile).AbsoluteUri;
+    if (!AppRecentService.TryParseVsCodeUri(folderFileUri, out var parsedFolderItem) ||
+        parsedFolderItem.Kind != AppRecentItemKind.Folder ||
+        !string.Equals(parsedFolderItem.FullPath, sampleProjectDir, StringComparison.OrdinalIgnoreCase) ||
+        !parsedFolderItem.CanBrowseDirectory)
+        throw new Exception("TryParseVsCodeUri folder failed");
+
+    if (!AppRecentService.TryParseVsCodeUri(wsFileUri, out var parsedWsItem) ||
+        parsedWsItem.Kind != AppRecentItemKind.Workspace ||
+        parsedWsItem.Name != "demo" ||
+        !parsedWsItem.CanBrowseDirectory ||
+        !string.Equals(parsedWsItem.BrowsableDirectoryPath, sampleProjectDir, StringComparison.OrdinalIgnoreCase))
+        throw new Exception("TryParseVsCodeUri workspace failed");
+
+    string remoteSshUri = "vscode-remote://ssh-remote%2B7b22686f73744e616d65223a225562756e74753232227d/home/dev/firmware";
+    if (!AppRecentService.TryParseVsCodeUri(remoteSshUri, out var parsedRemoteItem) ||
+        parsedRemoteItem.Kind != AppRecentItemKind.Remote ||
+        !parsedRemoteItem.Name.Contains("SSH: Ubuntu22", StringComparison.Ordinal) ||
+        !parsedRemoteItem.LaunchArguments.Contains("--folder-uri", StringComparison.Ordinal))
+        throw new Exception($"TryParseVsCodeUri remote SSH failed: {parsedRemoteItem.Name}");
+
+    string fakeRoaming = Path.Combine(directory, "FakeRoaming");
+    string fakeCodeUser = Path.Combine(fakeRoaming, "Code", "User");
+    string fakeGlobalStorage = Path.Combine(fakeCodeUser, "globalStorage");
+    string fakeWsHashDir = Path.Combine(fakeCodeUser, "workspaceStorage", "hash123");
+    Directory.CreateDirectory(fakeGlobalStorage);
+    Directory.CreateDirectory(fakeWsHashDir);
+    File.WriteAllText(Path.Combine(fakeWsHashDir, "workspace.json"), JsonSerializer.Serialize(new { folder = folderFileUri }));
+    File.WriteAllText(Path.Combine(fakeGlobalStorage, "storage.json"), JsonSerializer.Serialize(new
+    {
+        windowsState = new
+        {
+            lastActiveWindow = new
+            {
+                workspaceIdentifier = new { id = "w1", configURIPath = wsFileUri }
+            }
+        },
+        profileAssociations = new
+        {
+            workspaces = new Dictionary<string, string>
+            {
+                [remoteSshUri] = "__default__profile__"
+            }
+        }
+    }));
+
+    var vsCodeBookmark = new Bookmark { Name = "VS Code", Path = @"C:\Program Files\Microsoft VS Code\Code.exe" };
+    var vsCodeRecents = AppRecentService.ListRecentItems(vsCodeBookmark, reloadedCustom, customAppDataRoot: fakeRoaming);
+    if (vsCodeRecents.Count < 3 ||
+        !vsCodeRecents.Any(r => r.Kind == AppRecentItemKind.Workspace && r.IsCurrentlyOpen) ||
+        !vsCodeRecents.Any(r => r.Kind == AppRecentItemKind.Folder && string.Equals(r.FullPath, sampleProjectDir, StringComparison.OrdinalIgnoreCase)) ||
+        !vsCodeRecents.Any(r => r.Kind == AppRecentItemKind.Remote))
+        throw new Exception($"VS Code recent items discovery failed (count={vsCodeRecents.Count})");
+
+    // JetBrains recentProjects.xml 测试
+    string fakeClionOpts = Path.Combine(fakeRoaming, "JetBrains", "CLion2025.1", "options");
+    Directory.CreateDirectory(fakeClionOpts);
+    File.WriteAllText(Path.Combine(fakeClionOpts, "recentProjects.xml"), $"""
+        <application>
+          <component name="RecentProjectsManager">
+            <option name="additionalInfo">
+              <map>
+                <entry key="{sampleProjectDir.Replace('\\', '/')}">
+                  <value>
+                    <RecentProjectMetaInfo displayName="STM32_Firmware">
+                      <option name="projectOpenTimestamp" value="1760000000000" />
+                    </RecentProjectMetaInfo>
+                  </value>
+                </entry>
+              </map>
+            </option>
+          </component>
+        </application>
+        """);
+    var clionRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "CLion", Path = @"C:\JetBrains\CLion\bin\clion64.exe" },
+        reloadedCustom,
+        customAppDataRoot: fakeRoaming);
+    if (clionRecents.Count != 1 || clionRecents[0].Name != "STM32_Firmware")
+        throw new Exception("JetBrains recentProjects.xml discovery failed");
+
+    // 自定义应用关联项目持久化测试
+    reloadedCustom.UpsertAppRecentRecord(@"C:\CustomTool\tool.exe", sampleProjectDir, "自定义工程", AppRecentItemKind.Folder, pinnedByUser: true);
+    store.Save(reloadedCustom);
+    var reloadedWithAppRecents = store.Load();
+    var customToolRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "CustomTool", Path = @"C:\CustomTool\tool.exe" },
+        reloadedWithAppRecents,
+        customAppDataRoot: fakeRoaming);
+    if (customToolRecents.Count != 1 || !customToolRecents[0].PinnedByUser || customToolRecents[0].Name != "自定义工程")
+        throw new Exception("Custom app recent records round-trip failed");
+
+    Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, custom group icons, dock separators, utility hide, startup/close, updater mirror, palettes, AppRecentService");
 }
 finally
 {

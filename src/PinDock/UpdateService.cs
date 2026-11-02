@@ -512,7 +512,7 @@ public static class UpdateService
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
         };
         var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("PinDock-Updater/0.1.6");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("PinDock-Updater/0.1.7");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json, application/atom+xml, text/html, */*");
         return client;
     }

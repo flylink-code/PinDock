@@ -46,6 +46,7 @@ public sealed class AppController : IDisposable
         webPanel.Prewarm();
 
         dock.LaunchRequested += bookmark => _ = LaunchAsync(bookmark);
+        dock.AppRecentLaunchRequested += (app, recentItem) => _ = LaunchAppRecentAsync(app, recentItem);
         dock.EditRequested += EditBookmarkInteractive;
         dock.UnpinRequested += TogglePin;
         dock.RemoveRequested += RemoveBookmarkWithConfirm;
@@ -222,6 +223,33 @@ public sealed class AppController : IDisposable
             item.LaunchCount++;
             Persist();
         }
+        if (!Data.Settings.CollapseAfterLaunch) return;
+        if (appliedMode == DisplayMode.EdgeAutoHide) autoHide.HideNow();
+        else if (appliedMode == DisplayMode.Hotkey)
+        {
+            toggled = false;
+            SyncVisuals();
+        }
+    }
+
+    public async Task LaunchAppRecentAsync(Bookmark appBookmark, AppRecentItem recentItem)
+    {
+        try
+        {
+            await Task.Run(() => AppRecentService.LaunchRecentItem(appBookmark, recentItem, Data));
+        }
+        catch (Exception ex) when (ex is Win32Exception or IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            MessageBox.Show($"无法用“{appBookmark.Name}”打开“{recentItem.Name}”（{recentItem.FullPath}）：{ex.Message}");
+            return;
+        }
+        if (Data.Items.Contains(appBookmark))
+        {
+            appBookmark.LastLaunchedTicks = DateTime.UtcNow.Ticks;
+            appBookmark.LaunchCount++;
+        }
+        Persist();
+        trayFlyout.RefreshIfVisible();
         if (!Data.Settings.CollapseAfterLaunch) return;
         if (appliedMode == DisplayMode.EdgeAutoHide) autoHide.HideNow();
         else if (appliedMode == DisplayMode.Hotkey)

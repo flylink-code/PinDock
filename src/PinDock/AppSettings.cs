@@ -26,6 +26,7 @@ public sealed class AppSettings
     public bool AvoidFullscreen { get; set; } = true;
     public bool LockPosition { get; set; }
     public bool CollapseAfterLaunch { get; set; } = true;
+    public bool EnableAppRecentPreview { get; set; } = true;
     public double EdgeOffset { get; set; }
     public string? MonitorDeviceName { get; set; }
     public bool ExplorerContextMenu { get; set; }

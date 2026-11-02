@@ -634,6 +634,8 @@ public partial class WebPanelWindow : Window
             s.MonitorDeviceName = mdn.GetString();
         if (sEl.TryGetProperty("collapseAfterLaunch", out var cal))
             s.CollapseAfterLaunch = cal.GetBoolean();
+        if (sEl.TryGetProperty("enableAppRecentPreview", out var earp))
+            s.EnableAppRecentPreview = earp.GetBoolean();
         if (sEl.TryGetProperty("topmost", out var top))
             s.Topmost = top.GetBoolean();
         if (sEl.TryGetProperty("avoidFullscreen", out var af))
@@ -824,6 +826,7 @@ public partial class WebPanelWindow : Window
                 avoidFullscreen = s.AvoidFullscreen,
                 lockPosition = s.LockPosition,
                 collapseAfterLaunch = s.CollapseAfterLaunch,
+                enableAppRecentPreview = s.EnableAppRecentPreview,
                 monitorDeviceName = s.MonitorDeviceName,
                 explorerContextMenu = s.ExplorerContextMenu || ExplorerMenuService.IsRegistered(),
                 win11ClassicMenu = s.Win11ClassicMenu || ExplorerMenuService.IsWin11ClassicMenuEnabled(),

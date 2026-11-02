@@ -6,6 +6,17 @@ namespace PinDock;
 public enum GroupIconKind { DefaultGrid, MemberPreview, Preset, TextBadge, CustomFile }
 public enum BookmarkIconKind { Default, Preset, TextBadge, CustomFile }
 public enum DirectorySortMode { NameAsc, NameDesc, ModifiedDesc, ModifiedAsc, CreatedDesc }
+public enum AppRecentItemKind { Folder, Workspace, File, Remote }
+
+public sealed class AppRecentEntryRecord
+{
+    public string Path { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Arguments { get; set; } = "";
+    public AppRecentItemKind Kind { get; set; } = AppRecentItemKind.Folder;
+    public long LastOpenedTicks { get; set; }
+    public bool PinnedByUser { get; set; }
+}
 
 public sealed class GroupIconConfig
 {
@@ -37,7 +48,102 @@ public sealed class LibraryData
     public List<string> DockOrder { get; set; } = [];
     public List<string> HiddenFolderPaths { get; set; } = [];
     public Dictionary<string, DirectorySortMode> FolderSortModes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, List<AppRecentEntryRecord>> AppRecentItems { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public AppSettings Settings { get; set; } = new();
+
+    public IReadOnlyList<AppRecentEntryRecord> GetAppRecentRecords(string appKey)
+    {
+        if (string.IsNullOrWhiteSpace(appKey) || AppRecentItems is null)
+            return [];
+        string normKey = NormalizePathKey(appKey);
+        if (AppRecentItems.TryGetValue(normKey, out var direct) && direct is not null)
+            return direct;
+        foreach (var kv in AppRecentItems)
+        {
+            if (string.Equals(NormalizePathKey(kv.Key), normKey, StringComparison.OrdinalIgnoreCase) && kv.Value is not null)
+                return kv.Value;
+        }
+        return [];
+    }
+
+    public void UpsertAppRecentRecord(
+        string appKey,
+        string targetPath,
+        string name = "",
+        AppRecentItemKind? kind = null,
+        string arguments = "",
+        bool? pinnedByUser = null,
+        bool touchTimestamp = true)
+    {
+        if (string.IsNullOrWhiteSpace(appKey) || string.IsNullOrWhiteSpace(targetPath))
+            return;
+        AppRecentItems ??= new(StringComparer.OrdinalIgnoreCase);
+        string normApp = NormalizePathKey(appKey);
+        string normTarget = NormalizePathKey(targetPath);
+
+        List<AppRecentEntryRecord>? list = null;
+        string? matchedKey = AppRecentItems.Keys.FirstOrDefault(k => string.Equals(NormalizePathKey(k), normApp, StringComparison.OrdinalIgnoreCase));
+        if (matchedKey is not null)
+            list = AppRecentItems[matchedKey];
+        if (list is null)
+        {
+            list = [];
+            AppRecentItems[normApp] = list;
+        }
+
+        var existing = list.FirstOrDefault(r => string.Equals(NormalizePathKey(r.Path), normTarget, StringComparison.OrdinalIgnoreCase));
+        if (existing is null)
+        {
+            var resolvedKind = kind ?? (normTarget.EndsWith(".code-workspace", StringComparison.OrdinalIgnoreCase) ||
+                                        normTarget.EndsWith(".sln", StringComparison.OrdinalIgnoreCase) ||
+                                        normTarget.EndsWith(".slnx", StringComparison.OrdinalIgnoreCase)
+                ? AppRecentItemKind.Workspace
+                : Directory.Exists(normTarget)
+                    ? AppRecentItemKind.Folder
+                    : AppRecentItemKind.File);
+            string resolvedName = !string.IsNullOrWhiteSpace(name)
+                ? name
+                : Path.GetFileName(normTarget.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            if (string.IsNullOrWhiteSpace(resolvedName))
+                resolvedName = normTarget;
+
+            existing = new AppRecentEntryRecord
+            {
+                Path = normTarget,
+                Name = resolvedName,
+                Arguments = arguments ?? "",
+                Kind = resolvedKind,
+                LastOpenedTicks = DateTime.UtcNow.Ticks,
+                PinnedByUser = pinnedByUser ?? false
+            };
+            list.Insert(0, existing);
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+                existing.Name = name;
+            if (kind.HasValue)
+                existing.Kind = kind.Value;
+            if (!string.IsNullOrWhiteSpace(arguments))
+                existing.Arguments = arguments;
+            if (pinnedByUser.HasValue)
+                existing.PinnedByUser = pinnedByUser.Value;
+            if (touchTimestamp)
+                existing.LastOpenedTicks = DateTime.UtcNow.Ticks;
+        }
+    }
+
+    public void RemoveAppRecentRecord(string appKey, string targetPath)
+    {
+        if (string.IsNullOrWhiteSpace(appKey) || string.IsNullOrWhiteSpace(targetPath) || AppRecentItems is null)
+            return;
+        string normApp = NormalizePathKey(appKey);
+        string normTarget = NormalizePathKey(targetPath);
+        foreach (var kv in AppRecentItems.Where(kv => string.Equals(NormalizePathKey(kv.Key), normApp, StringComparison.OrdinalIgnoreCase)).ToList())
+        {
+            kv.Value?.RemoveAll(r => string.Equals(NormalizePathKey(r.Path), normTarget, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 
     public DirectorySortMode GetFolderSortMode(string directoryPath)
     {
@@ -90,6 +196,7 @@ public sealed class LibraryData
         GroupIcons ??= new(StringComparer.Ordinal);
         HiddenFolderPaths ??= [];
         FolderSortModes ??= new(StringComparer.OrdinalIgnoreCase);
+        AppRecentItems ??= new(StringComparer.OrdinalIgnoreCase);
         foreach (var item in Items)
             item.IconValue ??= "";
 

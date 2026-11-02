@@ -516,6 +516,13 @@ input[type="range"] {
           </div>
           <div class="row">
             <span>
+              应用悬停预览最近打开项目
+              <small>鼠标悬停 VS Code、Cursor、IDEA、Office 等应用时弹出最近工作区、目录与文件（也可右键随时查看或添加关联目录）</small>
+            </span>
+            <button class="switch" id="sw-app-recent" role="switch" aria-checked="true"></button>
+          </div>
+          <div class="row">
+            <span>
               界面语言 / Language
               <small>支持简体中文与 English 实时切换（顶部栏也可一键切换）</small>
             </span>
@@ -1617,6 +1624,7 @@ function bindSwitch(id, prop, cmdName = 'updateSettings') {
   };
 }
 bindSwitch('#sw-collapse', 'collapseAfterLaunch');
+bindSwitch('#sw-app-recent', 'enableAppRecentPreview');
 bindSwitch('#sw-topmost', 'topmost');
 bindSwitch('#sw-fullscreen', 'avoidFullscreen');
 bindSwitch('#sw-lock', 'lockPosition');
@@ -1785,6 +1793,7 @@ function applySettingsToUi() {
   $('#lbl-opacity').textContent = op + '%';
 
   $('#sw-collapse').setAttribute('aria-checked', String(!!s.collapseAfterLaunch));
+  if ($('#sw-app-recent')) $('#sw-app-recent').setAttribute('aria-checked', String(s.enableAppRecentPreview !== false));
   $('#sw-topmost').setAttribute('aria-checked', String(!!s.topmost));
   $('#sw-fullscreen').setAttribute('aria-checked', String(!!s.avoidFullscreen));
   $('#sw-lock').setAttribute('aria-checked', String(!!s.lockPosition));

@@ -33,6 +33,7 @@ public partial class DockWindow : Window
     private bool isExternalDragOver;
 
     public event Action<Bookmark>? LaunchRequested;
+    public event Action<Bookmark, AppRecentItem>? AppRecentLaunchRequested;
     public event Action<Bookmark>? EditRequested;
     public event Action<Bookmark>? UnpinRequested;
     public event Action<Bookmark>? RemoveRequested;
@@ -88,6 +89,11 @@ public partial class DockWindow : Window
         {
             folderPopup.Hide();
             LaunchRequested?.Invoke(bookmark);
+        };
+        folderPopup.AppRecentLaunchRequested += (app, recentItem) =>
+        {
+            folderPopup.Hide();
+            AppRecentLaunchRequested?.Invoke(app, recentItem);
         };
         folderPopup.PinFolderRequested += folderPath =>
         {
@@ -375,7 +381,9 @@ public partial class DockWindow : Window
 
     private Button CreateBookmarkButton(Bookmark item, double icon, string token)
     {
-        bool isFolder = BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Folder;
+        var kind = BookmarkKindHelper.FromPath(item.Path);
+        bool isFolder = kind == BookmarkKind.Folder;
+        bool isApp = kind == BookmarkKind.Application;
         var button = CreateChrome(
             icon,
             item.Name,
@@ -408,6 +416,42 @@ public partial class DockWindow : Window
                 folderOpenTimer.Stop();
             };
         }
+        else if (isApp)
+        {
+            button.MouseEnter += (_, _) =>
+            {
+                if (!data.Settings.EnableAppRecentPreview)
+                {
+                    button.ToolTip = item.Name;
+                    CloseFolderPopupOnOtherHover();
+                    return;
+                }
+                if (folderPopup.IsVisible && folderPopup.IsShowingAppRecent(item))
+                {
+                    folderOpenTimer.Stop();
+                    UpdateActiveFolderButtonRect(button);
+                    return;
+                }
+                if (AppRecentService.HasRecentItems(item, data))
+                {
+                    button.ToolTip = null;
+                    pendingHoverFolder = item;
+                    pendingHoverButton = button;
+                    folderOpenTimer.Stop();
+                    folderOpenTimer.Interval = TimeSpan.FromMilliseconds(folderPopup.IsVisible ? 45 : 180);
+                    folderOpenTimer.Start();
+                }
+                else
+                {
+                    button.ToolTip = item.Name;
+                    CloseFolderPopupOnOtherHover();
+                }
+            };
+            button.MouseLeave += (_, _) =>
+            {
+                folderOpenTimer.Stop();
+            };
+        }
         else
         {
             button.MouseEnter += (_, _) => CloseFolderPopupOnOtherHover();
@@ -423,7 +467,7 @@ public partial class DockWindow : Window
         {
             folderOpenTimer.Stop();
             folderPopup.Hide();
-            ShowBookmarkContextMenu(item, token);
+            ShowBookmarkContextMenu(item, token, button);
             e.Handled = true;
         };
         return button;
@@ -558,7 +602,7 @@ public partial class DockWindow : Window
         return buttonRect;
     }
 
-    private void OpenFolderPopupFor(Bookmark folderItem, Button anchorButton)
+    private void OpenFolderPopupFor(Bookmark targetItem, Button anchorButton)
     {
         if (groupPopup.IsVisible) groupPopup.Hide();
         var buttonRect = UpdateActiveFolderButtonRect(anchorButton);
@@ -566,7 +610,30 @@ public partial class DockWindow : Window
             ? new ScreenRect(buttonRect.X, placement.Bounds.Y, buttonRect.Width, placement.Bounds.Height)
             : new ScreenRect(placement.Bounds.X, buttonRect.Y, placement.Bounds.Width, buttonRect.Height);
 
-        folderPopup.ShowFolder(folderItem.Path, folderItem.Name, anchor, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+        var kind = BookmarkKindHelper.FromPath(targetItem.Path);
+        if (kind == BookmarkKind.Folder)
+        {
+            folderPopup.ShowFolder(targetItem.Path, targetItem.Name, anchor, workArea, data.Settings.DockEdge, data.Settings.Opacity);
+            if (!folderCloseTimer.IsEnabled) folderCloseTimer.Start();
+        }
+        else if (kind == BookmarkKind.Application)
+        {
+            if (folderPopup.ShowAppRecent(targetItem, anchor, workArea, data.Settings.DockEdge, data.Settings.Opacity))
+            {
+                if (!folderCloseTimer.IsEnabled) folderCloseTimer.Start();
+            }
+        }
+    }
+
+    private void OpenAppRecentPopupForced(Bookmark appItem, Button anchorButton)
+    {
+        if (groupPopup.IsVisible) groupPopup.Hide();
+        var buttonRect = UpdateActiveFolderButtonRect(anchorButton);
+        var anchor = data.Settings.DockEdge is DockEdge.Bottom or DockEdge.Top
+            ? new ScreenRect(buttonRect.X, placement.Bounds.Y, buttonRect.Width, placement.Bounds.Height)
+            : new ScreenRect(placement.Bounds.X, buttonRect.Y, placement.Bounds.Width, buttonRect.Height);
+
+        folderPopup.ShowAppRecent(appItem, anchor, workArea, data.Settings.DockEdge, data.Settings.Opacity, forceShowEmpty: true);
         if (!folderCloseTimer.IsEnabled) folderCloseTimer.Start();
     }
 
@@ -958,12 +1025,23 @@ public partial class DockWindow : Window
         catch (System.ComponentModel.Win32Exception) { }
     }
 
-    private void ShowBookmarkContextMenu(Bookmark item, string token)
+    private void ShowBookmarkContextMenu(Bookmark item, string token, Button anchorButton)
     {
         var menu = new ContextMenu();
         var openItem = new MenuItem { Tag = "↗", Header = T($"打开“{item.Name}”", $"Open \"{item.Name}\"") };
         openItem.Click += (_, _) => LaunchRequested?.Invoke(item);
         menu.Items.Add(openItem);
+
+        if (BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Application)
+        {
+            var recentItem = new MenuItem
+            {
+                Tag = "🕘",
+                Header = T("最近打开 / 关联常用项目…", "Recent items / Associate projects…")
+            };
+            recentItem.Click += (_, _) => OpenAppRecentPopupForced(item, anchorButton);
+            menu.Items.Add(recentItem);
+        }
 
         var revealItem = new MenuItem { Tag = "📂", Header = T("在资源管理器中显示", "Show in Explorer") };
         revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);

@@ -2,6 +2,18 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.7] - 2026-11-02
+
+### Added & Improved
+- **通用「应用最近打开预览」引擎 (`AppRecentService` + `FolderPopupWindow`)**：
+  - **VS Code 及同源 IDE 深度适配**：自动解析 `.lnk` 快捷方式或 `.exe` 目标，聚合 `workspaceStorage\*\workspace.json`（含 `state.vscdb` 精确活跃时间）、`globalStorage\storage.json`（当前打开窗口 `windowsState`、`backupWorkspaces` 与 `profileAssociations`）、`globalStorage\state.vscdb`（通过系统内置 `winsqlite3.dll` 读取 `history.recentlyOpenedPathsList`）以及 Windows `CustomDestinations` 跳转列表；同时支持 VS Code、VS Code Insiders、Cursor、Windsurf、Kiro、Trae、VSCodium 与 Antigravity，自动识别本地项目目录、`.code-workspace` 多根工作区及 `SSH / WSL / Container` 远程工作区；
+  - **多类主流开发与效率工具原生支持**：内置适配 JetBrains 全家桶（CLion / IntelliJ IDEA / PyCharm / WebStorm / GoLand / Rider / RustRover / Android Studio `recentProjects.xml`）、Visual Studio (`ApplicationPrivateSettings.xml`)、Sublime Text (`Session.sublime_session`)、Obsidian (`obsidian.json` Vault 列表)、Notepad++、Typora、Microsoft Office 与 WPS Office；
+  - **Windows 通用任务栏跳转列表与文件关联兜底**：实现纯 C# MS-SHLLINK 二进制流解析、`System.AppUserModel.ID` 提取与 Windows JumpList CRC64 哈希计算，自动读取任意应用的 `CustomDestinations` / `AutomaticDestinations` 跳转列表及通过 `AssocQueryStringW` 匹配的 `Recent` 最近文档；
+  - **自定义关联项目与目录内联下钻浏览**：在应用最近预览弹层中支持单击直接用该应用打开项目、点击「展开 ▸」在弹层内直接下钻浏览项目目录结构（可随时一键「⬅ 返回最近」）、点击「＋ 目录 / ＋ 文件」或直接拖拽文件夹/工作区到面板进行手动关联与置顶，支持隐藏不需要的历史项及一键固定到 Dock；
+  - **滚动防遮挡与悬停驻留详情提示 (`AttachRowHoverDetail`)**：目录浏览与应用最近打开列表默认均采用清爽单行展示，在滚动列表或快速移动鼠标时自动抑制详细名称与路径提示，仅当鼠标在某一行上静止停留约 `580ms` 后才同步弹出完整名称、完整路径与时间详情卡片及底部状态栏路径预览。
+
+---
+
 ## [0.1.6] - 2026-10-30
 
 ### Added & Improved
