@@ -315,6 +315,34 @@ try
         throw new Exception($"Mirror URL rewrite failed: {mirroredUrl}");
     if (UpdateService.ApplyMirror(rawReleaseAssetUrl, false, "https://ghfast.top") != rawReleaseAssetUrl)
         throw new Exception("Disabled mirror should keep raw URL");
+    if (UpdateService.ApplyMirror(mirroredUrl, false, "https://ghfast.top") != rawReleaseAssetUrl)
+        throw new Exception("Disabled mirror should strip existing mirror prefix");
+    if (UpdateService.ApplyMirror(mirroredUrl, true, "https://gh-proxy.com") != "https://gh-proxy.com/" + rawReleaseAssetUrl)
+        throw new Exception("Switching mirror should replace existing mirror prefix without double-prefixing");
+    if (!UpdateService.TryExtractTagFromReleaseUrl("/https://github.com/flylink-code/PinDock/releases/tag/v0.1.6", out string extractedTag) ||
+        extractedTag != "v0.1.6")
+        throw new Exception("TryExtractTagFromReleaseUrl failed on mirrored redirect location");
+    string sampleAtom = """
+        <feed><entry>
+          <id>tag:github.com,2008:Repository/1/v0.1.6</id>
+          <link rel="alternate" type="text/html" href="https://github.com/flylink-code/PinDock/releases/tag/v0.1.6"/>
+          <content type="html">&lt;p&gt;Fix updater rate limit&lt;/p&gt;</content>
+        </entry></feed>
+        """;
+    if (!UpdateService.TryParseLatestFromAtomXml(sampleAtom, out string atomTag, out string atomNotes) ||
+        atomTag != "v0.1.6" || !atomNotes.Contains("Fix updater rate limit"))
+        throw new Exception("TryParseLatestFromAtomXml failed");
+    string sampleChangelog = "# Changelog\n\n## [0.1.6] - 2026-10-30\n- Fixed 403\n\n---\n\n## [0.1.5] - 2026-10-29\n- Old\n";
+    if (!UpdateService.TryParseLatestFromChangelog(sampleChangelog, out string clVer, out string clNotes) ||
+        clVer != "0.1.6" || !clNotes.Contains("Fixed 403"))
+        throw new Exception("TryParseLatestFromChangelog failed");
+    var builtRes = UpdateService.BuildReleaseResult("0.1.5", "v0.1.6", clNotes, true, "https://ghfast.top/");
+    if (!builtRes.HasUpdate || builtRes.LatestVersion != "0.1.6" ||
+        builtRes.DownloadUrl != "https://ghfast.top/https://github.com/flylink-code/PinDock/releases/download/v0.1.6/PinDock-Setup-0.1.6.exe")
+        throw new Exception("BuildReleaseResult failed");
+    var candidates = UpdateService.BuildDownloadCandidateUrls(builtRes.DownloadUrl!, true, "https://ghfast.top/");
+    if (candidates.Count < 3 || candidates[^1] != "https://github.com/flylink-code/PinDock/releases/download/v0.1.6/PinDock-Setup-0.1.6.exe")
+        throw new Exception("BuildDownloadCandidateUrls failed");
     if (StartupService.BuildCommand(@"C:\App\PinDock.exe") != "\"C:\\App\\PinDock.exe\"")
         throw new Exception("StartupService BuildCommand failed");
 

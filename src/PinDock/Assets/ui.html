@@ -692,8 +692,8 @@ input[type="range"] {
           </div>
           <div class="row">
             <span>
-              使用国内镜像加速下载升级包
-              <small>开启后下载 GitHub Release 安装包时自动通过镜像加速源中转</small>
+              使用国内镜像加速检查与下载升级包
+              <small>开启后检查版本更新与下载 GitHub Release 安装包时自动通过镜像加速源中转，避开 GitHub API 403 限流</small>
             </span>
             <button class="switch" id="sw-github-mirror" role="switch" aria-checked="true"></button>
           </div>
@@ -706,7 +706,6 @@ input[type="range"] {
               <select id="sel-mirror-preset" style="width:120px">
                 <option value="https://ghfast.top/">ghfast.top</option>
                 <option value="https://gh-proxy.com/">gh-proxy.com</option>
-                <option value="https://mirror.ghproxy.com/">ghproxy.com</option>
                 <option value="custom">自定义…</option>
               </select>
               <input class="field-input" id="inp-github-mirror" placeholder="https://ghfast.top/" style="flex:1">
@@ -1910,6 +1909,13 @@ if (window.chrome && window.chrome.webview) {
           $('#btn-install-update').hidden = false;
           $('#btn-install-update').disabled = false;
           $('#btn-install-update').textContent = `立即升级 v${msg.latestVersion}`;
+          $('#btn-install-update').onclick = () => {
+            if (!pendingUpdateDownloadUrl) return;
+            send('downloadAndInstallUpdate', {
+              downloadUrl: pendingUpdateDownloadUrl,
+              assetName: pendingUpdateAssetName
+            });
+          };
         } else {
           $('#btn-install-update').hidden = false;
           $('#btn-install-update').disabled = false;

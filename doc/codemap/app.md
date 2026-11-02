@@ -45,5 +45,5 @@
 | [src/PinDock/ThemeService.cs](../../src/PinDock/ThemeService.cs) | 10 | [1](src_PinDock_ThemeService.cs-c58fdb5c-1.md) |
 | [src/PinDock/TrayFlyoutWindow.xaml.cs](../../src/PinDock/TrayFlyoutWindow.xaml.cs) | 28 | [1](src_PinDock_TrayFlyoutWindow.xaml.cs-5bccd4b7-1.md) |
 | [src/PinDock/TrayService.cs](../../src/PinDock/TrayService.cs) | 5 | [1](src_PinDock_TrayService.cs-66b0f4e9-1.md) |
-| [src/PinDock/UpdateService.cs](../../src/PinDock/UpdateService.cs) | 11 | [1](src_PinDock_UpdateService.cs-4928fecb-1.md) |
+| [src/PinDock/UpdateService.cs](../../src/PinDock/UpdateService.cs) | 19 | [1](src_PinDock_UpdateService.cs-4928fecb-1.md) |
 | [src/PinDock/WebPanelWindow.xaml.cs](../../src/PinDock/WebPanelWindow.xaml.cs) | 34 | [1](src_PinDock_WebPanelWindow.xaml.cs-dda098ed-1.md) |

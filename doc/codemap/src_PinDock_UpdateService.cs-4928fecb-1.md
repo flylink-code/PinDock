@@ -4,18 +4,26 @@
 
 [Module](app.md) · [Source](../../src/PinDock/UpdateService.cs) · page 1/1
 
-Source SHA-256: 138fb5056b7edbb50397f0b3fc0f0fb87fd4543795e09c8a7bc45111bf6cca40
+Source SHA-256: 8ee4e1d5ffbc1714b06df2b5241c6ea2c34ae8b994dc8da35778aab324b89956
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [8](../../src/PinDock/UpdateService.cs#L8) |
-| UpdateCheckResult | record_declaration | PinDock | [10](../../src/PinDock/UpdateService.cs#L10) |
-| UpdateService | class_declaration | PinDock | [19](../../src/PinDock/UpdateService.cs#L19) |
-| GetCurrentVersion | method_declaration | PinDock::UpdateService | [27](../../src/PinDock/UpdateService.cs#L27) |
-| ApplyMirror | method_declaration | PinDock::UpdateService | [40](../../src/PinDock/UpdateService.cs#L40) |
-| IsNewerVersion | method_declaration | PinDock::UpdateService | [54](../../src/PinDock/UpdateService.cs#L54) |
-| ParseVersionCore | method_declaration | PinDock::UpdateService | [61](../../src/PinDock/UpdateService.cs#L61) |
-| CheckForUpdateAsync | method_declaration | PinDock::UpdateService | [72](../../src/PinDock/UpdateService.cs#L72) |
-| DownloadInstallerAsync | method_declaration | PinDock::UpdateService | [117](../../src/PinDock/UpdateService.cs#L117) |
-| LaunchInstallerAndExit | method_declaration | PinDock::UpdateService | [161](../../src/PinDock/UpdateService.cs#L161) |
-| CreateHttpClient | method_declaration | PinDock::UpdateService | [172](../../src/PinDock/UpdateService.cs#L172) |
+| PinDock | file_scoped_namespace_declaration |  | [10](../../src/PinDock/UpdateService.cs#L10) |
+| UpdateCheckResult | record_declaration | PinDock | [12](../../src/PinDock/UpdateService.cs#L12) |
+| UpdateService | class_declaration | PinDock | [21](../../src/PinDock/UpdateService.cs#L21) |
+| GetCurrentVersion | method_declaration | PinDock::UpdateService | [51](../../src/PinDock/UpdateService.cs#L51) |
+| ExtractRawGitHubUrl | method_declaration | PinDock::UpdateService | [64](../../src/PinDock/UpdateService.cs#L64) |
+| ApplyMirror | method_declaration | PinDock::UpdateService | [87](../../src/PinDock/UpdateService.cs#L87) |
+| IsNewerVersion | method_declaration | PinDock::UpdateService | [103](../../src/PinDock/UpdateService.cs#L103) |
+| ParseVersionCore | method_declaration | PinDock::UpdateService | [110](../../src/PinDock/UpdateService.cs#L110) |
+| TryExtractTagFromReleaseUrl | method_declaration | PinDock::UpdateService | [121](../../src/PinDock/UpdateService.cs#L121) |
+| TryParseLatestFromAtomXml | method_declaration | PinDock::UpdateService | [135](../../src/PinDock/UpdateService.cs#L135) |
+| TryParseLatestFromChangelog | method_declaration | PinDock::UpdateService | [168](../../src/PinDock/UpdateService.cs#L168) |
+| BuildReleaseResult | method_declaration | PinDock::UpdateService | [193](../../src/PinDock/UpdateService.cs#L193) |
+| BuildDownloadCandidateUrls | method_declaration | PinDock::UpdateService | [227](../../src/PinDock/UpdateService.cs#L227) |
+| CheckForUpdateAsync | method_declaration | PinDock::UpdateService | [254](../../src/PinDock/UpdateService.cs#L254) |
+| TryFetchChangelogNotesAsync | method_declaration | PinDock::UpdateService | [391](../../src/PinDock/UpdateService.cs#L391) |
+| DownloadInstallerAsync | method_declaration | PinDock::UpdateService | [413](../../src/PinDock/UpdateService.cs#L413) |
+| IsValidPeExecutable | method_declaration | PinDock::UpdateService | [478](../../src/PinDock/UpdateService.cs#L478) |
+| LaunchInstallerAndExit | method_declaration | PinDock::UpdateService | [496](../../src/PinDock/UpdateService.cs#L496) |
+| CreateHttpClient | method_declaration | PinDock::UpdateService | [507](../../src/PinDock/UpdateService.cs#L507) |

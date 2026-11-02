@@ -408,7 +408,11 @@ public partial class WebPanelWindow : Window
                 string dlUrl = root.TryGetProperty("downloadUrl", out var dlEl) ? (dlEl.GetString() ?? "") : "";
                 string assetName = root.TryGetProperty("assetName", out var anEl) ? (anEl.GetString() ?? "") : "";
                 if (!string.IsNullOrWhiteSpace(dlUrl))
-                    _ = HandleDownloadAndInstallUpdateAsync(dlUrl, assetName);
+                {
+                    var curSettings = controller.Data.Settings;
+                    string effectiveUrl = UpdateService.ApplyMirror(dlUrl, curSettings.UseGithubMirror, curSettings.GithubMirrorUrl);
+                    _ = HandleDownloadAndInstallUpdateAsync(effectiveUrl, assetName);
+                }
                 break;
 
             case "openExternalUrl":
