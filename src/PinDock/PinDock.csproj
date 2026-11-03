@@ -24,6 +24,7 @@
   <ItemGroup>
     <Resource Include="Assets\PinDock.ico" />
     <Resource Include="Assets\ui.html" />
+    <EmbeddedResource Include="Recent\Descriptors\*.json" />
   </ItemGroup>
 
   <ItemGroup>

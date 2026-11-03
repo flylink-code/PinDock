@@ -347,8 +347,8 @@ try
         throw new Exception("StartupService BuildCommand failed");
 
     // 4. 应用最近打开服务 (AppRecentService) 与跨应用适配测试
-    if (AppRecentService.ComputeJumpListHash("Microsoft.VisualStudioCode") != "1ced32d74a95c7bc" ||
-        AppRecentService.ComputeJumpListHash("Microsoft.Windows.Explorer") != "f01b4d95cf55d32a")
+    if (JumpListRecentProvider.ComputeJumpListHash("Microsoft.VisualStudioCode") != "1ced32d74a95c7bc" ||
+        JumpListRecentProvider.ComputeJumpListHash("Microsoft.Windows.Explorer") != "f01b4d95cf55d32a")
         throw new Exception("JumpList CRC64 hash calculation failed");
 
     var resolvedLnk = AppRecentService.ResolveAppTarget(Path.Combine(directory, "快捷方式.lnk"));
@@ -362,13 +362,13 @@ try
 
     string folderFileUri = new Uri(sampleProjectDir).AbsoluteUri;
     string wsFileUri = new Uri(sampleWorkspaceFile).AbsoluteUri;
-    if (!AppRecentService.TryParseVsCodeUri(folderFileUri, out var parsedFolderItem) ||
+    if (!VsCodeFamilyRecentProvider.TryParseVsCodeUri(folderFileUri, out var parsedFolderItem) ||
         parsedFolderItem.Kind != AppRecentItemKind.Folder ||
         !string.Equals(parsedFolderItem.FullPath, sampleProjectDir, StringComparison.OrdinalIgnoreCase) ||
         !parsedFolderItem.CanBrowseDirectory)
         throw new Exception("TryParseVsCodeUri folder failed");
 
-    if (!AppRecentService.TryParseVsCodeUri(wsFileUri, out var parsedWsItem) ||
+    if (!VsCodeFamilyRecentProvider.TryParseVsCodeUri(wsFileUri, out var parsedWsItem) ||
         parsedWsItem.Kind != AppRecentItemKind.Workspace ||
         parsedWsItem.Name != "demo" ||
         !parsedWsItem.CanBrowseDirectory ||
@@ -376,7 +376,7 @@ try
         throw new Exception("TryParseVsCodeUri workspace failed");
 
     string remoteSshUri = "vscode-remote://ssh-remote%2B7b22686f73744e616d65223a225562756e74753232227d/home/dev/firmware";
-    if (!AppRecentService.TryParseVsCodeUri(remoteSshUri, out var parsedRemoteItem) ||
+    if (!VsCodeFamilyRecentProvider.TryParseVsCodeUri(remoteSshUri, out var parsedRemoteItem) ||
         parsedRemoteItem.Kind != AppRecentItemKind.Remote ||
         !parsedRemoteItem.Name.Contains("SSH: Ubuntu22", StringComparison.Ordinal) ||
         !parsedRemoteItem.LaunchArguments.Contains("--folder-uri", StringComparison.Ordinal))
@@ -452,6 +452,136 @@ try
         customAppDataRoot: fakeRoaming);
     if (customToolRecents.Count != 1 || !customToolRecents[0].PinnedByUser || customToolRecents[0].Name != "自定义工程")
         throw new Exception("Custom app recent records round-trip failed");
+
+    // 其余应用适配的特征测试：Sublime / Obsidian / Notepad++ / Typora / Visual Studio
+    string sampleSublimeWorkspace = Path.Combine(sampleProjectDir, "sample.sublime-workspace");
+    File.WriteAllText(sampleSublimeWorkspace, "{}");
+    string fakeSublimeLocal = Path.Combine(fakeRoaming, "Sublime Text", "Local");
+    Directory.CreateDirectory(fakeSublimeLocal);
+    File.WriteAllText(Path.Combine(fakeSublimeLocal, "Session.sublime_session"), JsonSerializer.Serialize(new
+    {
+        workspaces = new { recent_workspaces = new[] { sampleSublimeWorkspace.Replace('\\', '/') } },
+        folder_history = new[] { sampleProjectDir.Replace('\\', '/') }
+    }));
+    var sublimeRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "Sublime", Path = @"C:\Sublime\sublime_text.exe" },
+        customAppDataRoot: fakeRoaming);
+    if (sublimeRecents.Count != 2 ||
+        !sublimeRecents.Any(r => r.Kind == AppRecentItemKind.Workspace && r.Name == "sample") ||
+        !sublimeRecents.Any(r => r.Kind == AppRecentItemKind.Folder && r.Name == "SampleRepo"))
+        throw new Exception("Sublime recent items discovery failed");
+
+    string fakeObsidianDir = Path.Combine(fakeRoaming, "obsidian");
+    Directory.CreateDirectory(fakeObsidianDir);
+    File.WriteAllText(Path.Combine(fakeObsidianDir, "obsidian.json"), JsonSerializer.Serialize(new
+    {
+        vaults = new Dictionary<string, object>
+        {
+            ["abc123"] = new { path = sampleProjectDir, ts = 1760000000000L, open = true }
+        }
+    }));
+    var obsidianRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "Obsidian", Path = @"C:\Obsidian\Obsidian.exe" },
+        customAppDataRoot: fakeRoaming);
+    if (obsidianRecents.Count != 1 ||
+        obsidianRecents[0].Kind != AppRecentItemKind.Folder ||
+        obsidianRecents[0].LaunchUri != "obsidian://open?vault=abc123" ||
+        !obsidianRecents[0].IsCurrentlyOpen)
+        throw new Exception("Obsidian recent items discovery failed");
+
+    string fakeNppDir = Path.Combine(fakeRoaming, "Notepad++");
+    Directory.CreateDirectory(fakeNppDir);
+    File.WriteAllText(Path.Combine(fakeNppDir, "config.xml"),
+        new System.Xml.Linq.XElement("NotepadPlus",
+            new System.Xml.Linq.XElement("History",
+                new System.Xml.Linq.XElement("File", new System.Xml.Linq.XAttribute("filename", sampleWorkspaceFile)))).ToString());
+    var nppRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "Notepad++", Path = @"C:\Notepad++\notepad++.exe" },
+        customAppDataRoot: fakeRoaming);
+    if (nppRecents.Count != 1 ||
+        nppRecents[0].Kind != AppRecentItemKind.File ||
+        nppRecents[0].Name != "demo.code-workspace")
+        throw new Exception("Notepad++ recent items discovery failed");
+
+    string fakeTyporaDir = Path.Combine(fakeRoaming, "Typora");
+    Directory.CreateDirectory(fakeTyporaDir);
+    File.WriteAllText(Path.Combine(fakeTyporaDir, "history.data"), JsonSerializer.Serialize(new
+    {
+        recentFolder = new[] { new { path = sampleProjectDir } },
+        recentDocument = new[] { new { path = sampleWorkspaceFile } }
+    }));
+    var typoraRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "Typora", Path = @"C:\Typora\Typora.exe" },
+        customAppDataRoot: fakeRoaming);
+    if (typoraRecents.Count != 2 ||
+        !typoraRecents.Any(r => r.Kind == AppRecentItemKind.Folder && r.Name == "SampleRepo") ||
+        !typoraRecents.Any(r => r.Kind == AppRecentItemKind.File && r.Name == "demo.code-workspace"))
+        throw new Exception("Typora recent items discovery failed");
+
+    string fakeLocal = Path.Combine(directory, "FakeLocal");
+    string fakeVsDir = Path.Combine(fakeLocal, "Microsoft", "VisualStudio", "17.0_test");
+    Directory.CreateDirectory(fakeVsDir);
+    string vsContainersJson = JsonSerializer.Serialize(new[]
+    {
+        new { Key = sampleProjectDir, Value = new { LastAccessed = "2025-10-01T10:00:00+00:00", IsFavorite = true } }
+    });
+    File.WriteAllText(Path.Combine(fakeVsDir, "ApplicationPrivateSettings.xml"),
+        new System.Xml.Linq.XElement("content",
+            new System.Xml.Linq.XElement("collection",
+                new System.Xml.Linq.XAttribute("name", "CodeContainers.Offline"),
+                new System.Xml.Linq.XElement("value", vsContainersJson))).ToString());
+    var vsRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "Visual Studio", Path = @"C:\VS\Common7\IDE\devenv.exe" },
+        customAppDataRoot: fakeRoaming,
+        customLocalAppDataRoot: fakeLocal);
+    if (vsRecents.Count != 1 ||
+        vsRecents[0].Kind != AppRecentItemKind.Folder ||
+        vsRecents[0].Name != "SampleRepo" ||
+        !vsRecents[0].PinnedByUser)
+        throw new Exception("Visual Studio recent items discovery failed");
+
+    // 用户自定义声明式 Provider：合法描述生效；非法描述被拒绝并记录原因，且不影响合法描述
+    string descriptorDir = DeclarativeRecentProvider.UserDirectory(fakeLocal);
+    Directory.CreateDirectory(descriptorDir);
+    File.WriteAllText(Path.Combine(descriptorDir, "mytool.json"), """
+        { "exes": ["mytool.exe"], "sourceFile": "MyTool/recent.json",
+          "sources": [ { "collection": "projects", "kind": "Folder" } ] }
+        """);
+    File.WriteAllText(Path.Combine(descriptorDir, "bad-traversal.json"), """
+        { "exes": ["evil.exe"], "sourceFile": "..\..\Windows\win.ini",
+          "sources": [ { "collection": "x", "kind": "File" } ] }
+        """);
+    File.WriteAllText(Path.Combine(descriptorDir, "bad-typo.json"), """
+        { "exes": ["typo.exe"], "sourceFile": "T/r.json",
+          "sources": [ { "colection": "x", "kind": "File" } ] }
+        """);
+    File.WriteAllText(Path.Combine(descriptorDir, "bad-kind.json"), """
+        { "exes": ["kind.exe"], "sourceFile": "K/r.json",
+          "sources": [ { "collection": "x", "kind": "Remote" } ] }
+        """);
+    Directory.CreateDirectory(Path.Combine(fakeRoaming, "MyTool"));
+    File.WriteAllText(Path.Combine(fakeRoaming, "MyTool", "recent.json"), JsonSerializer.Serialize(new
+    {
+        projects = new[] { sampleProjectDir, Path.Combine(directory, "MissingProject") }
+    }));
+    var myToolRecents = AppRecentService.ListRecentItems(
+        new Bookmark { Name = "MyTool", Path = @"C:\MyTool\mytool.exe" },
+        customAppDataRoot: fakeRoaming,
+        customLocalAppDataRoot: fakeLocal);
+    if (myToolRecents.Count != 1 ||
+        myToolRecents[0].Kind != AppRecentItemKind.Folder ||
+        myToolRecents[0].Name != "SampleRepo")
+        throw new Exception("User declarative provider discovery failed");
+
+    var descriptorErrors = DeclarativeRecentProvider.DescriptorErrors;
+    foreach (string bad in new[] { "bad-traversal.json", "bad-typo.json", "bad-kind.json" })
+    {
+        string badPath = Path.Combine(descriptorDir, bad);
+        if (!descriptorErrors.TryGetValue(badPath, out string? reason) || reason.Length == 0)
+            throw new Exception($"Invalid descriptor was not rejected with a reason: {bad}");
+    }
+    if (descriptorErrors.ContainsKey(Path.Combine(descriptorDir, "mytool.json")))
+        throw new Exception("Valid descriptor was reported as an error");
 
     Console.WriteLine("PASS: round trip, duplicates, backup recovery, v1 migration, opacity, DockLayout, auto-hide logic, import/export, groups, custom group icons, dock separators, utility hide, startup/close, updater mirror, palettes, AppRecentService");
 }

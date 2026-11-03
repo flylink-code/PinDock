@@ -1,0 +1,9 @@
+{
+  "exes": ["typora.exe"],
+  "sourceFile": "Typora/history.data",
+  "encoding": "hex-utf8",
+  "sources": [
+    { "collection": "recentFolder", "kind": "Folder", "pathField": "path" },
+    { "collection": "recentDocument", "kind": "File", "pathField": "path" }
+  ]
+}

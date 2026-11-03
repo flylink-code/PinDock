@@ -1,0 +1,14 @@
+{
+  "exes": ["obsidian.exe"],
+  "sourceFile": "obsidian/obsidian.json",
+  "sources": [
+    {
+      "collection": "vaults",
+      "kind": "Folder",
+      "pathField": "path",
+      "timeField": "ts",
+      "openField": "open",
+      "launchUri": "obsidian://open?vault={key}"
+    }
+  ]
+}

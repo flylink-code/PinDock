@@ -4,18 +4,18 @@
 
 [Module](tests.md) · [Source](../../tests/PinDock.Tests/Program.cs) · page 1/1
 
-Source SHA-256: a7ee401e71c718aa3c202409f9a3fe16f4fb9cebae6654985ec97fbb97b73fcd
+Source SHA-256: 49a308cf6ebe1111491322f4f4fc53122b21d835d2a0fb66aecf99c4a509e429
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | (no extracted declarations) | | | |
 
-Parser recovery: 30 diagnostic(s). Inspect source; extraction may be incomplete.
+Parser recovery: 80 diagnostic(s). Inspect source; extraction may be incomplete.
+- line 1: ERROR
 - line 325: ERROR
 - line 325: ERROR
 - line 327: ERROR
 - line 327: ERROR
 - line 327: ERROR
 - line 327: ERROR
-- line 328: ERROR
 - line 328: ERROR

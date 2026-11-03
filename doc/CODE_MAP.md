@@ -16,7 +16,7 @@ node doc/codemap.mjs --module app    # 热缓存且其他模块未变化时局�
 node doc/codemap.mjs --help
 ```
 
-生成器需要 Node.js 以及可解析的 `typescript`、`web-tree-sitter`、`tree-sitter-wasms`。可通过 `CODEMAP_REQUIRE_FROM` 指向包含这些依赖的目录或 package.json；不要将它们作为应用运行时依赖。配置变化或跨模块修改后使用无参数命令，缓存可删除重建。
+生成器需要 Node.js 以及可解析的 `typescript`、`web-tree-sitter`、`tree-sitter-wasms`。可通过 `CODEMAP_REQUIRE_FROM` 指向包含这些依赖的目录或 package.json；不要将它们作为应用运行时依赖。版本需 `typescript@5`（7.x 不再提供 JS API）与 `web-tree-sitter@0.25`（0.27 无法加载 `tree-sitter-wasms@0.1.13` 的语法文件，且生成器会因报错信息为空而静默退出码 1）。配置变化或跨模块修改后使用无参数命令，缓存可删除重建。
 
 ## 覆盖契约
 
@@ -26,9 +26,9 @@ C# 使用 tree-sitter 提取声明，不提取 C# `using` 引用边；顶层语�
 
 ## 首次基线
 
-- 6 个文件、348 个符号、3 个模块、14 个生成页面；其中 tooling 的生成器自身有 319 个符号。
+- 55 个文件、1095 个符号、3 个模块、63 个生成页面；其中 tooling 的生成器自身有 319 个符号，app 模块 53 个文件、776 个符号（含 `src/PinDock/Recent/` 下的 14 个文件）。
 - 引用边：0 已解析、0 歧义、7 未解析；这些数字不代表 C# 的依赖情况，因此枢纽页为空是预期结果。
-- 1 条解析恢复：`src/PinDock/Collections.cs:22` 的 `LibraryStore(string directory)` 主构造函数语法处报告 `ERROR`；该声明及部分成员已提取，但不能保证完整性。
+- 81 条解析诊断：`src/PinDock/Collections.cs` 1 条（`LibraryStore(string directory)` 主构造函数语法处 `ERROR`，该声明及部分成员已提取，但不能保证完整性）；`tests/PinDock.Tests/Program.cs` 80 条，均由 C# 原始字符串字面量 `"""` 超出语法快照引起（该文件共 6 处，每处约 8~14 条）。诊断集中在测试文件内，不影响 `src/` 的声明提取；新增诊断时应核查原因并更新此基线。
 - `tests/PinDock.Tests/Program.cs` 以顶层语句实现测试，当前索引为 0 个声明，并不表示没有测试代码。
 - 首次生成后重复生成无变化，`--check` 无漂移；后续诊断增加时应核查原因并更新此基线。
 

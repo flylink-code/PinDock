@@ -4,76 +4,25 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppRecentService.cs) · page 1/1
 
-Source SHA-256: 4e709fea810a721f71a5bdc8bae6ae27290b92ee117ae77a5fda732f8d4f9f38
+Source SHA-256: 108adf2226babe0304503eab40a4416a0f3d769c5f775b15e07164c6dd99d61c
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [12](../../src/PinDock/AppRecentService.cs#L12) |
-| CanBrowseDirectory | property_declaration | PinDock | [25](../../src/PinDock/AppRecentService.cs#L25) |
-| BrowsableDirectoryPath | property_declaration | PinDock | [31](../../src/PinDock/AppRecentService.cs#L31) |
-| SafeGetDirectoryName | method_declaration | PinDock | [38](../../src/PinDock/AppRecentService.cs#L38) |
-| AppKey | property_declaration | PinDock | [53](../../src/PinDock/AppRecentService.cs#L53) |
-| AppRecentService | class_declaration | PinDock | [56](../../src/PinDock/AppRecentService.cs#L56) |
-| CachedAppRecentList | record_declaration | PinDock::AppRecentService | [60](../../src/PinDock/AppRecentService.cs#L60) |
-| ParsedShortcutLink | class_declaration | PinDock::AppRecentService | [66](../../src/PinDock/AppRecentService.cs#L66) |
-| TargetPath | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [68](../../src/PinDock/AppRecentService.cs#L68) |
-| Name | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [69](../../src/PinDock/AppRecentService.cs#L69) |
-| RelativePath | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [70](../../src/PinDock/AppRecentService.cs#L70) |
-| WorkingDirectory | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [71](../../src/PinDock/AppRecentService.cs#L71) |
-| Arguments | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [72](../../src/PinDock/AppRecentService.cs#L72) |
-| IconLocation | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [73](../../src/PinDock/AppRecentService.cs#L73) |
-| AppUserModelId | property_declaration | PinDock::AppRecentService::ParsedShortcutLink | [74](../../src/PinDock/AppRecentService.cs#L74) |
-| InvalidateCache | method_declaration | PinDock::AppRecentService | [150](../../src/PinDock/AppRecentService.cs#L150) |
-| ResolveAppTarget | method_declaration | PinDock::AppRecentService | [160](../../src/PinDock/AppRecentService.cs#L160) |
-| HasRecentItems | method_declaration | PinDock::AppRecentService | [212](../../src/PinDock/AppRecentService.cs#L212) |
-| ListRecentItems | method_declaration | PinDock::AppRecentService | [219](../../src/PinDock/AppRecentService.cs#L219) |
-| LaunchRecentItem | method_declaration | PinDock::AppRecentService | [340](../../src/PinDock/AppRecentService.cs#L340) |
-| SortRecentItems | method_declaration | PinDock::AppRecentService | [391](../../src/PinDock/AppRecentService.cs#L391) |
-| CompareRecentDesc | method_declaration | PinDock::AppRecentService | [408](../../src/PinDock/AppRecentService.cs#L408) |
-| CompareTimeThenName | method_declaration | PinDock::AppRecentService | [415](../../src/PinDock/AppRecentService.cs#L415) |
-| TryBuildFromRecord | method_declaration | PinDock::AppRecentService | [421](../../src/PinDock/AppRecentService.cs#L421) |
-| CollectVsCodeFamilyRecents | method_declaration | PinDock::AppRecentService | [486](../../src/PinDock/AppRecentService.cs#L486) |
-| ExtractWindowUri | method_declaration | PinDock::AppRecentService | [718](../../src/PinDock/AppRecentService.cs#L718) |
-| NormalizeVsCodeUriKey | method_declaration | PinDock::AppRecentService | [730](../../src/PinDock/AppRecentService.cs#L730) |
-| TryParseVsCodeUri | method_declaration | PinDock::AppRecentService | [742](../../src/PinDock/AppRecentService.cs#L742) |
-| DecodeRemoteAuthorityBadge | method_declaration | PinDock::AppRecentService | [846](../../src/PinDock/AppRecentService.cs#L846) |
-| TryDecodeHexUtf8 | method_declaration | PinDock::AppRecentService | [882](../../src/PinDock/AppRecentService.cs#L882) |
-| CollectJetBrainsRecents | method_declaration | PinDock::AppRecentService | [906](../../src/PinDock/AppRecentService.cs#L906) |
-| CollectVisualStudioRecents | method_declaration | PinDock::AppRecentService | [1011](../../src/PinDock/AppRecentService.cs#L1011) |
-| CollectSublimeRecents | method_declaration | PinDock::AppRecentService | [1100](../../src/PinDock/AppRecentService.cs#L1100) |
-| TryConvertSublimePath | method_declaration | PinDock::AppRecentService | [1167](../../src/PinDock/AppRecentService.cs#L1167) |
-| CollectObsidianRecents | method_declaration | PinDock::AppRecentService | [1187](../../src/PinDock/AppRecentService.cs#L1187) |
-| CollectNotepadPlusPlusRecents | method_declaration | PinDock::AppRecentService | [1242](../../src/PinDock/AppRecentService.cs#L1242) |
-| CollectTyporaRecents | method_declaration | PinDock::AppRecentService | [1276](../../src/PinDock/AppRecentService.cs#L1276) |
-| CollectOfficeAndWpsRecents | method_declaration | PinDock::AppRecentService | [1344](../../src/PinDock/AppRecentService.cs#L1344) |
-| ReadOfficeRegistryMru | method_declaration | PinDock::AppRecentService | [1404](../../src/PinDock/AppRecentService.cs#L1404) |
-| CollectWindowsJumpListAndRecent | method_declaration | PinDock::AppRecentService | [1440](../../src/PinDock/AppRecentService.cs#L1440) |
-| TryExtractRecentFromCustomLink | method_declaration | PinDock::AppRecentService | [1577](../../src/PinDock/AppRecentService.cs#L1577) |
-| TryExtractLocalPath | method_declaration | PinDock::AppRecentService | [1636](../../src/PinDock/AppRecentService.cs#L1636) |
-| ComputeCandidateJumpListHashes | method_declaration | PinDock::AppRecentService | [1651](../../src/PinDock/AppRecentService.cs#L1651) |
-| ComputeJumpListHash | method_declaration | PinDock::AppRecentService | [1686](../../src/PinDock/AppRecentService.cs#L1686) |
-| IsSameExecutable | method_declaration | PinDock::AppRecentService | [1702](../../src/PinDock/AppRecentService.cs#L1702) |
-| GetRegisteredSupportedExtensions | method_declaration | PinDock::AppRecentService | [1712](../../src/PinDock/AppRecentService.cs#L1712) |
-| GetDefaultAssociatedExecutable | method_declaration | PinDock::AppRecentService | [1730](../../src/PinDock/AppRecentService.cs#L1730) |
-| ParseEmbeddedLinks | method_declaration | PinDock::AppRecentService | [1747](../../src/PinDock/AppRecentService.cs#L1747) |
-| TryParseLnkAt | method_declaration | PinDock::AppRecentService | [1774](../../src/PinDock/AppRecentService.cs#L1774) |
-| ExtractAppUserModelIdFromBuffer | method_declaration | PinDock::AppRecentService | [1865](../../src/PinDock/AppRecentService.cs#L1865) |
-| BuildStartMenuAppIdIndex | method_declaration | PinDock::AppRecentService | [1901](../../src/PinDock/AppRecentService.cs#L1901) |
-| DecodePidlPath | method_declaration | PinDock::AppRecentService | [1941](../../src/PinDock/AppRecentService.cs#L1941) |
-| ReadCountedString | method_declaration | PinDock::AppRecentService | [1956](../../src/PinDock/AppRecentService.cs#L1956) |
-| ReadNullTerminatedUnicode | method_declaration | PinDock::AppRecentService | [1974](../../src/PinDock/AppRecentService.cs#L1974) |
-| ReadNullTerminatedAnsi | method_declaration | PinDock::AppRecentService | [1982](../../src/PinDock/AppRecentService.cs#L1982) |
-| TryQuerySqliteSingleValue | method_declaration | PinDock::AppRecentService | [1994](../../src/PinDock/AppRecentService.cs#L1994) |
-| ReadFileShared | method_declaration | PinDock::AppRecentService | [2035](../../src/PinDock/AppRecentService.cs#L2035) |
-| ReadTextShared | method_declaration | PinDock::AppRecentService | [2043](../../src/PinDock/AppRecentService.cs#L2043) |
-| SafeGetLastWriteTime | method_declaration | PinDock::AppRecentService | [2046](../../src/PinDock/AppRecentService.cs#L2046) |
-| NormalizeItemKey | method_declaration | PinDock::AppRecentService | [2058](../../src/PinDock/AppRecentService.cs#L2058) |
-| SHGetPathFromIDListW | method_declaration | PinDock::AppRecentService | [2061](../../src/PinDock/AppRecentService.cs#L2061) |
-| AssocQueryStringW | method_declaration | PinDock::AppRecentService | [2065](../../src/PinDock/AppRecentService.cs#L2065) |
-| sqlite3_open_v2 | method_declaration | PinDock::AppRecentService | [2068](../../src/PinDock/AppRecentService.cs#L2068) |
-| sqlite3_close | method_declaration | PinDock::AppRecentService | [2071](../../src/PinDock/AppRecentService.cs#L2071) |
-| sqlite3_prepare_v2 | method_declaration | PinDock::AppRecentService | [2074](../../src/PinDock/AppRecentService.cs#L2074) |
-| sqlite3_step | method_declaration | PinDock::AppRecentService | [2077](../../src/PinDock/AppRecentService.cs#L2077) |
-| sqlite3_column_text | method_declaration | PinDock::AppRecentService | [2080](../../src/PinDock/AppRecentService.cs#L2080) |
-| sqlite3_column_bytes | method_declaration | PinDock::AppRecentService | [2083](../../src/PinDock/AppRecentService.cs#L2083) |
-| sqlite3_finalize | method_declaration | PinDock::AppRecentService | [2086](../../src/PinDock/AppRecentService.cs#L2086) |
+| PinDock | file_scoped_namespace_declaration |  | [6](../../src/PinDock/AppRecentService.cs#L6) |
+| CanBrowseDirectory | property_declaration | PinDock | [19](../../src/PinDock/AppRecentService.cs#L19) |
+| BrowsableDirectoryPath | property_declaration | PinDock | [25](../../src/PinDock/AppRecentService.cs#L25) |
+| SafeGetDirectoryName | method_declaration | PinDock | [32](../../src/PinDock/AppRecentService.cs#L32) |
+| AppKey | property_declaration | PinDock | [47](../../src/PinDock/AppRecentService.cs#L47) |
+| AppRecentService | class_declaration | PinDock | [50](../../src/PinDock/AppRecentService.cs#L50) |
+| CachedAppRecentList | record_declaration | PinDock::AppRecentService | [54](../../src/PinDock/AppRecentService.cs#L54) |
+| InvalidateCache | method_declaration | PinDock::AppRecentService | [104](../../src/PinDock/AppRecentService.cs#L104) |
+| ResolveAppTarget | method_declaration | PinDock::AppRecentService | [114](../../src/PinDock/AppRecentService.cs#L114) |
+| HasRecentItems | method_declaration | PinDock::AppRecentService | [166](../../src/PinDock/AppRecentService.cs#L166) |
+| ListRecentItems | method_declaration | PinDock::AppRecentService | [173](../../src/PinDock/AppRecentService.cs#L173) |
+| LaunchRecentItem | method_declaration | PinDock::AppRecentService | [271](../../src/PinDock/AppRecentService.cs#L271) |
+| SortRecentItems | method_declaration | PinDock::AppRecentService | [322](../../src/PinDock/AppRecentService.cs#L322) |
+| CompareRecentDesc | method_declaration | PinDock::AppRecentService | [339](../../src/PinDock/AppRecentService.cs#L339) |
+| CompareTimeThenName | method_declaration | PinDock::AppRecentService | [346](../../src/PinDock/AppRecentService.cs#L346) |
+| TryBuildFromRecord | method_declaration | PinDock::AppRecentService | [352](../../src/PinDock/AppRecentService.cs#L352) |
+| BuildStartMenuAppIdIndex | method_declaration | PinDock::AppRecentService | [413](../../src/PinDock/AppRecentService.cs#L413) |
+| NormalizeItemKey | method_declaration | PinDock::AppRecentService | [453](../../src/PinDock/AppRecentService.cs#L453) |
