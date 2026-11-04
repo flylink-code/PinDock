@@ -302,9 +302,9 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.7")
-        throw new Exception($"Expected version 0.1.7, got {UpdateService.GetCurrentVersion()}");
-    if (!UpdateService.IsNewerVersion("0.1.7", "v0.1.8") ||
+    if (UpdateService.GetCurrentVersion() != "0.1.8")
+        throw new Exception($"Expected version 0.1.8, got {UpdateService.GetCurrentVersion()}");
+    if (!UpdateService.IsNewerVersion("0.1.8", "v0.1.9") ||
         !UpdateService.IsNewerVersion("0.1.7", "0.2.0") ||
         UpdateService.IsNewerVersion("0.1.7", "v0.1.7"))
         throw new Exception("UpdateService version comparison failed");

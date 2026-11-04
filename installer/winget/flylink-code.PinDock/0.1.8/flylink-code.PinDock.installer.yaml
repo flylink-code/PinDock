@@ -1,0 +1,19 @@
+﻿# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: flylink-code.PinDock
+PackageVersion: 0.1.8
+InstallerType: exe
+Scope: user
+InstallModes:
+  - interactive
+  - silent
+InstallerSwitches:
+  Silent: /SILENT
+  SilentWithProgress: /SILENT
+UpgradeBehavior: install
+ReleaseDate: 2026-11-04
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/flylink-code/PinDock/releases/download/v0.1.8/PinDock-Setup-0.1.8.exe
+    InstallerSha256: A27BCE54C595D5C0CBADCA84B4309D6E6261920624C74FFAC1E7510B38A1425A
+ManifestType: installer
+ManifestVersion: 1.6.0

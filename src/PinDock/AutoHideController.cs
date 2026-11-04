@@ -84,7 +84,10 @@ public sealed class AutoHideController : IDisposable
     private void Evaluate()
     {
         if (!enabled || State == AutoHideState.Hidden) return;
-        bool over = IsCursorOver(hitArea(), popupBounds());
+        // 锁屏、UAC 安全桌面、切换会话时输入桌面不属于本进程，GetCursorPos 会失败。
+        // 那时无法判断光标位置，跳过本次轮询（40ms 后重试），不要把异常抛到 DispatcherTimer。
+        if (!GetCursorPos(out var cursor)) return;
+        bool over = IsCursorOver(cursor, hitArea(), popupBounds());
         if (over) holdUntilHover = false;
         bool stay = AutoHideLogic.ShouldStayVisible(popupOpen(), dragging(), dialogOpen(), over) || holdUntilHover;
         if (stay)
@@ -104,12 +107,8 @@ public sealed class AutoHideController : IDisposable
         StateChanged?.Invoke(state);
     }
 
-    private static bool IsCursorOver(ScreenRect dock, ScreenRect? popup)
-    {
-        if (!GetCursorPos(out var point))
-            throw new InvalidOperationException("GetCursorPos 失败");
-        return dock.Contains(point.X, point.Y) || (popup is ScreenRect p && p.Contains(point.X, point.Y));
-    }
+    private static bool IsCursorOver(Point32 cursor, ScreenRect dock, ScreenRect? popup) =>
+        dock.Contains(cursor.X, cursor.Y) || (popup is ScreenRect p && p.Contains(cursor.X, cursor.Y));
 
     public static bool TryGetCursorPoint(out (int X, int Y) point)
     {

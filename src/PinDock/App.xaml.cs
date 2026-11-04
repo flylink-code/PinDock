@@ -9,6 +9,7 @@ public partial class App : Application
 {
     private const string PipeName = "PinDock.SingleInstance.Pipe";
     private Mutex? mutex;
+    private bool ownsMutex;
     private CancellationTokenSource? pipeCts;
     private AppController? controller;
 
@@ -21,6 +22,7 @@ public partial class App : Application
         string? firstAddPath = addPaths.Count > 0 ? addPaths[0] : null;
 
         mutex = new Mutex(true, @"Local\PinDock.SingleInstance", out bool created);
+        ownsMutex = created;
         if (!created)
         {
             if (addPaths.Count > 0)
@@ -99,7 +101,9 @@ public partial class App : Application
         pipeCts?.Cancel();
         pipeCts?.Dispose();
         controller?.Dispose();
-        mutex?.ReleaseMutex();
+        // 只有创建者持有互斥体；第二实例走 Shutdown() 时若也 ReleaseMutex 会抛
+        // ApplicationException（Object synchronization method was called from an unsynchronized block of code）。
+        if (ownsMutex) mutex?.ReleaseMutex();
         mutex?.Dispose();
         base.OnExit(e);
     }

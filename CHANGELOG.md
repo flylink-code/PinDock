@@ -2,6 +2,14 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.8] - 2026-11-04
+
+### Fixed
+- **修复锁屏 / UAC 安全桌面后 PinDock 进程崩溃**：`AutoHideController` 的 40ms 轮询把 `GetCursorPos` 失败直接 `throw`，异常抛出 `DispatcherTimer.FireTick` 后成为未处理异常并终止进程（事件日志 `System.InvalidOperationException: GetCursorPos 失败`，0.1.6 / 0.1.7 各累计多次）。输入桌面归属其他会话时无法定位光标，现在跳过本次轮询、下一拍重试。
+- **修复单实例互斥体在退出时抛异常**：命中 `Local\PinDock.SingleInstance` 的第二实例走 `Shutdown()` 后也会调用 `ReleaseMutex`，触发 `ApplicationException: Object synchronization method was called from an unsynchronized block of code`。现只有创建者释放互斥体。
+
+---
+
 ## [0.1.7] - 2026-11-02
 
 ### Added & Improved
