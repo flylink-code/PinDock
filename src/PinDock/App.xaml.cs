@@ -17,6 +17,7 @@ public partial class App : Application
     {
         Environment.SetEnvironmentVariable("CHROME_CRASHPAD_PIPE_NAME", null);
         Environment.SetEnvironmentVariable("ELECTRON_RUN_AS_NODE", null);
+        CrashLog.Install();
 
         var addPaths = ExplorerMenuService.ExtractAddPaths(e.Args);
         string? firstAddPath = addPaths.Count > 0 ? addPaths[0] : null;

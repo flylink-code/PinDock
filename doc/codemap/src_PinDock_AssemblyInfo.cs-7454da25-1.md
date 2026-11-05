@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AssemblyInfo.cs) · page 1/1
 
-Source SHA-256: d41e48d2bce7f9eda84eef27c4008920a5639dd3f56baeff39273d58381575fe
+Source SHA-256: 705fb05c11b83c5c28ebd8d6ae6fc7eb2851b70e9b69c49051b96055d0d1f667
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

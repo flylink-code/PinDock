@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Recent/ShellLinkParser.cs) · page 1/1
 
-Source SHA-256: 9ed0023ce62b95dbcc88b8eddefbf5b08a25c6bbd4b39caa38fbaddfccf3dcea
+Source SHA-256: 8b8de6e04d85346fa0d1f770e12924c8847a6411b9aa73596c09a3a5ac81ed3c
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -20,9 +20,10 @@ Source SHA-256: 9ed0023ce62b95dbcc88b8eddefbf5b08a25c6bbd4b39caa38fbaddfccf3dcea
 | AppUserModelId | property_declaration | PinDock::ShellLinkParser::ParsedShortcutLink | [17](../../src/PinDock/Recent/ShellLinkParser.cs#L17) |
 | ParseEmbeddedLinks | method_declaration | PinDock::ShellLinkParser | [32](../../src/PinDock/Recent/ShellLinkParser.cs#L32) |
 | TryParseLnkAt | method_declaration | PinDock::ShellLinkParser | [59](../../src/PinDock/Recent/ShellLinkParser.cs#L59) |
-| ExtractAppUserModelIdFromBuffer | method_declaration | PinDock::ShellLinkParser | [150](../../src/PinDock/Recent/ShellLinkParser.cs#L150) |
-| DecodePidlPath | method_declaration | PinDock::ShellLinkParser | [186](../../src/PinDock/Recent/ShellLinkParser.cs#L186) |
-| ReadCountedString | method_declaration | PinDock::ShellLinkParser | [201](../../src/PinDock/Recent/ShellLinkParser.cs#L201) |
-| ReadNullTerminatedUnicode | method_declaration | PinDock::ShellLinkParser | [219](../../src/PinDock/Recent/ShellLinkParser.cs#L219) |
-| ReadNullTerminatedAnsi | method_declaration | PinDock::ShellLinkParser | [227](../../src/PinDock/Recent/ShellLinkParser.cs#L227) |
-| SHGetPathFromIDListW | method_declaration | PinDock::ShellLinkParser | [235](../../src/PinDock/Recent/ShellLinkParser.cs#L235) |
+| ExtractAppUserModelIdFromBuffer | method_declaration | PinDock::ShellLinkParser | [151](../../src/PinDock/Recent/ShellLinkParser.cs#L151) |
+| IsValidItemIdList | method_declaration | PinDock::ShellLinkParser | [194](../../src/PinDock/Recent/ShellLinkParser.cs#L194) |
+| DecodePidlPath | method_declaration | PinDock::ShellLinkParser | [210](../../src/PinDock/Recent/ShellLinkParser.cs#L210) |
+| ReadCountedString | method_declaration | PinDock::ShellLinkParser | [230](../../src/PinDock/Recent/ShellLinkParser.cs#L230) |
+| ReadNullTerminatedUnicode | method_declaration | PinDock::ShellLinkParser | [248](../../src/PinDock/Recent/ShellLinkParser.cs#L248) |
+| ReadNullTerminatedAnsi | method_declaration | PinDock::ShellLinkParser | [256](../../src/PinDock/Recent/ShellLinkParser.cs#L256) |
+| SHGetPathFromIDListW | method_declaration | PinDock::ShellLinkParser | [264](../../src/PinDock/Recent/ShellLinkParser.cs#L264) |

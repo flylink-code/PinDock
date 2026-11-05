@@ -21,6 +21,7 @@
 | [src/PinDock/BookmarkRow.cs](../../src/PinDock/BookmarkRow.cs) | 16 | [1](src_PinDock_BookmarkRow.cs-335705d0-1.md) |
 | [src/PinDock/CardWindowBase.cs](../../src/PinDock/CardWindowBase.cs) | 6 | [1](src_PinDock_CardWindowBase.cs-fb3d7391-1.md) |
 | [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 73 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
+| [src/PinDock/CrashLog.cs](../../src/PinDock/CrashLog.cs) | 4 | [1](src_PinDock_CrashLog.cs-0fc60e73-1.md) |
 | [src/PinDock/DirectoryBrowserService.cs](../../src/PinDock/DirectoryBrowserService.cs) | 16 | [1](src_PinDock_DirectoryBrowserService.cs-95816456-1.md) |
 | [src/PinDock/DockLayout.cs](../../src/PinDock/DockLayout.cs) | 9 | [1](src_PinDock_DockLayout.cs-fd425178-1.md) |
 | [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 60 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
@@ -48,7 +49,7 @@
 | [src/PinDock/Recent/OfficeWpsRecentProvider.cs](../../src/PinDock/Recent/OfficeWpsRecentProvider.cs) | 4 | [1](src_PinDock_Recent_OfficeWpsRecentProvider.cs-92e56cca-1.md) |
 | [src/PinDock/Recent/RecentDescriptor.cs](../../src/PinDock/Recent/RecentDescriptor.cs) | 13 | [1](src_PinDock_Recent_RecentDescriptor.cs-79ebc2c8-1.md) |
 | [src/PinDock/Recent/RecentIo.cs](../../src/PinDock/Recent/RecentIo.cs) | 6 | [1](src_PinDock_Recent_RecentIo.cs-63fee988-1.md) |
-| [src/PinDock/Recent/ShellLinkParser.cs](../../src/PinDock/Recent/ShellLinkParser.cs) | 18 | [1](src_PinDock_Recent_ShellLinkParser.cs-2cf64a9c-1.md) |
+| [src/PinDock/Recent/ShellLinkParser.cs](../../src/PinDock/Recent/ShellLinkParser.cs) | 19 | [1](src_PinDock_Recent_ShellLinkParser.cs-2cf64a9c-1.md) |
 | [src/PinDock/Recent/SqliteReader.cs](../../src/PinDock/Recent/SqliteReader.cs) | 10 | [1](src_PinDock_Recent_SqliteReader.cs-2686afee-1.md) |
 | [src/PinDock/Recent/SublimeRecentProvider.cs](../../src/PinDock/Recent/SublimeRecentProvider.cs) | 4 | [1](src_PinDock_Recent_SublimeRecentProvider.cs-834bbf78-1.md) |
 | [src/PinDock/Recent/VisualStudioRecentProvider.cs](../../src/PinDock/Recent/VisualStudioRecentProvider.cs) | 3 | [1](src_PinDock_Recent_VisualStudioRecentProvider.cs-31bb87e4-1.md) |

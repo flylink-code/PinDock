@@ -72,8 +72,9 @@ internal static class ShellLinkParser
                 if (pos + 2 > data.Length) return false;
                 ushort idListSize = BitConverter.ToUInt16(data, pos);
                 pos += 2;
-                if (pos + idListSize > data.Length) return false;
-                pidlPath = DecodePidlPath(data, pos);
+                if (idListSize < 2 || pos + idListSize > data.Length) return false;
+                if (!IsValidItemIdList(data, pos, idListSize)) return false;
+                pidlPath = DecodePidlPath(data, pos, idListSize);
                 pos += idListSize;
             }
 
@@ -183,12 +184,40 @@ internal static class ShellLinkParser
         return "";
     }
 
-    private static string DecodePidlPath(byte[] data, int offset)
+    /// <summary>
+    /// 校验 LinkTargetIDList 的结构：每个 ItemID 的前 2 字节是本项字节数（含这 2 字节），
+    /// 列表以 2 字节 0 结尾，且整条链必须落在 IDListSize 声明的范围内。
+    /// JumpList 等容器文件里混有大量二进制数据，签名扫描可能命中畸形/截断的 .lnk；
+    /// 若直接把这种数据当成 PIDL 交给 shell32，NT 会沿伪造的长度链越界解引用，
+    /// 抛出无法被 catch 捕获的 ExecutionEngineException 并静默终止进程。
+    /// </summary>
+    private static bool IsValidItemIdList(byte[] data, int offset, int length)
     {
-        GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        int end = offset + length;
+        if (length < 2 || end > data.Length) return false;
+
+        int pos = offset;
+        while (pos + 2 <= end)
+        {
+            ushort cb = BitConverter.ToUInt16(data, pos);
+            if (cb == 0) return true;
+            if (cb < 2 || pos + cb > end) return false;
+            pos += cb;
+        }
+        return false;
+    }
+
+    private static string DecodePidlPath(byte[] data, int offset, int length)
+    {
+        // 复制到独立缓冲区并显式补上 0 结尾：shell32 只会在这段内存里遍历，
+        // 不会读到托管数组之外，也不会把整份 JumpList 文件钉住。
+        byte[] pidl = new byte[length + 2];
+        Buffer.BlockCopy(data, offset, pidl, 0, length);
+
+        GCHandle handle = GCHandle.Alloc(pidl, GCHandleType.Pinned);
         try
         {
-            IntPtr ptr = IntPtr.Add(handle.AddrOfPinnedObject(), offset);
+            IntPtr ptr = handle.AddrOfPinnedObject();
             var sb = new StringBuilder(1024);
             return SHGetPathFromIDListW(ptr, sb) ? sb.ToString() : "";
         }

@@ -351,6 +351,16 @@ try
         JumpListRecentProvider.ComputeJumpListHash("Microsoft.Windows.Explorer") != "f01b4d95cf55d32a")
         throw new Exception("JumpList CRC64 hash calculation failed");
 
+    // 畸形/截断的 LinkTargetIDList 必须在交给 shell32 之前被拒绝，否则会越界解码并终止进程。
+    byte[] malformedLnk = new byte[300];
+    new byte[] { 0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 }
+        .CopyTo(malformedLnk, 0);
+    BitConverter.TryWriteBytes(malformedLnk.AsSpan(20), 0x01u);            // HasLinkTargetIDList
+    BitConverter.TryWriteBytes(malformedLnk.AsSpan(76), (ushort)200);      // IDListSize
+    BitConverter.TryWriteBytes(malformedLnk.AsSpan(78), (ushort)0xFE00);   // 单项长度越过声明范围
+    if (ShellLinkParser.ParseEmbeddedLinks(malformedLnk).Count != 0)
+        throw new Exception("Malformed IDList was not rejected");
+
     var resolvedLnk = AppRecentService.ResolveAppTarget(Path.Combine(directory, "快捷方式.lnk"));
     if (!string.Equals(resolvedLnk.ExecutablePath, Environment.ProcessPath, StringComparison.OrdinalIgnoreCase))
         throw new Exception($"Shortcut target resolution failed: {resolvedLnk.ExecutablePath}");

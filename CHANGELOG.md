@@ -2,6 +2,14 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.9] - 2026-11-05
+
+### Fixed
+- **修复悬停应用图标时进程无提示崩溃**：`ShellLinkParser` 解析 JumpList（`*.automaticDestinations-ms` / `*.customDestinations-ms`）内嵌 `.lnk` 时，仅检查 `IDListSize` 是否落在文件范围内，就把原始字节当作 PIDL 传给 `SHGetPathFromIDListW`。容器文件中存在大量畸形/截断的 `LinkTargetIDList`（单项长度越过声明范围，或缺少 2 字节 0 结尾），shell32 会沿伪造的长度链越界解引用，抛出无法被 `catch` 捕获的 `ExecutionEngineException`（事件日志 `0xc0000005` / `HResult 0x80131506`），进程随即消失。现在先按 ItemID 的 `cb` 链校验整条 IDList 自洽并以 0 结尾，再复制到带显式结尾符的独立缓冲区交给 shell32；实测本机 185 个 JumpList 文件（含 35 个畸形候选）全部安全解析。
+- **新增未处理异常落盘日志**：`CrashLog` 将 UI 线程、后台线程与未观察任务的异常追加到 `%LOCALAPPDATA%\PinDock\logs\crash.log`；UI 事件回调异常记录后不再直接终止常驻进程，便于后续定位「无提示退出」。
+
+---
+
 ## [0.1.8] - 2026-11-04
 
 ### Fixed
