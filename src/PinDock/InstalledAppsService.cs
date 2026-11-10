@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO;
 
 namespace PinDock;
@@ -34,8 +35,28 @@ public sealed class InstalledAppsService
                 (Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), false, "桌面"),
                 (Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), false, "桌面")
             };
-            cached = ScanRoots(roots);
+            var apps = new List<InstalledApp>(ScanRoots(roots));
+            try
+            {
+                MergePackagedApps(apps);
+            }
+            catch (Win32Exception)
+            {
+                // 无法枚举 shell:AppsFolder（例如受限会话）时，保留开始菜单与桌面文件扫描结果。
+            }
+            apps.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+            cached = apps;
             return cached;
+        }
+    }
+
+    private static void MergePackagedApps(List<InstalledApp> apps)
+    {
+        var seenNames = new HashSet<string>(apps.Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
+        foreach (var app in PackagedApps.Enumerate())
+        {
+            if (ShouldIgnore(app.Name) || !seenNames.Add(app.Name)) continue;
+            apps.Add(app);
         }
     }
 

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/LibraryWindow.xaml.cs) · page 1/1
 
-Source SHA-256: 5be345a1496cfa0e8e7f63b4c803e807702b8674ff061e75813c9551cdcab094
+Source SHA-256: 2dd453042c712df5d746747aff036d1ea2accea06bd179f4ef9f3468101e1b6f
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -23,7 +23,7 @@ Source SHA-256: 5be345a1496cfa0e8e7f63b4c803e807702b8674ff061e75813c9551cdcab094
 | Remove_Click | method_declaration | PinDock::LibraryWindow | [156](../../src/PinDock/LibraryWindow.xaml.cs#L156) |
 | Pin_Click | method_declaration | PinDock::LibraryWindow | [164](../../src/PinDock/LibraryWindow.xaml.cs#L164) |
 | Row_RightClick | method_declaration | PinDock::LibraryWindow | [180](../../src/PinDock/LibraryWindow.xaml.cs#L180) |
-| RevealInExplorer | method_declaration | PinDock::LibraryWindow | [212](../../src/PinDock/LibraryWindow.xaml.cs#L212) |
-| ManageGroups_Click | method_declaration | PinDock::LibraryWindow | [224](../../src/PinDock/LibraryWindow.xaml.cs#L224) |
-| Window_Drop | method_declaration | PinDock::LibraryWindow | [232](../../src/PinDock/LibraryWindow.xaml.cs#L232) |
-| OnClosing | method_declaration | PinDock::LibraryWindow | [241](../../src/PinDock/LibraryWindow.xaml.cs#L241) |
+| RevealInExplorer | method_declaration | PinDock::LibraryWindow | [215](../../src/PinDock/LibraryWindow.xaml.cs#L215) |
+| ManageGroups_Click | method_declaration | PinDock::LibraryWindow | [227](../../src/PinDock/LibraryWindow.xaml.cs#L227) |
+| Window_Drop | method_declaration | PinDock::LibraryWindow | [235](../../src/PinDock/LibraryWindow.xaml.cs#L235) |
+| OnClosing | method_declaration | PinDock::LibraryWindow | [244](../../src/PinDock/LibraryWindow.xaml.cs#L244) |

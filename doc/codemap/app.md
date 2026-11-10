@@ -11,7 +11,7 @@
 | [src/PinDock/App.xaml.cs](../../src/PinDock/App.xaml.cs) | 6 | [1](src_PinDock_App.xaml.cs-80bd509d-1.md) |
 | [src/PinDock/AppController.cs](../../src/PinDock/AppController.cs) | 47 | [1](src_PinDock_AppController.cs-640ef5d0-1.md) |
 | [src/PinDock/AppRecentService.cs](../../src/PinDock/AppRecentService.cs) | 18 | [1](src_PinDock_AppRecentService.cs-f2e18a38-1.md) |
-| [src/PinDock/AppSettings.cs](../../src/PinDock/AppSettings.cs) | 68 | [1](src_PinDock_AppSettings.cs-4c46b6aa-1.md) |
+| [src/PinDock/AppSettings.cs](../../src/PinDock/AppSettings.cs) | 74 | [1](src_PinDock_AppSettings.cs-4c46b6aa-1.md) |
 | [src/PinDock/AssemblyInfo.cs](../../src/PinDock/AssemblyInfo.cs) | 0 | [1](src_PinDock_AssemblyInfo.cs-7454da25-1.md) |
 | [src/PinDock/AutoHideController.cs](../../src/PinDock/AutoHideController.cs) | 15 | [1](src_PinDock_AutoHideController.cs-b2651759-1.md) |
 | [src/PinDock/AutoHideLogic.cs](../../src/PinDock/AutoHideLogic.cs) | 7 | [1](src_PinDock_AutoHideLogic.cs-ec829696-1.md) |
@@ -23,7 +23,7 @@
 | [src/PinDock/Collections.cs](../../src/PinDock/Collections.cs) | 73 | [1](src_PinDock_Collections.cs-e26172d2-1.md) |
 | [src/PinDock/CrashLog.cs](../../src/PinDock/CrashLog.cs) | 4 | [1](src_PinDock_CrashLog.cs-0fc60e73-1.md) |
 | [src/PinDock/DirectoryBrowserService.cs](../../src/PinDock/DirectoryBrowserService.cs) | 16 | [1](src_PinDock_DirectoryBrowserService.cs-95816456-1.md) |
-| [src/PinDock/DockLayout.cs](../../src/PinDock/DockLayout.cs) | 9 | [1](src_PinDock_DockLayout.cs-fd425178-1.md) |
+| [src/PinDock/DockLayout.cs](../../src/PinDock/DockLayout.cs) | 10 | [1](src_PinDock_DockLayout.cs-fd425178-1.md) |
 | [src/PinDock/DockWindow.xaml.cs](../../src/PinDock/DockWindow.xaml.cs) | 60 | [1](src_PinDock_DockWindow.xaml.cs-dbd6ee70-1.md) |
 | [src/PinDock/EdgeHandleWindow.xaml.cs](../../src/PinDock/EdgeHandleWindow.xaml.cs) | 6 | [1](src_PinDock_EdgeHandleWindow.xaml.cs-52e7dde9-1.md) |
 | [src/PinDock/ExplorerMenuService.cs](../../src/PinDock/ExplorerMenuService.cs) | 18 | [1](src_PinDock_ExplorerMenuService.cs-64b5d39a-1.md) |
@@ -34,12 +34,13 @@
 | [src/PinDock/GroupPopupWindow.xaml.cs](../../src/PinDock/GroupPopupWindow.xaml.cs) | 11 | [1](src_PinDock_GroupPopupWindow.xaml.cs-ad48ca70-1.md) |
 | [src/PinDock/HotkeyService.cs](../../src/PinDock/HotkeyService.cs) | 13 | [1](src_PinDock_HotkeyService.cs-b324ace5-1.md) |
 | [src/PinDock/I18n.cs](../../src/PinDock/I18n.cs) | 4 | [1](src_PinDock_I18n.cs-ece47d35-1.md) |
-| [src/PinDock/InstalledAppsService.cs](../../src/PinDock/InstalledAppsService.cs) | 8 | [1](src_PinDock_InstalledAppsService.cs-dc1002b6-1.md) |
+| [src/PinDock/InstalledAppsService.cs](../../src/PinDock/InstalledAppsService.cs) | 9 | [1](src_PinDock_InstalledAppsService.cs-dc1002b6-1.md) |
 | [src/PinDock/LibraryTransfer.cs](../../src/PinDock/LibraryTransfer.cs) | 8 | [1](src_PinDock_LibraryTransfer.cs-dd166fb2-1.md) |
 | [src/PinDock/LibraryWindow.xaml.cs](../../src/PinDock/LibraryWindow.xaml.cs) | 19 | [1](src_PinDock_LibraryWindow.xaml.cs-cad84c65-1.md) |
 | [src/PinDock/MonitorInfo.cs](../../src/PinDock/MonitorInfo.cs) | 11 | [1](src_PinDock_MonitorInfo.cs-aa141772-1.md) |
 | [src/PinDock/NativeWindow.cs](../../src/PinDock/NativeWindow.cs) | 13 | [1](src_PinDock_NativeWindow.cs-f24656c5-1.md) |
-| [src/PinDock/Palettes.cs](../../src/PinDock/Palettes.cs) | 5 | [1](src_PinDock_Palettes.cs-db761e61-1.md) |
+| [src/PinDock/PackagedApps.cs](../../src/PinDock/PackagedApps.cs) | 18 | [1](src_PinDock_PackagedApps.cs-de31c883-1.md) |
+| [src/PinDock/Palettes.cs](../../src/PinDock/Palettes.cs) | 6 | [1](src_PinDock_Palettes.cs-db761e61-1.md) |
 | [src/PinDock/PromptDialog.xaml.cs](../../src/PinDock/PromptDialog.xaml.cs) | 5 | [1](src_PinDock_PromptDialog.xaml.cs-865af51d-1.md) |
 | [src/PinDock/Recent/DeclarativeRecentProvider.cs](../../src/PinDock/Recent/DeclarativeRecentProvider.cs) | 11 | [1](src_PinDock_Recent_DeclarativeRecentProvider.cs-df5eca78-1.md) |
 | [src/PinDock/Recent/IRecentProvider.cs](../../src/PinDock/Recent/IRecentProvider.cs) | 3 | [1](src_PinDock_Recent_IRecentProvider.cs-693a12dc-1.md) |
@@ -55,9 +56,9 @@
 | [src/PinDock/Recent/VisualStudioRecentProvider.cs](../../src/PinDock/Recent/VisualStudioRecentProvider.cs) | 3 | [1](src_PinDock_Recent_VisualStudioRecentProvider.cs-31bb87e4-1.md) |
 | [src/PinDock/Recent/VsCodeFamilyRecentProvider.cs](../../src/PinDock/Recent/VsCodeFamilyRecentProvider.cs) | 7 | [1](src_PinDock_Recent_VsCodeFamilyRecentProvider.cs-c99ae4fd-1.md) |
 | [src/PinDock/SettingsWindow.xaml.cs](../../src/PinDock/SettingsWindow.xaml.cs) | 20 | [1](src_PinDock_SettingsWindow.xaml.cs-a5b18687-1.md) |
-| [src/PinDock/ShellIconService.cs](../../src/PinDock/ShellIconService.cs) | 17 | [1](src_PinDock_ShellIconService.cs-5a643bb8-1.md) |
+| [src/PinDock/ShellIconService.cs](../../src/PinDock/ShellIconService.cs) | 23 | [1](src_PinDock_ShellIconService.cs-5a643bb8-1.md) |
 | [src/PinDock/StartupService.cs](../../src/PinDock/StartupService.cs) | 5 | [1](src_PinDock_StartupService.cs-74f10e6e-1.md) |
-| [src/PinDock/ThemeService.cs](../../src/PinDock/ThemeService.cs) | 10 | [1](src_PinDock_ThemeService.cs-c58fdb5c-1.md) |
+| [src/PinDock/ThemeService.cs](../../src/PinDock/ThemeService.cs) | 12 | [1](src_PinDock_ThemeService.cs-c58fdb5c-1.md) |
 | [src/PinDock/TrayFlyoutWindow.xaml.cs](../../src/PinDock/TrayFlyoutWindow.xaml.cs) | 28 | [1](src_PinDock_TrayFlyoutWindow.xaml.cs-5bccd4b7-1.md) |
 | [src/PinDock/TrayService.cs](../../src/PinDock/TrayService.cs) | 5 | [1](src_PinDock_TrayService.cs-66b0f4e9-1.md) |
 | [src/PinDock/UpdateService.cs](../../src/PinDock/UpdateService.cs) | 19 | [1](src_PinDock_UpdateService.cs-4928fecb-1.md) |

@@ -162,7 +162,6 @@ public partial class DockWindow : Window
         workArea = monitor.WorkingArea;
         bool vertical = settings.DockEdge is DockEdge.Left or DockEdge.Right;
         double available = vertical ? workArea.Height : workArea.Width;
-        int capacity = DockLayout.ComputeCapacity(available, DockLayout.IconPixels(settings.IconSize));
 
         var pinnedById = data.Items.Where(i => i.Pinned).ToDictionary(i => "bm:" + i.Id.ToString("D"), StringComparer.OrdinalIgnoreCase);
         var orderedPinned = new List<Bookmark>();
@@ -171,11 +170,35 @@ public partial class DockWindow : Window
             if (pinnedById.TryGetValue(token, out var bm))
                 orderedPinned.Add(bm);
         }
-        overflow = orderedPinned.Skip(capacity).ToList();
-        var visiblePinnedSet = new HashSet<Guid>(orderedPinned.Take(capacity).Select(i => i.Id));
 
-        Rebuild(visiblePinnedSet);
-        Reposition(capacity);
+        var activeGroups = new HashSet<string>(
+            data.Groups.Where(g => data.Items.Any(i => string.Equals(i.Group, g, StringComparison.Ordinal))),
+            StringComparer.Ordinal);
+        int groupCount = data.DockOrder.Count(t => t.StartsWith("grp:", StringComparison.Ordinal) && activeGroups.Contains(t[4..]));
+        int customSeparatorCount = data.DockOrder.Count(t => t.StartsWith("sep:", StringComparison.OrdinalIgnoreCase));
+
+        var dpi = VisualTreeHelper.GetDpi(this);
+        double scale = vertical ? dpi.DpiScaleY : dpi.DpiScaleX;
+        double icon = DockLayout.IconPixels(settings.IconSize);
+
+        int visibleCount = DockLayout.FitPinnedCount(
+            orderedPinned.Count, groupCount, customSeparatorCount, settings.UtilityCollapsed,
+            settings.ShowIconLabels, vertical, available, icon, scale);
+
+        // 与 macOS Dock 一致：优先保留用户设置的图标尺寸，空间不足时逐步缩小图标，最后才溢出到「更多」。
+        while (visibleCount < orderedPinned.Count && icon > DockLayout.MinIconPixels)
+        {
+            icon = Math.Max(DockLayout.MinIconPixels, icon - 2);
+            visibleCount = DockLayout.FitPinnedCount(
+                orderedPinned.Count, groupCount, customSeparatorCount, settings.UtilityCollapsed,
+                settings.ShowIconLabels, vertical, available, icon, scale);
+        }
+
+        overflow = orderedPinned.Skip(visibleCount).ToList();
+        var visiblePinnedSet = new HashSet<Guid>(orderedPinned.Take(visibleCount).Select(i => i.Id));
+
+        Rebuild(visiblePinnedSet, icon);
+        Reposition(visibleCount);
     }
 
     public void ShowDock()
@@ -224,7 +247,7 @@ public partial class DockWindow : Window
         NativeWindow.MoveTo(this, bounds.X, bounds.Y);
     }
 
-    private void Rebuild(IReadOnlySet<Guid> visiblePinnedIds)
+    private void Rebuild(IReadOnlySet<Guid> visiblePinnedIds, double icon)
     {
         dragStartCursor = null;
         IsDragging = false;
@@ -235,7 +258,6 @@ public partial class DockWindow : Window
         bool vertical = data.Settings.DockEdge is DockEdge.Left or DockEdge.Right;
         ItemsPanel.Orientation = vertical ? Orientation.Vertical : Orientation.Horizontal;
         DockChrome.Padding = vertical ? new Thickness(10, 12, 10, 12) : new Thickness(12, 10, 12, 10);
-        double icon = DockLayout.IconPixels(data.Settings.IconSize);
 
         var pinnedLookup = data.Items
             .Where(i => i.Pinned && visiblePinnedIds.Contains(i.Id))
@@ -1032,7 +1054,8 @@ public partial class DockWindow : Window
         openItem.Click += (_, _) => LaunchRequested?.Invoke(item);
         menu.Items.Add(openItem);
 
-        if (BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Application)
+        bool packaged = PackagedApps.IsPackagedPath(item.Path);
+        if (!packaged && BookmarkKindHelper.FromPath(item.Path) == BookmarkKind.Application)
         {
             var recentItem = new MenuItem
             {
@@ -1043,9 +1066,12 @@ public partial class DockWindow : Window
             menu.Items.Add(recentItem);
         }
 
-        var revealItem = new MenuItem { Tag = "📂", Header = T("在资源管理器中显示", "Show in Explorer") };
-        revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
-        menu.Items.Add(revealItem);
+        if (!packaged)
+        {
+            var revealItem = new MenuItem { Tag = "📂", Header = T("在资源管理器中显示", "Show in Explorer") };
+            revealItem.Click += (_, _) => LibraryWindow.RevealInExplorer(item.Path);
+            menu.Items.Add(revealItem);
+        }
 
         menu.Items.Add(new Separator());
 

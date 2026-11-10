@@ -277,6 +277,9 @@ public partial class TrayFlyoutWindow : Window
 
     private Button CreateRowButton(Bookmark item, string badge)
     {
+        string subtitle = PackagedApps.IsPackagedPath(item.Path)
+            ? T("开始菜单应用", "Start menu app")
+            : item.Path;
         var button = new Button
         {
             Background = Brushes.Transparent,
@@ -284,7 +287,7 @@ public partial class TrayFlyoutWindow : Window
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Padding = new Thickness(6, 7, 6, 7),
             Cursor = Cursors.Hand,
-            ToolTip = string.IsNullOrWhiteSpace(item.Path) ? item.Name : $"{item.Name}\n{item.Path}"
+            ToolTip = string.IsNullOrWhiteSpace(item.Path) ? item.Name : $"{item.Name}\n{subtitle}"
         };
         ToolTipService.SetInitialShowDelay(button, 160);
         ToolTipService.SetBetweenShowDelay(button, 80);
@@ -334,7 +337,7 @@ public partial class TrayFlyoutWindow : Window
         });
         texts.Children.Add(new TextBlock
         {
-            Text = item.Path,
+            Text = subtitle,
             FontSize = 10,
             Margin = new Thickness(0, 2, 0, 0),
             Foreground = (Brush)FindResource("MutedBrush"),

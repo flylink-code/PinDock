@@ -92,11 +92,46 @@ try
     if (BookmarkKindHelper.FromPath(Environment.ProcessPath!) != BookmarkKind.Application) throw new Exception("Exe kind");
     if (BookmarkKindHelper.FromPath(textFile) != BookmarkKind.File) throw new Exception("File kind");
 
+    // MSIX / 商店应用：AUMID 路径识别、枚举、名称解析与图标提取
+    const string storeAppPath = @"shell:AppsFolder\Claude_pzs8sxrjxfjjc!Claude";
+    if (!PackagedApps.IsPackagedPath(storeAppPath) || BookmarkKindHelper.FromPath(storeAppPath) != BookmarkKind.Application)
+        throw new Exception("Packaged app kind detection failed");
+    if (PackagedApps.IsPackagedPath(Environment.ProcessPath!))
+        throw new Exception("Regular executable path mistaken as packaged app");
+    var packagedApps = PackagedApps.Enumerate();
+    if (packagedApps.Count == 0)
+        throw new Exception("Packaged app enumeration returned no entries");
+    if (packagedApps.Any(a => !PackagedApps.IsPackagedPath(a.Path) ||
+                              !a.Path[PackagedApps.PathPrefix.Length..].Contains('!') ||
+                              a.Path[PackagedApps.PathPrefix.Length..].Contains('\\')))
+        throw new Exception("Packaged app enumeration returned a non-AUMID path");
+    if (PackagedApps.TryGetDisplayName(packagedApps[0].Path) is not { Length: > 0 })
+        throw new Exception("Packaged app display name resolution failed");
+    var packagedIconTarget = packagedApps.FirstOrDefault(a => a.Path.Contains('!'));
+    if (packagedIconTarget.Path is not null && !(await icons.GetAsync(packagedIconTarget.Path)).IsFrozen)
+        throw new Exception("Packaged app icon must be frozen for UI use");
+    var mergedInstalledApps = new InstalledAppsService().GetInstalledApps();
+    if (!mergedInstalledApps.Any(a => PackagedApps.IsPackagedPath(a.Path)))
+        throw new Exception("Installed app scan did not merge packaged apps");
+    if (mergedInstalledApps.Select(a => a.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() != mergedInstalledApps.Count)
+        throw new Exception("Installed app scan returned duplicate names");
+    Console.WriteLine($"PASS: Packaged app AUMID detection, enumeration ({packagedApps.Count} apps), display name, icon and installed-app merge");
+
     var work = new ScreenRect(0, 0, 1920, 1040);
-    int capacity = DockLayout.ComputeCapacity(work.Width, 46);
-    if (capacity is < 1 or > 9) throw new Exception($"Capacity out of range: {capacity}");
-    if (DockLayout.ComputeCapacity(300, 46) != 1) throw new Exception("Narrow screen must keep at least one pinned slot");
-    if (DockLayout.ComputeCapacity(100000, 46) != DockLayout.MaxPinnedVisible) throw new Exception("Capacity must be capped");
+    int unlabeledCapacity = DockLayout.FitPinnedCount(40, 0, 0, false, false, false, work.Width, 46, 1.0);
+    if (unlabeledCapacity is < 10 or >= 40)
+        throw new Exception($"Dock capacity should expand beyond nine items: {unlabeledCapacity}");
+    if (DockLayout.FitPinnedCount(40, 0, 0, false, false, false, 100000, 46, 1.0) != 40)
+        throw new Exception("Wide screen must fit all pinned items");
+    if (DockLayout.FitPinnedCount(30, 0, 0, false, false, false, 300, 46, 1.0) != 1)
+        throw new Exception("Narrow screen must keep at least one pinned slot");
+    if (DockLayout.FitPinnedCount(10, 0, 0, false, true, false, work.Width, 46, 1.0) != 10)
+        throw new Exception("Ten pinned apps must all remain visible");
+    if (DockLayout.FitPinnedCount(10, 3, 0, false, true, false, work.Width, 46, 1.0) != 10)
+        throw new Exception("Ten pinned apps plus groups must all remain visible on a 1920px dock");
+    int labeledCapacity = DockLayout.FitPinnedCount(40, 0, 0, false, true, false, work.Width, 46, 1.0);
+    if (labeledCapacity >= unlabeledCapacity)
+        throw new Exception("Icon labels must reduce the number of fitting items");
     var bottom = DockLayout.Fit(work, DockEdge.Bottom, 600, 68, 0, true);
     if (bottom.Y + bottom.Height > work.Y + work.Height) throw new Exception("Bottom dock outside work area");
     if (Math.Abs(bottom.X - (work.Width - 600) / 2) > 0.001) throw new Exception("Bottom dock must be centered");
@@ -302,8 +337,8 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.8")
-        throw new Exception($"Expected version 0.1.8, got {UpdateService.GetCurrentVersion()}");
+    if (UpdateService.GetCurrentVersion() != "0.1.11")
+        throw new Exception($"Expected version 0.1.11, got {UpdateService.GetCurrentVersion()}");
     if (!UpdateService.IsNewerVersion("0.1.8", "v0.1.9") ||
         !UpdateService.IsNewerVersion("0.1.7", "0.2.0") ||
         UpdateService.IsNewerVersion("0.1.7", "v0.1.7"))

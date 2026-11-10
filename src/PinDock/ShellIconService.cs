@@ -68,6 +68,8 @@ public sealed class ShellIconService
 
     private static string GetFileCacheKey(string filePath)
     {
+        if (PackagedApps.IsPackagedPath(filePath))
+            return filePath;
         string ext = Path.GetExtension(filePath);
         if (!string.IsNullOrEmpty(ext) && !PerFileIconExtensions.Contains(ext))
             return "ext:" + ext;
@@ -130,6 +132,9 @@ public sealed class ShellIconService
 
     private static ImageSource Extract(string path)
     {
+        if (PackagedApps.IsPackagedPath(path))
+            return ExtractPackagedAppIcon(path);
+
         string ext = Path.GetExtension(path);
         if (File.Exists(path) && (
             string.Equals(ext, ".png", StringComparison.OrdinalIgnoreCase) ||
@@ -185,6 +190,56 @@ public sealed class ShellIconService
             if (info.Icon != IntPtr.Zero) DestroyIcon(info.Icon);
         }
     }
+
+    private static readonly Guid IidShellItemImageFactory = new("bcc18b79-ba16-442f-80c4-8a59c30c463b");
+
+    private static ImageSource ExtractPackagedAppIcon(string path)
+    {
+        Guid iid = IidShellItemImageFactory;
+        int hr = SHCreateItemFromParsingName(path, IntPtr.Zero, ref iid, out IShellItemImageFactory factory);
+        if (hr < 0)
+            throw new Win32Exception(hr, $"无法解析应用图标：{path}");
+
+        IntPtr hBitmap = IntPtr.Zero;
+        try
+        {
+            hr = factory.GetImage(new SIZE { cx = 64, cy = 64 }, 0x04 /* SIIGBF_ICONONLY */, out hBitmap);
+            if (hr < 0 || hBitmap == IntPtr.Zero)
+                throw new Win32Exception(hr, $"无法提取应用图标：{path}");
+
+            var image = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            image.Freeze();
+            return image;
+        }
+        finally
+        {
+            if (hBitmap != IntPtr.Zero) DeleteObject(hBitmap);
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SIZE
+    {
+        public int cx;
+        public int cy;
+    }
+
+    [ComImport, Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IShellItemImageFactory
+    {
+        [PreserveSig] int GetImage(SIZE size, int flags, out IntPtr phbm);
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = true)]
+    private static extern int SHCreateItemFromParsingName(
+        string pszPath,
+        IntPtr pbc,
+        ref Guid riid,
+        [MarshalAs(UnmanagedType.Interface)] out IShellItemImageFactory ppv);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeleteObject(IntPtr hObject);
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct SHFILEINFO

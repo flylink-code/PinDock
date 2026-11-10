@@ -4,15 +4,16 @@
 
 [Module](app.md) · [Source](../../src/PinDock/InstalledAppsService.cs) · page 1/1
 
-Source SHA-256: 50b271cc92639c5201850bed7d1ecab0de4c4c660316bab27ef6adc49436429d
+Source SHA-256: 99855d034b73ad2ef421f4c0d72b90952ada4157a214cfc888e474ea0ef248be
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/InstalledAppsService.cs#L3) |
-| InstalledAppsService | class_declaration | PinDock | [7](../../src/PinDock/InstalledAppsService.cs#L7) |
-| InstalledAppsService | constructor_declaration | PinDock::InstalledAppsService | [20](../../src/PinDock/InstalledAppsService.cs#L20) |
-| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [25](../../src/PinDock/InstalledAppsService.cs#L25) |
-| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [42](../../src/PinDock/InstalledAppsService.cs#L42) |
-| ScanRoots | method_declaration | PinDock::InstalledAppsService | [48](../../src/PinDock/InstalledAppsService.cs#L48) |
-| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [70](../../src/PinDock/InstalledAppsService.cs#L70) |
-| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [101](../../src/PinDock/InstalledAppsService.cs#L101) |
+| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/InstalledAppsService.cs#L4) |
+| InstalledAppsService | class_declaration | PinDock | [8](../../src/PinDock/InstalledAppsService.cs#L8) |
+| InstalledAppsService | constructor_declaration | PinDock::InstalledAppsService | [21](../../src/PinDock/InstalledAppsService.cs#L21) |
+| GetInstalledApps | method_declaration | PinDock::InstalledAppsService | [26](../../src/PinDock/InstalledAppsService.cs#L26) |
+| MergePackagedApps | method_declaration | PinDock::InstalledAppsService | [53](../../src/PinDock/InstalledAppsService.cs#L53) |
+| DiscoverFromDirectories | method_declaration | PinDock::InstalledAppsService | [63](../../src/PinDock/InstalledAppsService.cs#L63) |
+| ScanRoots | method_declaration | PinDock::InstalledAppsService | [69](../../src/PinDock/InstalledAppsService.cs#L69) |
+| EnumerateCandidateFiles | method_declaration | PinDock::InstalledAppsService | [91](../../src/PinDock/InstalledAppsService.cs#L91) |
+| ShouldIgnore | method_declaration | PinDock::InstalledAppsService | [122](../../src/PinDock/InstalledAppsService.cs#L122) |

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkLauncher.cs) · page 1/1
 
-Source SHA-256: 4309c0f34483b585867d1fc25826ee5a668b1fc35cb8a32c21c96b70784cd1f6
+Source SHA-256: 363945e99183efd210f7863215bb6b63b43f31ae6a01cacdd9cdd73790a44847
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |

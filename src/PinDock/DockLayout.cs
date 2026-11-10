@@ -18,20 +18,73 @@ public readonly record struct DockPlacement(ScreenRect Bounds, int Capacity, Scr
 
 public static class DockLayout
 {
-    public const int MaxPinnedVisible = 9;
-    public const int UtilitySlots = 5;
+    public const int MinIconPixels = 32;
     public const double HandleThickness = 3;
     public const double DockGap = 9;
     public const double DockMargin = 18;
 
+    private const double ChromePadding = 24;
+    private const double LabelExtra = 16;
+    private const double LabelGap = 10;
+    private const double VerticalLabelExtra = 20;
+    private const double SeparatorExtent = 10;
+    private const double CustomSeparatorExtent = 19;
+
     public static int IconPixels(IconSize size) => (int)size;
 
-    public static int ComputeCapacity(double availableAlongEdge, double iconSize)
+    /// <summary>
+    /// 按屏幕可用空间计算能完整显示的固定项数量。与 macOS Dock 一样优先展示全部固定项，
+    /// 仅在图标缩到下限仍放不下时才把末尾项目移入「更多」。
+    /// </summary>
+    public static int FitPinnedCount(
+        int pinnedCount,
+        int groupCount,
+        int customSeparatorCount,
+        bool utilityCollapsed,
+        bool showLabels,
+        bool vertical,
+        double availablePixels,
+        double iconPixels,
+        double dpiScale)
     {
-        double unit = iconSize + DockGap;
-        int capacity = (int)Math.Floor((availableAlongEdge - DockMargin * 2) / unit) - UtilitySlots;
-        return Math.Clamp(capacity, 1, MaxPinnedVisible);
+        if (pinnedCount <= 0) return 0;
+
+        double item = ItemExtent(iconPixels, showLabels, vertical);
+        double drawer = Math.Max(28, iconPixels * 0.58) + DockGap;
+        double customSeparators = customSeparatorCount * CustomSeparatorExtent;
+
+        for (int visible = pinnedCount; visible >= 1; visible--)
+        {
+            int overflow = pinnedCount - visible;
+            int utilities = (utilityCollapsed ? 0 : 3) + (overflow > 0 ? 1 : 0);
+            bool hasMain = visible + groupCount + customSeparatorCount > 0;
+
+            int separators = 0;
+            if (hasMain && utilities > 0) separators++;
+            if (hasMain && utilityCollapsed) separators++;
+            if (customSeparatorCount == 0 && visible > 0 && groupCount > 0) separators++;
+
+            // 最后一个元素的外边距会被清零，这里扣除对应间隙。
+            double content = ChromePadding
+                + visible * item
+                + groupCount * item
+                + utilities * item
+                + drawer
+                + customSeparators
+                + separators * SeparatorExtent
+                - DockGap;
+
+            if (content * dpiScale + DockMargin * 2 <= availablePixels)
+                return visible;
+        }
+
+        return 1;
     }
+
+    private static double ItemExtent(double iconPixels, bool showLabels, bool vertical) =>
+        vertical
+            ? iconPixels + (showLabels ? VerticalLabelExtra + DockGap : DockGap)
+            : iconPixels + (showLabels ? LabelExtra + LabelGap : DockGap);
 
     public static ScreenRect Fit(ScreenRect workArea, DockEdge edge, double width, double height, double edgeOffset, bool lockPosition)
     {

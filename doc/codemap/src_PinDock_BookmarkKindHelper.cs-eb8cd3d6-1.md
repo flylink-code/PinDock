@@ -4,11 +4,11 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkKindHelper.cs) · page 1/1
 
-Source SHA-256: b1c90f104572baba63de4f3dc2f06adbb4b731d300e72527adddb77212ad27b2
+Source SHA-256: eb171af82c68d7618b4656d18d80c457aa03c1624ee668221f9e3e27b1450c04
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/BookmarkKindHelper.cs#L3) |
 | BookmarkKindHelper | class_declaration | PinDock | [5](../../src/PinDock/BookmarkKindHelper.cs#L5) |
 | FromPath | method_declaration | PinDock::BookmarkKindHelper | [7](../../src/PinDock/BookmarkKindHelper.cs#L7) |
-| ToDisplayName | method_declaration | PinDock::BookmarkKindHelper | [20](../../src/PinDock/BookmarkKindHelper.cs#L20) |
+| ToDisplayName | method_declaration | PinDock::BookmarkKindHelper | [22](../../src/PinDock/BookmarkKindHelper.cs#L22) |

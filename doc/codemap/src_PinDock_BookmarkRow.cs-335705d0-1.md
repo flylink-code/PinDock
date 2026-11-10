@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkRow.cs) · page 1/1
 
-Source SHA-256: a3ec7216084012d7d5bcf47338b8b350ad7e0ad15de9e162085714e33a4903e6
+Source SHA-256: ca5bdcd28a63c5e203309f90522228306adecdbcc049e8f70f910710ac620dd8
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -18,9 +18,9 @@ Source SHA-256: a3ec7216084012d7d5bcf47338b8b350ad7e0ad15de9e162085714e33a4903e6
 | Kind | property_declaration | PinDock::BookmarkRow | [16](../../src/PinDock/BookmarkRow.cs#L16) |
 | FallbackGlyph | property_declaration | PinDock::BookmarkRow | [18](../../src/PinDock/BookmarkRow.cs#L18) |
 | Subtitle | property_declaration | PinDock::BookmarkRow | [25](../../src/PinDock/BookmarkRow.cs#L25) |
-| PinLabel | property_declaration | PinDock::BookmarkRow | [29](../../src/PinDock/BookmarkRow.cs#L29) |
-| IsPinnedOrCandidate | property_declaration | PinDock::BookmarkRow | [33](../../src/PinDock/BookmarkRow.cs#L33) |
-| SavedActionsVisibility | property_declaration | PinDock::BookmarkRow | [35](../../src/PinDock/BookmarkRow.cs#L35) |
-| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [39](../../src/PinDock/BookmarkRow.cs#L39) |
-| NotifyPinChanged | method_declaration | PinDock::BookmarkRow | [47](../../src/PinDock/BookmarkRow.cs#L47) |
-| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [55](../../src/PinDock/BookmarkRow.cs#L55) |
+| PinLabel | property_declaration | PinDock::BookmarkRow | [37](../../src/PinDock/BookmarkRow.cs#L37) |
+| IsPinnedOrCandidate | property_declaration | PinDock::BookmarkRow | [41](../../src/PinDock/BookmarkRow.cs#L41) |
+| SavedActionsVisibility | property_declaration | PinDock::BookmarkRow | [43](../../src/PinDock/BookmarkRow.cs#L43) |
+| BookmarkRow | constructor_declaration | PinDock::BookmarkRow | [47](../../src/PinDock/BookmarkRow.cs#L47) |
+| NotifyPinChanged | method_declaration | PinDock::BookmarkRow | [55](../../src/PinDock/BookmarkRow.cs#L55) |
+| LoadIconAsync | method_declaration | PinDock::BookmarkRow | [63](../../src/PinDock/BookmarkRow.cs#L63) |

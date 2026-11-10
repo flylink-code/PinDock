@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AppSettings.cs) · page 1/1
 
-Source SHA-256: fea295c45ed546accd0f235b807f55691a377417d9f3dfaa6268285a097cd384
+Source SHA-256: 772fc0d4a5f4e13d3e27b140a4b7fe0f442d328964d5c73a2593fc0afcaeb2b9
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -28,6 +28,12 @@ Source SHA-256: fea295c45ed546accd0f235b807f55691a377417d9f3dfaa6268285a097cd384
 | Sand | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
 | Clay | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
 | Graphite | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacBlue | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacPurple | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacPink | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacOrange | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacGreen | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
+| MacGraphite | enum_member_declaration | PinDock::Palette | [6](../../src/PinDock/AppSettings.cs#L6) |
 | MonitorPolicy | enum_declaration | PinDock | [7](../../src/PinDock/AppSettings.cs#L7) |
 | Fixed | enum_member_declaration | PinDock::MonitorPolicy | [7](../../src/PinDock/AppSettings.cs#L7) |
 | Primary | enum_member_declaration | PinDock::MonitorPolicy | [7](../../src/PinDock/AppSettings.cs#L7) |

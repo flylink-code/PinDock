@@ -6,6 +6,8 @@ public static class BookmarkKindHelper
 {
     public static BookmarkKind FromPath(string path)
     {
+        if (PackagedApps.IsPackagedPath(path))
+            return BookmarkKind.Application;
         if (Directory.Exists(path) || path.EndsWith(Path.DirectorySeparatorChar) || path.EndsWith(Path.AltDirectorySeparatorChar))
             return BookmarkKind.Folder;
         string extension = Path.GetExtension(path);

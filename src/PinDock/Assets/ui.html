@@ -34,6 +34,38 @@ body[data-palette="graphite"] {
   --line: #dce0e4; --soft: #e2e7eb; --selected: #eceff2;
 }
 
+/* macOS 系统强调色：中性灰底 + 系统圆角风格强调色 */
+body[data-palette="macblue"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #007aff; --soft: #ececf1; --selected: #e3efff;
+  --input-bg: #ffffffcc; --focus-ring: #007aff;
+}
+body[data-palette="macpurple"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #af52de; --soft: #ececf1; --selected: #f3e9fb;
+  --input-bg: #ffffffcc; --focus-ring: #af52de;
+}
+body[data-palette="macpink"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #ff2d55; --soft: #ececf1; --selected: #ffe7ec;
+  --input-bg: #ffffffcc; --focus-ring: #ff2d55;
+}
+body[data-palette="macorange"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #ff9500; --soft: #ececf1; --selected: #fff0dc;
+  --input-bg: #ffffffcc; --focus-ring: #e08200;
+}
+body[data-palette="macgreen"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #34c759; --soft: #ececf1; --selected: #e5f8ea;
+  --input-bg: #ffffffcc; --focus-ring: #1f9e44;
+}
+body[data-palette="macgraphite"] {
+  --ink: #1d1d1f; --muted: #6e6e73; --paper: #f5f5f7; --line: #d8d8de;
+  --accent: #8e8e93; --soft: #ececf1; --selected: #ececef;
+  --input-bg: #ffffffcc; --focus-ring: #8e8e93;
+}
+
 /* 深色主题：对齐 preview-v2 清爽现代深色蓝灰/曜石基底 + 主题强调色 */
 body.dark {
   --ink: #e6eef4;
@@ -61,6 +93,36 @@ body.dark[data-palette="clay"] {
 body.dark[data-palette="graphite"] {
   --ink: #e8ecef; --muted: #9aa4ad; --paper: #1f2327; --line: #333940;
   --soft: #2b3137; --selected: #272c32; --accent: #9cb4c9;
+}
+body.dark[data-palette="macblue"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #0a84ff; --soft: #2c2c2e; --selected: #17293f;
+  --input-bg: #2c2c2e; --focus-ring: #0a84ff;
+}
+body.dark[data-palette="macpurple"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #bf5af2; --soft: #2c2c2e; --selected: #281c33;
+  --input-bg: #2c2c2e; --focus-ring: #bf5af2;
+}
+body.dark[data-palette="macpink"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #ff375f; --soft: #2c2c2e; --selected: #331a22;
+  --input-bg: #2c2c2e; --focus-ring: #ff375f;
+}
+body.dark[data-palette="macorange"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #ff9f0a; --soft: #2c2c2e; --selected: #332416;
+  --input-bg: #2c2c2e; --focus-ring: #ff9f0a;
+}
+body.dark[data-palette="macgreen"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #30d158; --soft: #2c2c2e; --selected: #162a1d;
+  --input-bg: #2c2c2e; --focus-ring: #30d158;
+}
+body.dark[data-palette="macgraphite"] {
+  --ink: #f5f5f7; --muted: #a1a1a6; --paper: #1c1c1e; --line: #38383a;
+  --accent: #98989d; --soft: #2c2c2e; --selected: #2a2a2d;
+  --input-bg: #2c2c2e; --focus-ring: #98989d;
 }
 
 * { box-sizing: border-box; user-select: none; -webkit-user-drag: none; }
@@ -94,7 +156,11 @@ input:focus-visible, select:focus-visible, .key-btn:focus-visible {
 
 .app-shell {
   width: 100vw; height: 100vh; display: flex; flex-direction: column;
-  background: var(--paper); position: relative;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 88%, white 12%), var(--paper) 280px);
+  position: relative;
+}
+body.dark .app-shell {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 94%, white 6%), var(--paper) 280px);
 }
 .view { display: none; width: 100%; height: 100%; flex-direction: column; }
 .view.active { display: flex; }
@@ -365,6 +431,24 @@ input[type="range"] {
   width: 100%; min-width: 0; padding: 8px 11px; border: 1px solid var(--line); border-radius: 7px;
   background: var(--input-bg); color: var(--ink); font-size: 12px; user-select: text;
 }
+.app-picker-list {
+  max-height: 208px; overflow-y: auto; overflow-x: hidden;
+  border: 1px solid var(--line); border-radius: 7px; background: var(--input-bg);
+  padding: 4px; display: flex; flex-direction: column; gap: 1px;
+}
+.app-picker-item {
+  display: flex; align-items: baseline; gap: 8px; padding: 7px 9px;
+  border-radius: 6px; cursor: pointer; font-size: 12px; min-width: 0;
+}
+.app-picker-item:hover, .app-picker-item.active { background: var(--soft); }
+.app-picker-item strong {
+  font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; max-width: 55%;
+}
+.app-picker-item small {
+  color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; flex: 1; min-width: 0;
+}
+.app-picker-empty { padding: 10px; color: var(--muted); font-size: 12px; text-align: center; }
 .member-checklist {
   max-height: 220px; overflow-y: auto; overflow-x: hidden;
   border: 1px solid var(--line); border-radius: 8px; background: var(--input-bg);
@@ -383,8 +467,10 @@ input[type="range"] {
   color: #e05a4f; font-size: 12px; font-weight: 500; margin-right: auto;
 }
 .primary-btn {
-  padding: 8px 16px; border-radius: 7px; background: var(--accent);
+  padding: 8px 16px; border-radius: 7px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 86%, white 14%), var(--accent));
   color: var(--paper); font-size: 12px; font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 1px 2px rgba(0, 0, 0, .10);
 }
 .modal-footer {
   padding: 12px 22px; border-top: 1px solid var(--line);
@@ -544,6 +630,15 @@ input[type="range"] {
             <button class="swatch" data-palette-choice="Sand" style="--chip:#b5925e"><i></i>暖砂</button>
             <button class="swatch" data-palette-choice="Clay" style="--chip:#bc7a60"><i></i>陶土</button>
             <button class="swatch" data-palette-choice="Graphite" style="--chip:#6b7a86"><i></i>石墨</button>
+          </div>
+          <div class="section-label">macOS 风格 · 系统强调色</div>
+          <div class="swatches" role="group" aria-label="macOS 配色方案">
+            <button class="swatch" data-palette-choice="MacBlue" style="--chip:#007aff" title="macOS 系统蓝"><i></i>系统蓝</button>
+            <button class="swatch" data-palette-choice="MacPurple" style="--chip:#af52de" title="macOS 系统紫"><i></i>梦幻紫</button>
+            <button class="swatch" data-palette-choice="MacPink" style="--chip:#ff2d55" title="macOS 系统粉"><i></i>樱花粉</button>
+            <button class="swatch" data-palette-choice="MacOrange" style="--chip:#ff9500" title="macOS 系统橙"><i></i>活力橙</button>
+            <button class="swatch" data-palette-choice="MacGreen" style="--chip:#34c759" title="macOS 系统绿"><i></i>清爽绿</button>
+            <button class="swatch" data-palette-choice="MacGraphite" style="--chip:#8e8e93" title="macOS 石墨灰"><i></i>中性灰</button>
           </div>
           <div class="row">
             <span>主题</span>
@@ -750,12 +845,11 @@ input[type="range"] {
       <button class="close-btn" id="btn-close-editor">×</button>
     </div>
     <div class="modal-body">
-      <label class="field-label" id="quick-app-wrap">
+      <div class="field-label" id="quick-app-wrap">
         <span>从本机已安装软件快速填充</span>
-        <select id="editor-installed-select" class="field-input">
-          <option value="">— 选择开始菜单 / 桌面已安装应用 —</option>
-        </select>
-      </label>
+        <input class="field-input" id="editor-app-search" placeholder="输入名称搜索本机已安装软件…" autocomplete="off" spellcheck="false">
+        <div class="app-picker-list" id="editor-app-list" hidden></div>
+      </div>
       <label class="field-label">
         <span>目标路径</span>
         <div class="field-row">
@@ -955,6 +1049,9 @@ function isEn() {
 function tr(zh, en) {
   return isEn() ? en : zh;
 }
+function isPackagedPath(path) {
+  return (path || '').toLowerCase().startsWith('shell:appsfolder\\');
+}
 
 function switchView(viewName, options = {}) {
   state.view = viewName;
@@ -1115,19 +1212,24 @@ function renderLibrary() {
     const strong = document.createElement('strong');
     strong.textContent = item.name;
     const small = document.createElement('small');
-    small.textContent = (item.group || item.kind) + ' · ' + item.path;
+    const targetText = isPackagedPath(item.path)
+      ? (item.isCandidate ? '' : tr('开始菜单应用', 'Start menu app'))
+      : item.path;
+    small.textContent = (item.group || item.kind) + (targetText ? ' · ' + targetText : '');
     mainBtn.append(strong, small);
     mainBtn.onclick = () => send('launch', { path: item.path, id: item.id });
 
     const actions = document.createElement('div');
     actions.className = 'entry-actions';
 
-    const revealBtn = document.createElement('button');
-    revealBtn.className = 'row-act';
-    revealBtn.textContent = tr('定位', 'Reveal');
-    revealBtn.title = tr('在资源管理器中显示', 'Show in Explorer');
-    revealBtn.onclick = () => send('reveal', { path: item.path });
-    actions.append(revealBtn);
+    if (!isPackagedPath(item.path)) {
+      const revealBtn = document.createElement('button');
+      revealBtn.className = 'row-act';
+      revealBtn.textContent = tr('定位', 'Reveal');
+      revealBtn.title = tr('在资源管理器中显示', 'Show in Explorer');
+      revealBtn.onclick = () => send('reveal', { path: item.path });
+      actions.append(revealBtn);
+    }
 
     if (!item.isCandidate) {
       const editBtn = document.createElement('button');
@@ -1319,14 +1421,7 @@ function openEditor(item = null) {
   updateEditorCustomIconPreview($('#editor-custom-icon-path').value);
   updateEditorIconKindVisibility();
 
-  const sel = $('#editor-installed-select');
-  sel.innerHTML = '<option value="">— 选择开始菜单 / 桌面已安装应用 —</option>';
-  state.installedApps.forEach((app, idx) => {
-    const opt = document.createElement('option');
-    opt.value = String(idx);
-    opt.textContent = `${app.name} (${app.category})`;
-    sel.append(opt);
-  });
+  resetAppPicker();
 
   const dl = $('#group-datalist');
   dl.innerHTML = '';
@@ -1340,14 +1435,108 @@ function openEditor(item = null) {
   $('#editor-path').focus();
 }
 
-$('#editor-installed-select').onchange = e => {
-  const idx = parseInt(e.target.value, 10);
-  if (!isNaN(idx) && state.installedApps[idx]) {
-    const app = state.installedApps[idx];
-    $('#editor-name').value = app.name;
-    $('#editor-path').value = app.path;
+// 已安装软件搜索选择器
+let appPickerMatches = [];
+let appPickerActive = -1;
+
+function closeAppPicker() {
+  $('#editor-app-list').hidden = true;
+  appPickerActive = -1;
+}
+
+function resetAppPicker() {
+  $('#editor-app-search').value = '';
+  $('#editor-app-list').innerHTML = '';
+  closeAppPicker();
+}
+
+function renderAppPicker() {
+  const list = $('#editor-app-list');
+  const query = $('#editor-app-search').value.trim().toLowerCase();
+  const terms = query ? query.split(/\s+/) : [];
+
+  appPickerMatches = state.installedApps.filter(app => {
+    if (terms.length === 0) return true;
+    const haystack = `${app.name} ${app.path} ${app.category || ''}`.toLowerCase();
+    return terms.every(term => haystack.includes(term));
+  }).slice(0, 60);
+
+  list.innerHTML = '';
+  if (appPickerMatches.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'app-picker-empty';
+    empty.textContent = state.installedApps.length === 0
+      ? tr('未检测到已安装软件', 'No installed apps detected')
+      : tr('没有匹配的已安装软件', 'No matching installed apps');
+    list.append(empty);
+  } else {
+    appPickerMatches.forEach((app, idx) => {
+      const row = document.createElement('div');
+      row.className = 'app-picker-item';
+      row.dataset.idx = String(idx);
+      row.title = app.path;
+      const name = document.createElement('strong');
+      name.textContent = app.name;
+      const sub = document.createElement('small');
+      sub.textContent = isPackagedPath(app.path)
+        ? tr('Microsoft Store 应用', 'Microsoft Store app')
+        : app.path;
+      row.append(name, sub);
+      list.append(row);
+    });
+  }
+
+  appPickerActive = -1;
+  list.hidden = false;
+}
+
+function fillFromInstalledApp(app) {
+  $('#editor-name').value = app.name;
+  $('#editor-path').value = app.path;
+  closeAppPicker();
+}
+
+$('#editor-app-search').oninput = renderAppPicker;
+$('#editor-app-search').onfocus = renderAppPicker;
+$('#editor-app-search').onkeydown = e => {
+  if (e.key === 'Escape') {
+    closeAppPicker();
+    return;
+  }
+  if ($('#editor-app-list').hidden) return;
+
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const count = appPickerMatches.length;
+    if (count === 0) return;
+    appPickerActive = e.key === 'ArrowDown'
+      ? (appPickerActive + 1) % count
+      : (appPickerActive - 1 + count) % count;
+    $$('#editor-app-list .app-picker-item').forEach((row, idx) =>
+      row.classList.toggle('active', idx === appPickerActive));
+    const active = $('#editor-app-list .app-picker-item.active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+    return;
+  }
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const app = appPickerMatches[appPickerActive >= 0 ? appPickerActive : 0];
+    if (app) fillFromInstalledApp(app);
   }
 };
+
+$('#editor-app-list').onmousedown = e => {
+  const row = e.target.closest('.app-picker-item');
+  if (!row) return;
+  e.preventDefault();
+  const app = appPickerMatches[Number(row.dataset.idx)];
+  if (app) fillFromInstalledApp(app);
+};
+
+document.addEventListener('mousedown', e => {
+  if (!e.target.closest('#quick-app-wrap')) closeAppPicker();
+});
 $('#btn-open-add').onclick = () => openEditor(null);
 $('#btn-close-editor').onclick = () => $('#modal-editor').classList.remove('open');
 $('#btn-cancel-editor').onclick = () => $('#modal-editor').classList.remove('open');

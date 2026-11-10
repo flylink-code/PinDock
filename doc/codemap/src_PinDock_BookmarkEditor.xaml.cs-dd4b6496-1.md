@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/BookmarkEditor.xaml.cs) · page 1/1
 
-Source SHA-256: 9c8d66ecd7d2cd4e6931e87e45511dd1a2f73c1ab7bbe351bd91f23ccffbd5f2
+Source SHA-256: 5b81f08cc00d9545085e2496b99e6d8e38b6765ce6b2422ae7aa3e0fe766a0a7
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -18,4 +18,4 @@ Source SHA-256: 9c8d66ecd7d2cd4e6931e87e45511dd1a2f73c1ab7bbe351bd91f23ccffbd5f2
 | Window_Drop | method_declaration | PinDock::BookmarkEditor | [79](../../src/PinDock/BookmarkEditor.xaml.cs#L79) |
 | ApplyPickedPath | method_declaration | PinDock::BookmarkEditor | [85](../../src/PinDock/BookmarkEditor.xaml.cs#L85) |
 | SuggestDisplayName | method_declaration | PinDock::BookmarkEditor | [92](../../src/PinDock/BookmarkEditor.xaml.cs#L92) |
-| Save_Click | method_declaration | PinDock::BookmarkEditor | [111](../../src/PinDock/BookmarkEditor.xaml.cs#L111) |
+| Save_Click | method_declaration | PinDock::BookmarkEditor | [113](../../src/PinDock/BookmarkEditor.xaml.cs#L113) |

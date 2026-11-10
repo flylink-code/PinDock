@@ -6,10 +6,10 @@ Read AGENTS.md → [hubs](codemap/hubs.md) → module → file/symbol page → s
 
 | Module | Files | Symbols | Map |
 | --- | ---: | ---: | --- |
-| app | 54 | 781 | [open](codemap/app.md) |
+| app | 55 | 816 | [open](codemap/app.md) |
 | tests | 1 | 0 | [open](codemap/tests.md) |
 | tooling | 1 | 319 | [open](codemap/tooling.md) |
 
-Total: 56 source files, 1100 extracted symbols, 81 parser diagnostics; import edges 0 resolved / 0 ambiguous / 7 unresolved.
+Total: 57 source files, 1135 extracted symbols, 81 parser diagnostics; import edges 0 resolved / 0 ambiguous / 7 unresolved.
 
 Scope includes Rust/TS/JS declarations; excludes imports, parameters, runtime/macro-generated symbols. Shell/PowerShell/BAT use lexical navigation.

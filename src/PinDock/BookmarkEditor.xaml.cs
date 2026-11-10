@@ -92,6 +92,8 @@ public partial class BookmarkEditor : CardWindowBase
     public static string SuggestDisplayName(string fullPath)
     {
         string trimmed = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (PackagedApps.IsPackagedPath(trimmed))
+            return PackagedApps.TryGetDisplayName(trimmed) ?? trimmed[PackagedApps.PathPrefix.Length..];
         if (Directory.Exists(trimmed))
         {
             string folderName = Path.GetFileName(trimmed);

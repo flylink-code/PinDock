@@ -3,7 +3,7 @@ namespace PinDock;
 public enum DockEdge { Bottom, Top, Left, Right }
 public enum DisplayMode { Persistent, Hotkey, EdgeAutoHide }
 public enum ThemeMode { Light, Dark, System }
-public enum Palette { Forest, Ocean, Sand, Clay, Graphite }
+public enum Palette { Forest, Ocean, Sand, Clay, Graphite, MacBlue, MacPurple, MacPink, MacOrange, MacGreen, MacGraphite }
 public enum MonitorPolicy { Fixed, Primary, FollowCursor }
 public enum IconSize { Compact = 38, Standard = 46, Comfortable = 56 }
 public enum CloseAction { MinimizeToTray, ExitApplication }

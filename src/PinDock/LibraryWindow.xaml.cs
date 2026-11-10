@@ -189,9 +189,12 @@ public partial class LibraryWindow : CardWindowBase
         pinItem.Click += (_, _) => Pin_Click(sender, e);
         menu.Items.Add(pinItem);
 
-        var revealItem = new MenuItem { Header = "在资源管理器中显示" };
-        revealItem.Click += (_, _) => RevealInExplorer(row.Bookmark.Path);
-        menu.Items.Add(revealItem);
+        if (!PackagedApps.IsPackagedPath(row.Bookmark.Path))
+        {
+            var revealItem = new MenuItem { Header = "在资源管理器中显示" };
+            revealItem.Click += (_, _) => RevealInExplorer(row.Bookmark.Path);
+            menu.Items.Add(revealItem);
+        }
 
         if (!row.IsInstalledCandidate)
         {

@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/DockLayout.cs) · page 1/1
 
-Source SHA-256: d065f91b47effef648772c0bf445bde03b2a398724efa30aefb01af8a2d2d716
+Source SHA-256: fb0ef4a6e5cb2538156da5fdc5f1000a53c890967d239079e7e3bb19d7a79be4
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,8 +12,9 @@ Source SHA-256: d065f91b47effef648772c0bf445bde03b2a398724efa30aefb01af8a2d2d716
 | Contains | method_declaration | PinDock | [5](../../src/PinDock/DockLayout.cs#L5) |
 | Union | method_declaration | PinDock | [7](../../src/PinDock/DockLayout.cs#L7) |
 | DockLayout | class_declaration | PinDock | [19](../../src/PinDock/DockLayout.cs#L19) |
-| IconPixels | method_declaration | PinDock::DockLayout | [27](../../src/PinDock/DockLayout.cs#L27) |
-| ComputeCapacity | method_declaration | PinDock::DockLayout | [29](../../src/PinDock/DockLayout.cs#L29) |
-| Fit | method_declaration | PinDock::DockLayout | [36](../../src/PinDock/DockLayout.cs#L36) |
-| EdgeHandleFor | method_declaration | PinDock::DockLayout | [66](../../src/PinDock/DockLayout.cs#L66) |
-| ClampEdgeOffset | method_declaration | PinDock::DockLayout | [83](../../src/PinDock/DockLayout.cs#L83) |
+| IconPixels | method_declaration | PinDock::DockLayout | [33](../../src/PinDock/DockLayout.cs#L33) |
+| FitPinnedCount | method_declaration | PinDock::DockLayout | [39](../../src/PinDock/DockLayout.cs#L39) |
+| ItemExtent | method_declaration | PinDock::DockLayout | [84](../../src/PinDock/DockLayout.cs#L84) |
+| Fit | method_declaration | PinDock::DockLayout | [89](../../src/PinDock/DockLayout.cs#L89) |
+| EdgeHandleFor | method_declaration | PinDock::DockLayout | [119](../../src/PinDock/DockLayout.cs#L119) |
+| ClampEdgeOffset | method_declaration | PinDock::DockLayout | [136](../../src/PinDock/DockLayout.cs#L136) |

@@ -4,12 +4,13 @@
 
 [Module](app.md) · [Source](../../src/PinDock/Palettes.cs) · page 1/1
 
-Source SHA-256: 0ecd538ec64e341d25cc3a4772b3d0d49e3840da86b07d4a5501b4909d6454de
+Source SHA-256: e32b4b09a1ffc25946e9ef8ab032a9e4fd35d938a25243defae637821bc681b5
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [3](../../src/PinDock/Palettes.cs#L3) |
 | Palettes | class_declaration | PinDock | [21](../../src/PinDock/Palettes.cs#L21) |
 | Resolve | method_declaration | PinDock::Palettes | [23](../../src/PinDock/Palettes.cs#L23) |
-| C | method_declaration | PinDock::Palettes | [38](../../src/PinDock/Palettes.cs#L38) |
-| Parse | method_declaration | PinDock::Palettes | [59](../../src/PinDock/Palettes.cs#L59) |
+| C | method_declaration | PinDock::Palettes | [52](../../src/PinDock/Palettes.cs#L52) |
+| Mix | method_declaration | PinDock::Palettes | [77](../../src/PinDock/Palettes.cs#L77) |
+| Parse | method_declaration | PinDock::Palettes | [83](../../src/PinDock/Palettes.cs#L83) |

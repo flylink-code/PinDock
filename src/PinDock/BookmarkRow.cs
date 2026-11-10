@@ -22,9 +22,17 @@ public sealed class BookmarkRow : INotifyPropertyChanged
         _ => "▤"
     };
 
-    public string Subtitle => IsInstalledCandidate
-        ? $"本机已安装（{CandidateCategory}） · {Bookmark.Path}"
-        : $"{(Bookmark.Group.Length == 0 ? BookmarkKindHelper.ToDisplayName(Kind) : Bookmark.Group)} · {Bookmark.Path}";
+    public string Subtitle
+    {
+        get
+        {
+            bool packaged = PackagedApps.IsPackagedPath(Bookmark.Path);
+            if (IsInstalledCandidate)
+                return packaged ? $"本机已安装（{CandidateCategory}）" : $"本机已安装（{CandidateCategory}） · {Bookmark.Path}";
+            string badge = Bookmark.Group.Length == 0 ? BookmarkKindHelper.ToDisplayName(Kind) : Bookmark.Group;
+            return $"{badge} · {(packaged ? "开始菜单应用" : Bookmark.Path)}";
+        }
+    }
 
     public string PinLabel => IsInstalledCandidate
         ? "＋ 固定到 Dock"
