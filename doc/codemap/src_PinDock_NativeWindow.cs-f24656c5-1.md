@@ -4,20 +4,21 @@
 
 [Module](app.md) · [Source](../../src/PinDock/NativeWindow.cs) · page 1/1
 
-Source SHA-256: ec5662ea5785ee3acf2811738849eacf890af7fb9a3aa7f049e57b175a44a752
+Source SHA-256: 590bdcea199f5988c4bd8d29b52bf43297c7aa8c5a1a6e3fa8357f85d471fc30
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/NativeWindow.cs#L5) |
 | NativeWindow | class_declaration | PinDock | [7](../../src/PinDock/NativeWindow.cs#L7) |
-| HideFromAltTab | method_declaration | PinDock::NativeWindow | [16](../../src/PinDock/NativeWindow.cs#L16) |
-| GetPixelBounds | method_declaration | PinDock::NativeWindow | [24](../../src/PinDock/NativeWindow.cs#L24) |
-| MoveTo | method_declaration | PinDock::NativeWindow | [32](../../src/PinDock/NativeWindow.cs#L32) |
-| SetBounds | method_declaration | PinDock::NativeWindow | [39](../../src/PinDock/NativeWindow.cs#L39) |
-| EnableHardwareRoundedCorners | method_declaration | PinDock::NativeWindow | [46](../../src/PinDock/NativeWindow.cs#L46) |
-| Rect | struct_declaration | PinDock::NativeWindow | [53](../../src/PinDock/NativeWindow.cs#L53) |
-| DwmSetWindowAttribute | method_declaration | PinDock::NativeWindow | [56](../../src/PinDock/NativeWindow.cs#L56) |
-| GetWindowLong | method_declaration | PinDock::NativeWindow | [59](../../src/PinDock/NativeWindow.cs#L59) |
-| SetWindowLong | method_declaration | PinDock::NativeWindow | [62](../../src/PinDock/NativeWindow.cs#L62) |
-| GetWindowRect | method_declaration | PinDock::NativeWindow | [65](../../src/PinDock/NativeWindow.cs#L65) |
-| SetWindowPos | method_declaration | PinDock::NativeWindow | [69](../../src/PinDock/NativeWindow.cs#L69) |
+| HideFromAltTab | method_declaration | PinDock::NativeWindow | [19](../../src/PinDock/NativeWindow.cs#L19) |
+| GetPixelBounds | method_declaration | PinDock::NativeWindow | [27](../../src/PinDock/NativeWindow.cs#L27) |
+| MoveTo | method_declaration | PinDock::NativeWindow | [35](../../src/PinDock/NativeWindow.cs#L35) |
+| SetBounds | method_declaration | PinDock::NativeWindow | [42](../../src/PinDock/NativeWindow.cs#L42) |
+| SetTopmost | method_declaration | PinDock::NativeWindow | [53](../../src/PinDock/NativeWindow.cs#L53) |
+| EnableHardwareRoundedCorners | method_declaration | PinDock::NativeWindow | [60](../../src/PinDock/NativeWindow.cs#L60) |
+| Rect | struct_declaration | PinDock::NativeWindow | [67](../../src/PinDock/NativeWindow.cs#L67) |
+| DwmSetWindowAttribute | method_declaration | PinDock::NativeWindow | [70](../../src/PinDock/NativeWindow.cs#L70) |
+| GetWindowLong | method_declaration | PinDock::NativeWindow | [73](../../src/PinDock/NativeWindow.cs#L73) |
+| SetWindowLong | method_declaration | PinDock::NativeWindow | [76](../../src/PinDock/NativeWindow.cs#L76) |
+| GetWindowRect | method_declaration | PinDock::NativeWindow | [79](../../src/PinDock/NativeWindow.cs#L79) |
+| SetWindowPos | method_declaration | PinDock::NativeWindow | [83](../../src/PinDock/NativeWindow.cs#L83) |

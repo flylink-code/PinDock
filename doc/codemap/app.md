@@ -38,7 +38,7 @@
 | [src/PinDock/LibraryTransfer.cs](../../src/PinDock/LibraryTransfer.cs) | 8 | [1](src_PinDock_LibraryTransfer.cs-dd166fb2-1.md) |
 | [src/PinDock/LibraryWindow.xaml.cs](../../src/PinDock/LibraryWindow.xaml.cs) | 19 | [1](src_PinDock_LibraryWindow.xaml.cs-cad84c65-1.md) |
 | [src/PinDock/MonitorInfo.cs](../../src/PinDock/MonitorInfo.cs) | 11 | [1](src_PinDock_MonitorInfo.cs-aa141772-1.md) |
-| [src/PinDock/NativeWindow.cs](../../src/PinDock/NativeWindow.cs) | 13 | [1](src_PinDock_NativeWindow.cs-f24656c5-1.md) |
+| [src/PinDock/NativeWindow.cs](../../src/PinDock/NativeWindow.cs) | 14 | [1](src_PinDock_NativeWindow.cs-f24656c5-1.md) |
 | [src/PinDock/PackagedApps.cs](../../src/PinDock/PackagedApps.cs) | 18 | [1](src_PinDock_PackagedApps.cs-de31c883-1.md) |
 | [src/PinDock/Palettes.cs](../../src/PinDock/Palettes.cs) | 6 | [1](src_PinDock_Palettes.cs-db761e61-1.md) |
 | [src/PinDock/PromptDialog.xaml.cs](../../src/PinDock/PromptDialog.xaml.cs) | 5 | [1](src_PinDock_PromptDialog.xaml.cs-865af51d-1.md) |

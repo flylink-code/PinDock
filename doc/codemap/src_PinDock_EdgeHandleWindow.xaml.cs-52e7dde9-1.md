@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/EdgeHandleWindow.xaml.cs) · page 1/1
 
-Source SHA-256: f59cc953f0d918df58648330127ea36a1b0a9a871447d0d17bfec5b787fad4d5
+Source SHA-256: 0968875b109357416e5df3fb5359b61e28806a37ce71128b7ed917e16b6a1532
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,5 +12,5 @@ Source SHA-256: f59cc953f0d918df58648330127ea36a1b0a9a871447d0d17bfec5b787fad4d5
 | EdgeHandleWindow | class_declaration | PinDock | [5](../../src/PinDock/EdgeHandleWindow.xaml.cs#L5) |
 | EdgeHandleWindow | constructor_declaration | PinDock::EdgeHandleWindow | [9](../../src/PinDock/EdgeHandleWindow.xaml.cs#L9) |
 | ShowAt | method_declaration | PinDock::EdgeHandleWindow | [15](../../src/PinDock/EdgeHandleWindow.xaml.cs#L15) |
-| Window_MouseEnter | method_declaration | PinDock::EdgeHandleWindow | [22](../../src/PinDock/EdgeHandleWindow.xaml.cs#L22) |
-| Window_DragEnter | method_declaration | PinDock::EdgeHandleWindow | [24](../../src/PinDock/EdgeHandleWindow.xaml.cs#L24) |
+| Window_MouseEnter | method_declaration | PinDock::EdgeHandleWindow | [24](../../src/PinDock/EdgeHandleWindow.xaml.cs#L24) |
+| Window_DragEnter | method_declaration | PinDock::EdgeHandleWindow | [26](../../src/PinDock/EdgeHandleWindow.xaml.cs#L26) |

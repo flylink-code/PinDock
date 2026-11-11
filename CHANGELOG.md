@@ -2,6 +2,13 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.12] - 2026-11-11
+
+### Fixed
+- **修复「贴边自动隐藏」模式下 Dock 无法唤出**：触发条（`EdgeHandleWindow`）虽然带有 `WS_EX_TOPMOST`，但窗口一旦因全屏应用或其它置顶窗口掉出顶层窗口带，WPF 的 `Topmost` 属性赋值在值未变化时不会重新调用 `SetWindowPos`，`Show()` 也不会自动恢复层级，导致这条 3px 高的触发条被普通窗口盖住，既不可见也收不到鼠标悬停，Dock 收起后无法再唤出。现在每次显示触发条都会显式重新置顶，Dock 本体显示时也做同样处理。
+
+---
+
 ## [0.1.11] - 2026-11-10
 
 ### Added

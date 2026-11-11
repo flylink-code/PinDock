@@ -209,6 +209,7 @@ public partial class DockWindow : Window
         if (!IsVisible) Show();
         UpdateLayout();
         Reposition(placement.Capacity);
+        NativeWindow.SetTopmost(this, data.Settings.Topmost);
     }
 
     public void HideDock()
