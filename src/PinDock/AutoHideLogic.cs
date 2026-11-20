@@ -13,4 +13,16 @@ public static class AutoHideLogic
         if (current == AutoHideState.Hidden) return AutoHideState.Hidden;
         return stayVisible || !hideDelayElapsed ? AutoHideState.Visible : AutoHideState.Hidden;
     }
+
+    /// <summary>收起状态下通过光标进入边缘触发条区域来兜底唤出，防止触发条被遮挡或漏触发 MouseEnter 时无法呼出。</summary>
+    public static bool ShouldRevealFromEdge(
+        AutoHideState current,
+        bool suppressed,
+        bool cursorOverEdge,
+        bool requireCursorExitFirst)
+    {
+        if (current != AutoHideState.Hidden || suppressed || requireCursorExitFirst)
+            return false;
+        return cursorOverEdge;
+    }
 }

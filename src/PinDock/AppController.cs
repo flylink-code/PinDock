@@ -2,6 +2,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Threading;
+using Microsoft.Win32;
 
 namespace PinDock;
 
@@ -18,9 +20,11 @@ public sealed class AppController : IDisposable
     private readonly EdgeHandleWindow edgeHandle = new();
     private readonly WebPanelWindow webPanel;
     private readonly TrayFlyoutWindow trayFlyout;
+    private readonly DispatcherTimer environmentRelayoutTimer = new() { Interval = TimeSpan.FromMilliseconds(150) };
     private DisplayMode appliedMode;
     private bool dialogOpen;
     private bool suppressedByFullscreen;
+    private bool disposed;
     // 常驻模式下表示“被快捷键临时收起”，快捷键呼出模式下表示“被快捷键呼出”。
     private bool toggled;
 
@@ -73,14 +77,28 @@ public sealed class AppController : IDisposable
             Persist();
             webPanel.RefreshIfVisible();
         };
+        dock.EnvironmentChanged += ScheduleEnvironmentRelayout;
 
-        edgeHandle.Hovered += () => autoHide.Reveal(false);
+        environmentRelayoutTimer.Tick += (_, _) =>
+        {
+            environmentRelayoutTimer.Stop();
+            if (!disposed) RelayoutDock();
+        };
+
+        edgeHandle.Hovered += () =>
+        {
+            if (!suppressedByFullscreen)
+                autoHide.Reveal(false);
+        };
         autoHide.Configure(
             () => dock.IsGroupOpen || trayFlyout.IsVisible,
             () => dock.IsDragging,
             () => dialogOpen || webPanel.IsVisible,
+            () => suppressedByFullscreen,
             () => dock.HitArea,
-            () => dock.GroupBounds);
+            () => dock.GroupBounds,
+            () => dock.EdgeHandleRect,
+            OnAutoHideHiddenHealthCheck);
         autoHide.StateChanged += _ => SyncVisuals();
 
         tray.FlyoutRequested += () => trayFlyout.ToggleFlyout();
@@ -90,6 +108,7 @@ public sealed class AppController : IDisposable
         tray.ExitRequested += RequestExitApplication;
 
         hotkeys.Pressed += ToggleVisibility;
+        fullscreen.Configure(() => dock.CurrentMonitorBounds);
         fullscreen.Changed += OnFullscreenChanged;
         theme.Changed += () =>
         {
@@ -97,6 +116,9 @@ public sealed class AppController : IDisposable
             webPanel.RefreshIfVisible();
             trayFlyout.RefreshIfVisible();
         };
+        SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+        SystemEvents.SessionSwitch += OnSessionSwitch;
+        SystemEvents.PowerModeChanged += OnPowerModeChanged;
 
         tray.ApplyLanguage(Data.Settings.IsEnglish);
         if (Data.Settings.ExplorerContextMenu || ExplorerMenuService.IsRegistered())
@@ -189,6 +211,8 @@ public sealed class AppController : IDisposable
     {
         if (appliedMode == DisplayMode.EdgeAutoHide)
         {
+            if (Data.Settings.MonitorPolicy == MonitorPolicy.FollowCursor)
+                dock.Relayout();
             autoHide.Reveal(true);
             return;
         }
@@ -468,6 +492,11 @@ public sealed class AppController : IDisposable
 
     public void Dispose()
     {
+        disposed = true;
+        environmentRelayoutTimer.Stop();
+        SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+        SystemEvents.SessionSwitch -= OnSessionSwitch;
+        SystemEvents.PowerModeChanged -= OnPowerModeChanged;
         autoHide.Dispose();
         fullscreen.Dispose();
         hotkeys.Dispose();
@@ -594,8 +623,16 @@ public sealed class AppController : IDisposable
     {
         if (appliedMode == DisplayMode.EdgeAutoHide)
         {
-            if (autoHide.State == AutoHideState.Visible) autoHide.HideNow();
-            else autoHide.Reveal(true);
+            if (autoHide.State == AutoHideState.Visible)
+            {
+                autoHide.HideNow();
+            }
+            else
+            {
+                if (Data.Settings.MonitorPolicy == MonitorPolicy.FollowCursor)
+                    dock.Relayout();
+                autoHide.Reveal(true);
+            }
             return;
         }
         toggled = !toggled;
@@ -603,6 +640,59 @@ public sealed class AppController : IDisposable
         if (showing && Data.Settings.MonitorPolicy == MonitorPolicy.FollowCursor)
             dock.Relayout();
         SyncVisuals();
+    }
+
+    private void OnAutoHideHiddenHealthCheck()
+    {
+        if (disposed || appliedMode != DisplayMode.EdgeAutoHide || autoHide.State != AutoHideState.Hidden)
+            return;
+
+        if (Data.Settings.MonitorPolicy == MonitorPolicy.FollowCursor)
+        {
+            var resolved = MonitorQuery.Resolve(Data.Settings);
+            if (!string.Equals(resolved.DeviceName, dock.CurrentMonitorDeviceName, StringComparison.OrdinalIgnoreCase) ||
+                resolved.WorkingArea != dock.CurrentWorkArea)
+            {
+                RelayoutDock();
+                return;
+            }
+        }
+
+        if (suppressedByFullscreen)
+            return;
+
+        // 防止因锁屏、任务栏刷新、Win+D 或其他置顶窗口导致触发条掉出顶层或意外隐藏后无法呼出。
+        edgeHandle.EnsureVisibleAndTopmost(
+            dock.EdgeHandleRect,
+            Data.Settings.Topmost,
+            allowZOrderRefresh: !trayFlyout.IsVisible && !webPanel.IsVisible);
+    }
+
+    private void ScheduleEnvironmentRelayout()
+    {
+        if (disposed) return;
+        environmentRelayoutTimer.Stop();
+        environmentRelayoutTimer.Start();
+    }
+
+    private void ScheduleEnvironmentRelayoutFromBackground()
+    {
+        if (disposed) return;
+        Application.Current?.Dispatcher.BeginInvoke(ScheduleEnvironmentRelayout);
+    }
+
+    private void OnDisplaySettingsChanged(object? sender, EventArgs e) => ScheduleEnvironmentRelayoutFromBackground();
+
+    private void OnSessionSwitch(object sender, SessionSwitchEventArgs e)
+    {
+        if (e.Reason is SessionSwitchReason.SessionUnlock or SessionSwitchReason.ConsoleConnect or SessionSwitchReason.RemoteConnect)
+            ScheduleEnvironmentRelayoutFromBackground();
+    }
+
+    private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    {
+        if (e.Mode == PowerModes.Resume)
+            ScheduleEnvironmentRelayoutFromBackground();
     }
 
     private void OnFullscreenChanged(bool isFullscreen)

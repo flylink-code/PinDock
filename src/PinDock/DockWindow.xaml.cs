@@ -1,6 +1,8 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -9,18 +11,27 @@ namespace PinDock;
 
 public partial class DockWindow : Window
 {
+    private const int WmSettingChange = 0x001A;
+    private const int WmDisplayChange = 0x007E;
+    private const int WmDpiChanged = 0x02E0;
+    private const int SpiSetWorkArea = 0x002F;
+
     private readonly ShellIconService icons;
     private readonly GroupPopupWindow groupPopup;
     private readonly FolderPopupWindow folderPopup;
     private readonly DispatcherTimer folderOpenTimer = new() { Interval = TimeSpan.FromMilliseconds(180) };
     private readonly DispatcherTimer folderCloseTimer = new() { Interval = TimeSpan.FromMilliseconds(220) };
     private readonly DispatcherTimer utilityHoverHideTimer = new() { Interval = TimeSpan.FromMilliseconds(260) };
+    private readonly uint taskbarCreatedMessage;
     private Bookmark? pendingHoverFolder;
     private Button? pendingHoverButton;
     private ScreenRect activeFolderButtonRect;
+    private sealed record MonitorSnapshot(string DeviceName, ScreenRect Bounds, ScreenRect WorkArea);
+
     private LibraryData data = new();
     private DockPlacement placement;
     private ScreenRect workArea;
+    private volatile MonitorSnapshot? monitorSnapshot;
     private List<Bookmark> overflow = [];
     private ScreenRect? dragStartCursor;
     private double dragOriginOffset;
@@ -52,12 +63,16 @@ public partial class DockWindow : Window
     public event Action? DrawerToggled;
     public event Action? ExitRequested;
     public event Action? DragEnded;
+    public event Action? EnvironmentChanged;
 
     public bool IsDragging { get; private set; }
     public bool IsShown { get; private set; }
     public bool IsGroupOpen => groupPopup.IsVisible || folderPopup.IsVisible || isContextMenuOpen || folderPopup.IsContextMenuOpen || isExternalDragOver || IsMouseOver;
     public ScreenRect CurrentBounds => placement.Bounds;
     public ScreenRect EdgeHandleRect => placement.EdgeHandle;
+    public ScreenRect CurrentWorkArea => monitorSnapshot?.WorkArea ?? workArea;
+    public ScreenRect CurrentMonitorBounds => monitorSnapshot?.Bounds ?? default;
+    public string CurrentMonitorDeviceName => monitorSnapshot?.DeviceName ?? "";
     public ScreenRect HitArea
     {
         get
@@ -78,6 +93,8 @@ public partial class DockWindow : Window
         this.icons = icons;
         InitializeComponent();
         NativeWindow.HideFromAltTab(this);
+        taskbarCreatedMessage = RegisterWindowMessage("TaskbarCreated");
+        HwndSource.FromHwnd(new WindowInteropHelper(this).Handle)?.AddHook(WndProc);
         groupPopup = new GroupPopupWindow(icons);
         groupPopup.LaunchRequested += bookmark =>
         {
@@ -160,6 +177,7 @@ public partial class DockWindow : Window
         data.NormalizeDockOrder();
         var monitor = MonitorQuery.Resolve(settings);
         workArea = monitor.WorkingArea;
+        monitorSnapshot = new MonitorSnapshot(monitor.DeviceName, monitor.Bounds, monitor.WorkingArea);
         bool vertical = settings.DockEdge is DockEdge.Left or DockEdge.Right;
         double available = vertical ? workArea.Height : workArea.Width;
 
@@ -203,7 +221,11 @@ public partial class DockWindow : Window
 
     public void ShowDock()
     {
-        if (IsShown && IsVisible) return;
+        if (IsShown && IsVisible)
+        {
+            NativeWindow.SetTopmost(this, data.Settings.Topmost);
+            return;
+        }
         IsShown = true;
         Opacity = data.Settings.Opacity;
         if (!IsVisible) Show();
@@ -218,6 +240,7 @@ public partial class DockWindow : Window
         dragStartCursor = null;
         IsDragging = false;
         isReordering = false;
+        isExternalDragOver = false;
         reorderToken = null;
         reorderElement = null;
         folderOpenTimer.Stop();
@@ -1582,4 +1605,19 @@ public partial class DockWindow : Window
             e.Handled = true;
         }
     }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WmDisplayChange ||
+            msg == WmDpiChanged ||
+            (msg == WmSettingChange && wParam.ToInt32() == SpiSetWorkArea) ||
+            (taskbarCreatedMessage != 0 && msg == (int)taskbarCreatedMessage))
+        {
+            EnvironmentChanged?.Invoke();
+        }
+        return IntPtr.Zero;
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern uint RegisterWindowMessage(string lpString);
 }

@@ -157,6 +157,28 @@ try
     if (AutoHideLogic.NextState(AutoHideState.Visible, false, true) != AutoHideState.Hidden) throw new Exception("Should hide after delay");
     if (AutoHideLogic.NextState(AutoHideState.Visible, true, true) != AutoHideState.Visible) throw new Exception("Should stay when held");
     if (AutoHideLogic.NextState(AutoHideState.Hidden, true, true) != AutoHideState.Hidden) throw new Exception("Hidden must not reopen without user action");
+    if (!AutoHideLogic.ShouldRevealFromEdge(AutoHideState.Hidden, false, true, false)) throw new Exception("Edge cursor should reveal hidden dock");
+    if (AutoHideLogic.ShouldRevealFromEdge(AutoHideState.Hidden, true, true, false)) throw new Exception("Suppressed fullscreen must not reveal dock");
+    if (AutoHideLogic.ShouldRevealFromEdge(AutoHideState.Hidden, false, true, true)) throw new Exception("Must wait for cursor to exit edge after explicit HideNow");
+    if (AutoHideLogic.ShouldRevealFromEdge(AutoHideState.Visible, false, true, false)) throw new Exception("Already visible dock does not need edge reveal");
+
+    var primaryMon = new ScreenRect(0, 0, 1920, 1080);
+    if (FullscreenWatcher.EvaluateFullscreenState(5, true, primaryMon, "Chrome_WidgetWin_1", false, true, false, false, primaryMon))
+        throw new Exception("QUNS_ACCEPTS_NOTIFICATIONS must not suppress");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, primaryMon, "WorkerW", false, true, false, false, primaryMon))
+        throw new Exception("Desktop window must not trigger fullscreen suppression");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, primaryMon, "Shell_TrayWnd", false, true, false, false, primaryMon))
+        throw new Exception("Taskbar window must not trigger fullscreen suppression");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, primaryMon, "PinDock", true, true, false, false, primaryMon))
+        throw new Exception("Own process must not trigger fullscreen suppression");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, new ScreenRect(1920, 0, 1920, 1080), "Chrome_WidgetWin_1", false, true, false, false, primaryMon))
+        throw new Exception("Fullscreen on another monitor must not suppress primary monitor dock");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, new ScreenRect(0, 0, 1920, 1040), "Chrome_WidgetWin_1", false, true, false, false, primaryMon))
+        throw new Exception("Normal maximized work-area window must not suppress dock");
+    if (FullscreenWatcher.EvaluateFullscreenState(2, true, primaryMon, "Chrome_WidgetWin_1", false, true, false, true, primaryMon))
+        throw new Exception("Cloaked window must not suppress dock");
+    if (!FullscreenWatcher.EvaluateFullscreenState(2, true, primaryMon, "Chrome_WidgetWin_1", false, true, false, false, primaryMon))
+        throw new Exception("True fullscreen foreground window on target monitor must suppress dock");
 
     var transfer = new LibraryData
     {
@@ -337,8 +359,8 @@ try
         throw new Exception("RenameGroup did not update GroupIcons or DockOrder");
 
     // 3. 版本号、GitHub 版本比较、国内镜像 URL 拼接与开机启动命令测试
-    if (UpdateService.GetCurrentVersion() != "0.1.11")
-        throw new Exception($"Expected version 0.1.11, got {UpdateService.GetCurrentVersion()}");
+    if (UpdateService.GetCurrentVersion() != "0.1.13")
+        throw new Exception($"Expected version 0.1.13, got {UpdateService.GetCurrentVersion()}");
     if (!UpdateService.IsNewerVersion("0.1.8", "v0.1.9") ||
         !UpdateService.IsNewerVersion("0.1.7", "0.2.0") ||
         UpdateService.IsNewerVersion("0.1.7", "v0.1.7"))

@@ -4,7 +4,7 @@
 
 [Module](tests.md) · [Source](../../tests/PinDock.Tests/Program.cs) · page 1/1
 
-Source SHA-256: abd12c415e32fd860d5fdd205b022a8791c7aba23c1399308b5da2dc8c4a2512
+Source SHA-256: d5e130ab99541d86a5678d57872abf81ba7c3036a3aa2838065f768295ee28d3
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -12,10 +12,10 @@ Source SHA-256: abd12c415e32fd860d5fdd205b022a8791c7aba23c1399308b5da2dc8c4a2512
 
 Parser recovery: 80 diagnostic(s). Inspect source; extraction may be incomplete.
 - line 1: ERROR
-- line 360: ERROR
-- line 360: ERROR
-- line 362: ERROR
-- line 362: ERROR
-- line 362: ERROR
-- line 362: ERROR
-- line 363: ERROR
+- line 382: ERROR
+- line 382: ERROR
+- line 384: ERROR
+- line 384: ERROR
+- line 384: ERROR
+- line 384: ERROR
+- line 385: ERROR

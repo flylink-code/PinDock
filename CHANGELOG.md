@@ -2,6 +2,15 @@
 
 All notable changes to **PinDock** will be documented in this file.
 
+## [0.1.13] - 2026-11-20
+
+### Fixed & Improved
+- **彻底优化「贴边自动隐藏」稳定性与自愈能力**：
+  - **全屏避让精准按目标显示器判定 (`FullscreenWatcher`)**：在 `SHQueryUserNotificationState` 返回 `2/3/4` 时，进一步校验当前前台可见且未最小化/未 Cloaked 的非桌面、非任务栏、非本进程窗口是否真正覆盖 Dock 所在显示器全屏范围，避免副屏全屏、普通最大化窗口或桌面假阳性 `QUNS_BUSY` 导致主屏隐藏条与 Dock 一并消失。
+  - **收起态光标边缘兜底呼出 (`AutoHideController` / `AutoHideLogic`)**：即使 3px 触发条因瞬时遮挡、高速划过或出现时指针已在区域内导致未触发 `MouseEnter`，收起态仍会通过光标位置兜底检测边缘区域并自动唤出 Dock；同时增强 `EdgeHandleWindow` 命中底色与移动/点击响应。
+  - **触发条定时自检与智能置顶恢复 (`EdgeHandleWindow` / `NativeWindow`)**：在 `Hidden` 态定期核查触发条可见性、像素边界及顶层 Z 序；若掉出 `WS_EX_TOPMOST`、被任务栏（`Shell_TrayWnd`）压住或发生前台窗口切换（避开开始菜单与右键菜单等瞬态壳层浮窗），自动无激活恢复置顶。
+  - **响应显示、会话与工作区变更 (`AppController` / `DockWindow`)**：监听显示器配置/DPI 变更、任务栏工作区调整（`SPI_SETWORKAREA` / `TaskbarCreated`）、锁屏解锁及休眠唤醒，防抖重算布局并同步触发条位置；贴边模式下亦支持 `FollowCursor` 跨屏自动跟随。
+
 ## [0.1.12] - 2026-11-11
 
 ### Fixed

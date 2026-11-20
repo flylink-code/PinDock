@@ -4,7 +4,7 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AutoHideLogic.cs) · page 1/1
 
-Source SHA-256: 8cbac27885b16a721b0bad8b2a6238b5d3961d995c1cf4bd1cc7f647ab6abddd
+Source SHA-256: 8f7d76e953984c59a0c22834c9e4a06fa2ce1c3000841d855833f9e025802e68
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
@@ -15,3 +15,4 @@ Source SHA-256: 8cbac27885b16a721b0bad8b2a6238b5d3961d995c1cf4bd1cc7f647ab6abddd
 | AutoHideLogic | class_declaration | PinDock | [5](../../src/PinDock/AutoHideLogic.cs#L5) |
 | ShouldStayVisible | method_declaration | PinDock::AutoHideLogic | [7](../../src/PinDock/AutoHideLogic.cs#L7) |
 | NextState | method_declaration | PinDock::AutoHideLogic | [11](../../src/PinDock/AutoHideLogic.cs#L11) |
+| ShouldRevealFromEdge | method_declaration | PinDock::AutoHideLogic | [18](../../src/PinDock/AutoHideLogic.cs#L18) |

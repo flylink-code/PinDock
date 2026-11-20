@@ -4,15 +4,27 @@
 
 [Module](app.md) · [Source](../../src/PinDock/FullscreenWatcher.cs) · page 1/1
 
-Source SHA-256: 83ba571c25b605ca4c676d53bdd4291e6127c12de9c42e3e3f27ae0dcf05e662
+Source SHA-256: e67ed3895918d9f737ec000e2f5be0c4671c3d6c087e5216af3414929bbfa3f9
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
-| PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/FullscreenWatcher.cs#L4) |
-| FullscreenWatcher | class_declaration | PinDock | [6](../../src/PinDock/FullscreenWatcher.cs#L6) |
-| IsFullscreen | property_declaration | PinDock::FullscreenWatcher | [14](../../src/PinDock/FullscreenWatcher.cs#L14) |
-| FullscreenWatcher | constructor_declaration | PinDock::FullscreenWatcher | [16](../../src/PinDock/FullscreenWatcher.cs#L16) |
-| SetEnabled | method_declaration | PinDock::FullscreenWatcher | [21](../../src/PinDock/FullscreenWatcher.cs#L21) |
-| Dispose | method_declaration | PinDock::FullscreenWatcher | [31](../../src/PinDock/FullscreenWatcher.cs#L31) |
-| Poll | method_declaration | PinDock::FullscreenWatcher | [33](../../src/PinDock/FullscreenWatcher.cs#L33) |
-| SHQueryUserNotificationState | method_declaration | PinDock::FullscreenWatcher | [47](../../src/PinDock/FullscreenWatcher.cs#L47) |
+| PinDock | file_scoped_namespace_declaration |  | [5](../../src/PinDock/FullscreenWatcher.cs#L5) |
+| FullscreenWatcher | class_declaration | PinDock | [7](../../src/PinDock/FullscreenWatcher.cs#L7) |
+| IsFullscreen | property_declaration | PinDock::FullscreenWatcher | [18](../../src/PinDock/FullscreenWatcher.cs#L18) |
+| FullscreenWatcher | constructor_declaration | PinDock::FullscreenWatcher | [20](../../src/PinDock/FullscreenWatcher.cs#L20) |
+| Configure | method_declaration | PinDock::FullscreenWatcher | [25](../../src/PinDock/FullscreenWatcher.cs#L25) |
+| SetEnabled | method_declaration | PinDock::FullscreenWatcher | [30](../../src/PinDock/FullscreenWatcher.cs#L30) |
+| Dispose | method_declaration | PinDock::FullscreenWatcher | [40](../../src/PinDock/FullscreenWatcher.cs#L40) |
+| Poll | method_declaration | PinDock::FullscreenWatcher | [42](../../src/PinDock/FullscreenWatcher.cs#L42) |
+| EvaluateState | method_declaration | PinDock::FullscreenWatcher | [56](../../src/PinDock/FullscreenWatcher.cs#L56) |
+| EvaluateFullscreenState | method_declaration | PinDock::FullscreenWatcher | [92](../../src/PinDock/FullscreenWatcher.cs#L92) |
+| GetWindowClassName | method_declaration | PinDock::FullscreenWatcher | [128](../../src/PinDock/FullscreenWatcher.cs#L128) |
+| Rect | struct_declaration | PinDock::FullscreenWatcher | [135](../../src/PinDock/FullscreenWatcher.cs#L135) |
+| SHQueryUserNotificationState | method_declaration | PinDock::FullscreenWatcher | [138](../../src/PinDock/FullscreenWatcher.cs#L138) |
+| GetForegroundWindow | method_declaration | PinDock::FullscreenWatcher | [141](../../src/PinDock/FullscreenWatcher.cs#L141) |
+| IsWindowVisible | method_declaration | PinDock::FullscreenWatcher | [144](../../src/PinDock/FullscreenWatcher.cs#L144) |
+| IsIconic | method_declaration | PinDock::FullscreenWatcher | [148](../../src/PinDock/FullscreenWatcher.cs#L148) |
+| GetWindowThreadProcessId | method_declaration | PinDock::FullscreenWatcher | [152](../../src/PinDock/FullscreenWatcher.cs#L152) |
+| GetClassName | method_declaration | PinDock::FullscreenWatcher | [155](../../src/PinDock/FullscreenWatcher.cs#L155) |
+| GetWindowRect | method_declaration | PinDock::FullscreenWatcher | [158](../../src/PinDock/FullscreenWatcher.cs#L158) |
+| DwmGetWindowAttribute | method_declaration | PinDock::FullscreenWatcher | [162](../../src/PinDock/FullscreenWatcher.cs#L162) |

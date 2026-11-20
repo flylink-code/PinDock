@@ -4,22 +4,22 @@
 
 [Module](app.md) · [Source](../../src/PinDock/AutoHideController.cs) · page 1/1
 
-Source SHA-256: e2d7507adb16bb5ad771ec2a17c2bff776e3b01e1720fc29d050fc402a3afb05
+Source SHA-256: 1145d28a8705b1861c51c602c1dfbcf50d9ead4b1a699e66d5ecc616b00de943
 
 | Symbol | Kind | Scope | Line |
 | --- | --- | --- | ---: |
 | PinDock | file_scoped_namespace_declaration |  | [4](../../src/PinDock/AutoHideController.cs#L4) |
 | AutoHideController | class_declaration | PinDock | [6](../../src/PinDock/AutoHideController.cs#L6) |
-| State | property_declaration | PinDock::AutoHideController | [19](../../src/PinDock/AutoHideController.cs#L19) |
-| AutoHideController | constructor_declaration | PinDock::AutoHideController | [22](../../src/PinDock/AutoHideController.cs#L22) |
-| Configure | method_declaration | PinDock::AutoHideController | [33](../../src/PinDock/AutoHideController.cs#L33) |
-| SetEnabled | method_declaration | PinDock::AutoHideController | [42](../../src/PinDock/AutoHideController.cs#L42) |
-| Reveal | method_declaration | PinDock::AutoHideController | [60](../../src/PinDock/AutoHideController.cs#L60) |
-| HideNow | method_declaration | PinDock::AutoHideController | [69](../../src/PinDock/AutoHideController.cs#L69) |
-| Dispose | method_declaration | PinDock::AutoHideController | [78](../../src/PinDock/AutoHideController.cs#L78) |
-| Evaluate | method_declaration | PinDock::AutoHideController | [84](../../src/PinDock/AutoHideController.cs#L84) |
-| SetState | method_declaration | PinDock::AutoHideController | [103](../../src/PinDock/AutoHideController.cs#L103) |
-| IsCursorOver | method_declaration | PinDock::AutoHideController | [110](../../src/PinDock/AutoHideController.cs#L110) |
-| TryGetCursorPoint | method_declaration | PinDock::AutoHideController | [113](../../src/PinDock/AutoHideController.cs#L113) |
-| Point32 | struct_declaration | PinDock::AutoHideController | [124](../../src/PinDock/AutoHideController.cs#L124) |
-| GetCursorPos | method_declaration | PinDock::AutoHideController | [127](../../src/PinDock/AutoHideController.cs#L127) |
+| State | property_declaration | PinDock::AutoHideController | [24](../../src/PinDock/AutoHideController.cs#L24) |
+| AutoHideController | constructor_declaration | PinDock::AutoHideController | [27](../../src/PinDock/AutoHideController.cs#L27) |
+| Configure | method_declaration | PinDock::AutoHideController | [38](../../src/PinDock/AutoHideController.cs#L38) |
+| SetEnabled | method_declaration | PinDock::AutoHideController | [58](../../src/PinDock/AutoHideController.cs#L58) |
+| Reveal | method_declaration | PinDock::AutoHideController | [78](../../src/PinDock/AutoHideController.cs#L78) |
+| HideNow | method_declaration | PinDock::AutoHideController | [89](../../src/PinDock/AutoHideController.cs#L89) |
+| Dispose | method_declaration | PinDock::AutoHideController | [101](../../src/PinDock/AutoHideController.cs#L101) |
+| Evaluate | method_declaration | PinDock::AutoHideController | [107](../../src/PinDock/AutoHideController.cs#L107) |
+| SetState | method_declaration | PinDock::AutoHideController | [149](../../src/PinDock/AutoHideController.cs#L149) |
+| IsCursorOver | method_declaration | PinDock::AutoHideController | [156](../../src/PinDock/AutoHideController.cs#L156) |
+| TryGetCursorPoint | method_declaration | PinDock::AutoHideController | [159](../../src/PinDock/AutoHideController.cs#L159) |
+| Point32 | struct_declaration | PinDock::AutoHideController | [170](../../src/PinDock/AutoHideController.cs#L170) |
+| GetCursorPos | method_declaration | PinDock::AutoHideController | [173](../../src/PinDock/AutoHideController.cs#L173) |
